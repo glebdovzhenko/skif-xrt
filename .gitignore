@@ -1,2 +1,4 @@
 .idea
 *.npy
+_tmp
+.run

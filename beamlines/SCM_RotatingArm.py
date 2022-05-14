@@ -15,7 +15,7 @@ import xrt.runner as xrtrun
 
 
 show = False
-repeats = 100
+repeats = 1
 
 """ energy_scan(plts, bl: RotatingArmBL): """
 energies = [5.0e4, 5.5e4, 6.0e4, 6.5e4, 7.0e4, 7.5e4]
@@ -96,7 +96,7 @@ class RotatingArmBL(raycing.BeamLine):
         self.MonochromatorCr1 = roes.BentLaueCylinder(
             bl=self,
             name=r'Si[111] Crystal 1',
-            center=['auto', monochromator_distance, 'auto'],
+            center=[0., monochromator_distance, 0.],
             pitch=monochromator_c1_rx,
             roll=monochromator_c1_ry,
             yaw=monochromator_c1_rz,
@@ -217,8 +217,8 @@ def energy_scan(plts, bl: RotatingArmBL):
 
         # changing energy for the beamline / source
         bl.alignE = energy
-        bl.SuperCWiggler.eMin = energy - 2. * d_energy
-        bl.SuperCWiggler.eMax = energy + 2. * d_energy
+        bl.SuperCWiggler.eMin = energy - .05
+        bl.SuperCWiggler.eMax = energy + .05
 
         # changing monochromator orientation
         bl.MonochromatorCr1.pitch = pitch
@@ -254,7 +254,7 @@ def energy_scan(plts, bl: RotatingArmBL):
             plot.caxis.offset = energy
             plot.caxis.limits = [energy - np.ceil(d_energy), energy + np.ceil(d_energy)]
 
-            plot.x_axis.limits = [1.4 * bl.SampleAperture.opening[0], 1.4 * bl.SampleAperture.opening[1]]
+            plot.xaxis.limits = [1.4 * bl.SampleAperture.opening[0], 1.4 * bl.SampleAperture.opening[1]]
 
         plts[1].yaxis.limits = [1.4 * bl.SampleAperture.opening[2], 1.4 * bl.SampleAperture.opening[3]]
 

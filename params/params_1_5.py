@@ -5,3 +5,7 @@ front_end_v_angle = 0.2e-3  # rad
 filter_distance = 18000  # from source
 
 monochromator_distance = 33500  # from source
+monochromator_z_offset = 25  # fixed beam offset in z direction
+
+monochromator_slit_distance = 115000  # from source
+monochromator_slit_opening = [-107.5, 107.5, -10, 10]
