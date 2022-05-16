@@ -93,7 +93,7 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c1_alpha,
             material=(cr_si_1,),
-            R=np.inf,
+            R=5e3,
             targetOpenCL='CPU'
         )
 
@@ -107,7 +107,7 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c2_alpha,
             material=(cr_si_2,),
-            R=np.inf,
+            R=5e3,
             targetOpenCL='CPU'
         )
 
@@ -162,13 +162,8 @@ rrun.run_process = run_process
 # ##################################################### PLOTS ##########################################################
 
 
-class MyPlot(xrtplot.XYCPlot):
-    def update_user_elements(self):
-        return 'hello'
-
-
 plots = [
-    MyPlot(
+    xrtplot.XYCPlot(
         beam='BeamAperture1Local',
         title='Front End Spot',
         xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x),
@@ -181,7 +176,7 @@ plots = [
     #     yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
     #     aspect='auto'),
 
-    MyPlot(
+    xrtplot.XYCPlot(
         beam='BeamAperture2Local',
         title='DCD Slit Spot',
         xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x),
@@ -233,8 +228,8 @@ def energy_scan(plts, bl: SKIF15):
         for plot in plts:
             plot.saveName = '%s-%dkeV-%s-%s.png' % (
                 plot.title, int(energy * 1e-3),
-                (str(int(bl.MonochromatorCr1.R * 1e-3)) + 'm') if bl.MonochromatorCr1.R < np.inf else 'inf',
-                (str(int(bl.MonochromatorCr2.R * 1e-3)) + 'm') if bl.MonochromatorCr2.R < np.inf else 'inf'
+                ('%02dm' % int(bl.MonochromatorCr1.R * 1e-3)) if bl.MonochromatorCr1.R < np.inf else 'inf',
+                ('%02dm' % int(bl.MonochromatorCr2.R * 1e-3)) if bl.MonochromatorCr2.R < np.inf else 'inf'
             )
             plot.caxis.offset = energy
             plot.caxis.limits = [energy - de_plot_scaling * dE, energy + de_plot_scaling * dE]
