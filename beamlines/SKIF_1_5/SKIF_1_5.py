@@ -19,12 +19,13 @@ from params.params_1_5 import front_end_distance, front_end_h_angle, front_end_v
 # ################################################## SIM PARAMETERS ####################################################
 
 
-show = True
-repeats = 10
+show = False
+repeats = 200
 
 """ energy_scan(plts, bl: SKIF15): """
-energies = [3.0e4, 3.5e4, 4.0e4, 4.5e4, 5.0e4, 5.5e4, 6.0e4, 6.5e4, 7.0e4, 7.5e4]  # [7.5e4]  #
+energies = [5.5e4]  # [3.0e4, 3.5e4, 4.0e4, 4.5e4, 5.0e4, 5.5e4, 6.0e4, 6.5e4, 7.0e4, 7.5e4]  #
 dE = 1e3
+de_plot_scaling = .5
 
 
 # ################################################# SETUP PARAMETERS ###################################################
@@ -92,6 +93,7 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c1_alpha,
             material=(cr_si_1,),
+            R=np.inf,
             targetOpenCL='CPU'
         )
 
@@ -105,13 +107,8 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c2_alpha,
             material=(cr_si_2,),
+            R=np.inf,
             targetOpenCL='CPU'
-        )
-
-        self.MCr1Screen = rscreens.Screen(
-            bl=self,
-            name='Monitor After Crystal 1',
-            center=[0, monochromator_distance, monochromator_z_offset]
         )
 
         self.MonochromatorSlit = rapts.RectangularAperture(
@@ -165,8 +162,13 @@ rrun.run_process = run_process
 # ##################################################### PLOTS ##########################################################
 
 
+class MyPlot(xrtplot.XYCPlot):
+    def update_user_elements(self):
+        return 'hello'
+
+
 plots = [
-    xrtplot.XYCPlot(
+    MyPlot(
         beam='BeamAperture1Local',
         title='Front End Spot',
         xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x),
@@ -179,15 +181,15 @@ plots = [
     #     yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
     #     aspect='auto'),
 
-    xrtplot.XYCPlot(
+    MyPlot(
         beam='BeamAperture2Local',
         title='DCD Slit Spot',
         xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x),
         yaxis=xrtplot.XYCAxis(label=r'$z$', unit='mm', data=raycing.get_z),
         aspect='auto'),
     # xrtplot.XYCPlot(
-    #     beam='BeamMonitorC2Local',
-    #     title='C2 Directions',
+    #     beam='BeamAperture2Local',
+    #     title='DCD Slit Directions',
     #     xaxis=xrtplot.XYCAxis(label=r'$x^{\prime}$', unit='', data=raycing.get_xprime),
     #     yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
     #     aspect='auto'),
@@ -197,36 +199,45 @@ plots = [
 # ############################################### SEQUENCE GENERATOR ###################################################
 
 
+def align_energy(bl: SKIF15, en, d_en):
+    # changing energy for the beamline / source
+    bl.alignE = en
+    bl.SuperCWiggler.eMin = en - d_en
+    bl.SuperCWiggler.eMax = en + d_en
+
+    # Diffraction angle for the DCM
+    theta0 = np.arcsin(rm.ch / (2 * bl.MonochromatorCr1.material[0].d * en))
+
+    # Setting up DCM orientations / positions
+    # Crystal 1
+    bl.MonochromatorCr1.pitch = np.pi / 2 + theta0 + monochromator_c1_alpha
+    bl.MonochromatorCr1.set_alpha(monochromator_c1_alpha)
+    bl.MonochromatorCr1.center = [
+        0.,
+        monochromator_distance - monochromator_z_offset / np.tan(2. * theta0),
+        0.
+    ]
+
+    # Crystal 2
+    bl.MonochromatorCr2.pitch = np.pi / 2 - theta0 - monochromator_c2_alpha
+    bl.MonochromatorCr2.set_alpha(-monochromator_c2_alpha)
+
+
 def energy_scan(plts, bl: SKIF15):
 
     for ii, energy in enumerate(energies):
 
-        # changing energy for the beamline / source
-        bl.alignE = energy
-        bl.SuperCWiggler.eMin = energy - dE
-        bl.SuperCWiggler.eMax = energy + dE
-
-        theta0 = np.arcsin(rm.ch / (2 * bl.MonochromatorCr1.material[0].d * energy))
-
-        # changing monochromator orientations
-        bl.MonochromatorCr1.pitch = np.pi / 2 + theta0 + monochromator_c1_alpha
-        bl.MonochromatorCr1.set_alpha(monochromator_c1_alpha)
-        bl.MonochromatorCr1.center = [
-            0.,
-            monochromator_distance - monochromator_z_offset / np.tan(2. * theta0),
-            0.
-        ]
-
-        bl.MonochromatorCr2.pitch = np.pi / 2 - theta0 - monochromator_c1_alpha
-        bl.MonochromatorCr2.set_alpha(-monochromator_c1_alpha)
+        align_energy(bl, energy, dE)
 
         # adjusting plots
-        # rename all
         for plot in plts:
-            plot.saveName = '%s-%.01fkeV.png' % (plot.title, energy * 1e-3)
+            plot.saveName = '%s-%dkeV-%s-%s.png' % (
+                plot.title, int(energy * 1e-3),
+                (str(int(bl.MonochromatorCr1.R * 1e-3)) + 'm') if bl.MonochromatorCr1.R < np.inf else 'inf',
+                (str(int(bl.MonochromatorCr2.R * 1e-3)) + 'm') if bl.MonochromatorCr2.R < np.inf else 'inf'
+            )
             plot.caxis.offset = energy
-            plot.caxis.limits = [energy - .5 * dE, energy + .5 * dE]
-
+            plot.caxis.limits = [energy - de_plot_scaling * dE, energy + de_plot_scaling * dE]
 
         yield
 
