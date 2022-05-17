@@ -112,6 +112,7 @@ if __name__ == '__main__':
         result = []
         for tt in np.arange(0.5, 2.5, 0.01):
             result.append(rocking_curve(t=tt, energy=70000))
+            plt.show()
         result = np.stack(result, axis=-1)
     except KeyboardInterrupt:
         plt.show()

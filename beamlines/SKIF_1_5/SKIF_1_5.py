@@ -11,6 +11,7 @@ import xrt.backends.raycing as raycing
 import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
 
+from components import BentLaueCylinder
 from params.sources import ring_kwargs, wiggler_1_5_kwargs
 from params.params_1_5 import front_end_distance, front_end_h_angle, front_end_v_angle, monochromator_distance, \
     monochromator_z_offset, monochromator_slit_distance, monochromator_slit_opening
@@ -84,7 +85,8 @@ class SKIF15(raycing.BeamLine):
             opening=front_end_opening
         )
 
-        self.MonochromatorCr1 = roes.BentLaueCylinder(
+        # self.MonochromatorCr1 = roes.BentLaueCylinder(
+        self.MonochromatorCr1 = BentLaueCylinder(
             bl=self,
             name=r'Si[111] Crystal 1',
             center=[0., monochromator_distance, 0.],
@@ -93,11 +95,12 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c1_alpha,
             material=(cr_si_1,),
-            R=5e3,
+            R=-35e3,
             targetOpenCL='CPU'
         )
 
-        self.MonochromatorCr2 = roes.BentLaueCylinder(
+        # self.MonochromatorCr2 = roes.BentLaueCylinder(
+        self.MonochromatorCr2 = BentLaueCylinder(
             bl=self,
             name=r'Si[111] Crystal 2',
             center=[0., monochromator_distance, monochromator_z_offset],
@@ -107,7 +110,7 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c2_alpha,
             material=(cr_si_2,),
-            R=5e3,
+            R=-35e3,
             targetOpenCL='CPU'
         )
 
@@ -228,8 +231,8 @@ def energy_scan(plts, bl: SKIF15):
         for plot in plts:
             plot.saveName = '%s-%dkeV-%s-%s.png' % (
                 plot.title, int(energy * 1e-3),
-                ('%02dm' % int(bl.MonochromatorCr1.R * 1e-3)) if bl.MonochromatorCr1.R < np.inf else 'inf',
-                ('%02dm' % int(bl.MonochromatorCr2.R * 1e-3)) if bl.MonochromatorCr2.R < np.inf else 'inf'
+                ('-%02dm' % int(bl.MonochromatorCr1.R * 1e-3)) if bl.MonochromatorCr1.R < np.inf else 'inf',
+                ('-%02dm' % int(bl.MonochromatorCr2.R * 1e-3)) if bl.MonochromatorCr2.R < np.inf else 'inf'
             )
             plot.caxis.offset = energy
             plot.caxis.limits = [energy - de_plot_scaling * dE, energy + de_plot_scaling * dE]
