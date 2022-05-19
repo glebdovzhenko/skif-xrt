@@ -25,8 +25,8 @@ repeats = 200
 
 """ energy_scan(plts, bl: SKIF15): """
 energies = [5.5e4]  # [3.0e4, 3.5e4, 4.0e4, 4.5e4, 5.0e4, 5.5e4, 6.0e4, 6.5e4, 7.0e4, 7.5e4]  #
-dE = 1e3
-de_plot_scaling = .5
+dE = 6e2
+de_plot_scaling = .9
 
 
 # ################################################# SETUP PARAMETERS ###################################################
@@ -95,7 +95,7 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c1_alpha,
             material=(cr_si_1,),
-            R=-35e3,
+            R=30e3,
             targetOpenCL='CPU'
         )
 
@@ -110,7 +110,7 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c2_alpha,
             material=(cr_si_2,),
-            R=-35e3,
+            R=30e3,
             targetOpenCL='CPU'
         )
 
@@ -118,7 +118,7 @@ class SKIF15(raycing.BeamLine):
             bl=self,
             name=r"Monochromator Slit",
             center=[0, monochromator_slit_distance, monochromator_z_offset],
-            opening=monochromator_slit_opening
+            opening=monochromator_slit_opening[:2] + [-2.5, 2.5]
         )
 
 
@@ -227,17 +227,26 @@ def energy_scan(plts, bl: SKIF15):
 
         align_energy(bl, energy, dE)
 
-        # adjusting plots
-        for plot in plts:
-            plot.saveName = '%s-%dkeV-%s-%s.png' % (
-                plot.title, int(energy * 1e-3),
-                ('-%02dm' % int(bl.MonochromatorCr1.R * 1e-3)) if bl.MonochromatorCr1.R < np.inf else 'inf',
-                ('-%02dm' % int(bl.MonochromatorCr2.R * 1e-3)) if bl.MonochromatorCr2.R < np.inf else 'inf'
-            )
-            plot.caxis.offset = energy
-            plot.caxis.limits = [energy - de_plot_scaling * dE, energy + de_plot_scaling * dE]
+        for r in np.arange(-100., 200., 10.):
+            if np.isclose(r, 0.):
+                r = np.inf
+            bl.MonochromatorCr1.R = r * 1e3
+            bl.MonochromatorCr2.R = r * 1e3
 
-        yield
+            # adjusting plots
+            for plot in plts:
+                plot.saveName = 'img/55kev-Rscan/%s-%dkeV-%s-%s.png' % (
+                    plot.title, int(energy * 1e-3),
+                    (('' if bl.MonochromatorCr1.convergingBend else '-') +
+                        '%02dm' % int(bl.MonochromatorCr1.R * 1e-3)) if bl.MonochromatorCr1.R < np.inf else 'inf',
+                    (('' if bl.MonochromatorCr2.convergingBend else '-') +
+                        '%02dm' % int(bl.MonochromatorCr2.R * 1e-3)) if bl.MonochromatorCr2.R < np.inf else 'inf'
+                )
+                plot.caxis.offset = energy
+                # plot.caxis.limits = [energy - de_plot_scaling * dE, energy + de_plot_scaling * dE]
+                plot.caxis.limits = [energy - 75, energy + 75]
+
+            yield
 
 
 # ###################################################### MAIN ##########################################################

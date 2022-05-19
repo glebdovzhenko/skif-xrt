@@ -10,15 +10,17 @@ import xrt.backends.raycing as raycing
 import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
 
+from components import BentLaueCylinder
+
 
 # ################################################## SIM PARAMETERS ####################################################
 
 
 show = False
-repeats = 1
+repeats = 10
 
 """ energy_scan(plts, bl: RotatingArmBL): """
-energies = [5.0e4, 5.5e4, 6.0e4, 6.5e4, 7.0e4, 7.5e4]
+energies = [5.5e4]  # [5.0e4, 5.5e4, 6.0e4, 6.5e4, 7.0e4, 7.5e4]
 # between d_energies, ap_sizes if one is 'auto', it will be calculated from the other one.
 d_energies = [500.] * len(energies)
 ap_sizes = [2.] * len(energies)
@@ -47,7 +49,7 @@ monochromator_c1_rz = 0.
 monochromator_asymmetry = 0.  # asymmetric cut angle
 
 """ Sample Aperture """
-sample_ap_distance = 32000  # from source
+sample_ap_distance = 38500  # from source
 sample_ap_opening = [-5, 5, -5, 5]
 sample_ap_monitor_distance = 100
 
@@ -93,7 +95,8 @@ class RotatingArmBL(raycing.BeamLine):
             center=[0, front_end_distance + 100, 0]
         )
 
-        self.MonochromatorCr1 = roes.BentLaueCylinder(
+        # self.MonochromatorCr1 = roes.BentLaueCylinder(
+        self.MonochromatorCr1 = BentLaueCylinder(
             bl=self,
             name=r'Si[111] Crystal 1',
             center=[0., monochromator_distance, 0.],
@@ -102,7 +105,9 @@ class RotatingArmBL(raycing.BeamLine):
             yaw=monochromator_c1_rz,
             alpha=monochromator_asymmetry,
             material=(si111, ),
-            targetOpenCL='CPU'
+            targetOpenCL='CPU',
+            R=-.5e3,
+            bendingOrientation='meridional'
         )
 
         self.SampleAperture = rapts.RectangularAperture(
@@ -217,8 +222,8 @@ def energy_scan(plts, bl: RotatingArmBL):
 
         # changing energy for the beamline / source
         bl.alignE = energy
-        bl.SuperCWiggler.eMin = energy - .05
-        bl.SuperCWiggler.eMax = energy + .05
+        bl.SuperCWiggler.eMin = energy - d_energy
+        bl.SuperCWiggler.eMax = energy + d_energy
 
         # changing monochromator orientation
         bl.MonochromatorCr1.pitch = pitch
