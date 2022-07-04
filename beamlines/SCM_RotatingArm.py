@@ -1,8 +1,6 @@
 import numpy as np
 
 import xrt.backends.raycing.sources as rsources
-import xrt.backends.raycing.screens as rscreens
-import xrt.backends.raycing.oes as roes
 import xrt.backends.raycing.apertures as rapts
 import xrt.backends.raycing.materials as rm
 import xrt.backends.raycing.run as rrun
@@ -11,53 +9,75 @@ import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
 
 from components import BentLaueCylinder
+from params.sources import ring_kwargs, wiggler_1_5_kwargs
+from params.params_1_5 import front_end_distance, front_end_opening, front_end_h_angle, front_end_v_angle, \
+    monochromator_distance
 
 
 # ################################################## SIM PARAMETERS ####################################################
 
 
 show = False
-repeats = 10
+repeats = 100
 
-""" energy_scan(plts, bl: RotatingArmBL): """
-energies = [5.5e4]  # [5.0e4, 5.5e4, 6.0e4, 6.5e4, 7.0e4, 7.5e4]
-# between d_energies, ap_sizes if one is 'auto', it will be calculated from the other one.
-d_energies = [500.] * len(energies)
-ap_sizes = [2.] * len(energies)
+# """ scan1 """
+# scan = 'energy_scan'
+# subdir = 'img/'
+# energies = [7.0e4]
+# d_energy = 1.0e3
+# ap_size = None
+# de_plot_scaling = .2
+# xzpr_plot_scaling = 3.5
+# xz_plot_scaling = 1.1
+
+# """ scan2 """
+# scan = 'alpha_scan'
+# subdir = 'img/70keV-Alpscan'
+# energies = [7.0e4]
+# d_energy = 1.0e3
+# ap_size = None
+# de_plot_scaling = .2
+# xzpr_plot_scaling = 3.5
+# xz_plot_scaling = 1.1
+
+""" scan3 """
+# scan = 't_alp_maxs'
+# subdir = 'img/70keV-t-alp-maxs'
+# energies = [7.0e4]
+# d_energy = 1.0e3
+# ap_size = None
+# de_plot_scaling = .2
+# xzpr_plot_scaling = 3.5
+# xz_plot_scaling = 1.1
+
+""" scan4 """
+scan = 'r_scan'
+subdir = 'img/70keV-Rscan'
+energies = [7.0e4]
+d_energy = 1.5e3
+ap_size = [-50., 50., -30, 30]
+de_plot_scaling = .5
+xzpr_plot_scaling = 12.5
+xz_plot_scaling = 1.1
 
 
 # ################################################# SETUP PARAMETERS ###################################################
 
 
-""" Front End Aperture """
-front_end_distance = 10000  # from source
-front_end_h_angle = 2.e-3  # rad
-front_end_v_angle = 0.2e-3  # rad
-front_end_opening = [
-    -front_end_distance * np.tan(front_end_h_angle / 2.),
-    front_end_distance * np.tan(front_end_h_angle / 2.),
-    -front_end_distance * np.tan(front_end_v_angle / 2.),
-    front_end_distance * np.tan(front_end_v_angle / 2.)
-]
-
 """ Monochromator """
-monochromator_distance = 33500  # from source
-monochromator_alignment_energy = 55000
-monochromator_c1_rx = 0.  # if rx == 'auto', it will be calculated from alignment_energy
-monochromator_c1_ry = 0.
-monochromator_c1_rz = 0.
-monochromator_asymmetry = 0.  # asymmetric cut angle
+monochromator_c1_alpha = np.radians(1.)
+monochromator_c1_thickness = 0.73
+monochromator_c1_radius = np.inf
+
 
 """ Sample Aperture """
-sample_ap_distance = 38500  # from source
-sample_ap_opening = [-5, 5, -5, 5]
-sample_ap_monitor_distance = 100
+sample_ap_distance = 2. * monochromator_distance  # from source
 
 
 # #################################################### MATERIALS #######################################################
 
 
-si111 = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', t=2.1)
+si111 = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', t=monochromator_c1_thickness)
 
 
 # #################################################### BEAMLINE ########################################################
@@ -67,19 +87,18 @@ class RotatingArmBL(raycing.BeamLine):
     def __init__(self):
         raycing.BeamLine.__init__(self)
 
-        self.alignE = monochromator_alignment_energy
+        self.alignE = 75e3
 
         self.SuperCWiggler = rsources.Wiggler(
             name=r"Superconducting Wiggler",
             bl=self,
             center=[0, 0, 0],
-            eE=3.0,
-            eI=0.4,
-            K=7.5632,
-            period=48,
-            n=18,
             eMin=100,
-            eMax=20000
+            eMax=150000,
+            xPrimeMax=front_end_h_angle * .505e3,
+            zPrimeMax=front_end_v_angle * .505e3,
+            **ring_kwargs,
+            **wiggler_1_5_kwargs
         )
 
         self.FrontEnd = rapts.RectangularAperture(
@@ -89,38 +108,23 @@ class RotatingArmBL(raycing.BeamLine):
             opening=front_end_opening
         )
 
-        self.FrontEndMonitor = rscreens.Screen(
-            bl=self,
-            name='Front End Monitor',
-            center=[0, front_end_distance + 100, 0]
-        )
-
-        # self.MonochromatorCr1 = roes.BentLaueCylinder(
         self.MonochromatorCr1 = BentLaueCylinder(
             bl=self,
             name=r'Si[111] Crystal 1',
             center=[0., monochromator_distance, 0.],
-            pitch=monochromator_c1_rx,
-            roll=monochromator_c1_ry,
-            yaw=monochromator_c1_rz,
-            alpha=monochromator_asymmetry,
-            material=(si111, ),
-            targetOpenCL='CPU',
-            R=-.5e3,
-            bendingOrientation='meridional'
+            pitch=np.pi / 2.,
+            roll=0.,
+            yaw=0.,
+            alpha=monochromator_c1_alpha,
+            material=(si111,),
+            R=monochromator_c1_radius,
+            targetOpenCL='CPU'
         )
 
         self.SampleAperture = rapts.RectangularAperture(
             bl=self,
             name=r"Sample Aperture",
             center=[0, sample_ap_distance, 0],
-            opening=sample_ap_opening
-        )
-
-        self.PostCr1Monitor = rscreens.Screen(
-            bl=self,
-            name='Monitor After Crystal 1 & Aperture',
-            center=[0, sample_ap_distance + 100, 0]
         )
 
 
@@ -134,16 +138,10 @@ def run_process(bl: RotatingArmBL):
     beam_ap1 = bl.FrontEnd.propagate(
         beam=beam_source
     )
-    beam_monitor1 = bl.FrontEndMonitor.expose(
-        beam=beam_source
-    )
     beam_mono_c1_global, beam_mono_c1_local = bl.MonochromatorCr1.reflect(
         beam=beam_source
     )
     beam_ap2 = bl.SampleAperture.propagate(
-        beam=beam_mono_c1_global
-    )
-    beam_monitor2 = bl.PostCr1Monitor.expose(
         beam=beam_mono_c1_global
     )
 
@@ -153,11 +151,9 @@ def run_process(bl: RotatingArmBL):
     return {
         'BeamSourceGlobal': beam_source,
         'BeamAperture1Local': beam_ap1,
-        'BeamPreC1MonitorLocal': beam_monitor1,
         'BeamMonoC1Local': beam_mono_c1_local,
         'BeamMonoC1Global': beam_mono_c1_global,
         'BeamAperture2Local': beam_ap2,
-        'BeamPostC1MonitorLocal': beam_monitor2,
     }
 
 
@@ -168,113 +164,265 @@ rrun.run_process = run_process
 
 
 plots = [
-    xrtplot.XYCPlot(
-        beam='BeamPreC1MonitorLocal',
-        title='Before SCD Monitor',
-        xaxis=xrtplot.XYCAxis(r'$x$', 'mm', limits=(1.4 * front_end_opening[0], 1.4 * front_end_opening[1])),
-        yaxis=xrtplot.XYCAxis(r'$z$', 'mm', limits=(1.4 * front_end_opening[2], 1.4 * front_end_opening[3])),
-        ePos=1),
+    # xrtplot.XYCPlot(
+    #     beam='BeamAperture1Local',
+    #     title='Front End Spot',
+    #     xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x,
+    #                           limits=[xz_plot_scaling * front_end_opening[0],
+    #                                   xz_plot_scaling * front_end_opening[1]]),
+    #     yaxis=xrtplot.XYCAxis(label=r'$z$', unit='mm', data=raycing.get_z,
+    #                           limits=[xz_plot_scaling * front_end_opening[2],
+    #                                   xz_plot_scaling * front_end_opening[3]]),
+    #     aspect='auto'),
+    #
+    # xrtplot.XYCPlot(
+    #     beam='BeamAperture1Local',
+    #     title='Front End Directions',
+    #     xaxis=xrtplot.XYCAxis(label=r'$x^{\prime}$', unit='', data=raycing.get_xprime,
+    #                           limits=[xzpr_plot_scaling * front_end_opening[0] / front_end_distance,
+    #                                   xzpr_plot_scaling * front_end_opening[1] / front_end_distance]
+    #                           ),
+    #     yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime,
+    #                           limits=[xzpr_plot_scaling * front_end_opening[2] / front_end_distance,
+    #                                   xzpr_plot_scaling * front_end_opening[3] / front_end_distance]
+    #                           ),
+    #     aspect='auto'),
+    #
+    # xrtplot.XYCPlot(
+    #     beam='BeamAperture1Local',
+    #     title='Front End Corr',
+    #     xaxis=xrtplot.XYCAxis(label=r'$z$', unit='mm', data=raycing.get_z,
+    #                           limits=[xz_plot_scaling * front_end_opening[2],
+    #                                   xz_plot_scaling * front_end_opening[3]]),
+    #     yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime,
+    #                           limits=[xzpr_plot_scaling * front_end_opening[2] / front_end_distance,
+    #                                   xzpr_plot_scaling * front_end_opening[3] / front_end_distance]
+    #                           ),
+    #     aspect='auto'),
+
     xrtplot.XYCPlot(
         beam='BeamAperture2Local',
-        title='Aperture X-section',
-        xaxis=xrtplot.XYCAxis(r'$x$', 'mm', limits=(-20, 20)),
-        yaxis=xrtplot.XYCAxis(r'$z$', 'mm', limits=(-20, 20)),
-        ePos=1),
+        title='SCM Slit Spot',
+        xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x),
+        yaxis=xrtplot.XYCAxis(label=r'$z$', unit='mm', data=raycing.get_z),
+        aspect='auto'),
+
     xrtplot.XYCPlot(
-        beam='BeamPostC1MonitorLocal',
-        title='After SCD Monitor',
-        xaxis=xrtplot.XYCAxis(r'$x$', 'mm', limits=(-20, 20)),
-        yaxis=xrtplot.XYCAxis(r'$z$', 'mm', limits=(-20, 20)),
-        ePos=1)
+        beam='BeamAperture2Local',
+        title='SCM Slit Directions',
+        xaxis=xrtplot.XYCAxis(label=r'$x^{\prime}$', unit='', data=raycing.get_xprime,
+                              limits=[xzpr_plot_scaling * front_end_opening[0] / front_end_distance,
+                                      xzpr_plot_scaling * front_end_opening[1] / front_end_distance]
+                              ),
+        yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime,
+                              limits=[xzpr_plot_scaling * front_end_opening[2] / front_end_distance,
+                                      xzpr_plot_scaling * front_end_opening[3] / front_end_distance]
+                              ),
+        aspect='auto'),
+
+    # xrtplot.XYCPlot(
+    #     beam='BeamAperture2Local',
+    #     title='SCM Slit Corr',
+    #     xaxis=xrtplot.XYCAxis(label=r'$z$', unit='mm', data=raycing.get_z),
+    #     yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime,
+    #                           limits=[xzpr_plot_scaling * front_end_opening[2] / front_end_distance,
+    #                                   xzpr_plot_scaling * front_end_opening[3] / front_end_distance]
+    #                           ),
+    #     aspect='auto'),
 ]
 
 
 # ############################################### SEQUENCE GENERATOR ###################################################
 
 
+def align_energy(bl: RotatingArmBL, en, d_en, ap_s):
+    # changing energy for the beamline / source
+    bl.alignE = en
+    bl.SuperCWiggler.eMin = en - d_en
+    bl.SuperCWiggler.eMax = en + d_en
+
+    # Diffraction angle for the DCM
+    theta0 = np.arcsin(rm.ch / (2 * bl.MonochromatorCr1.material[0].d * en))
+
+    # Setting up SCM orientation
+    bl.MonochromatorCr1.pitch = np.pi / 2 + theta0 + monochromator_c1_alpha
+    bl.MonochromatorCr1.set_alpha(monochromator_c1_alpha)
+
+    # Moving aperture
+    bl.SampleAperture.center = [
+        0.,
+        monochromator_distance + (sample_ap_distance - monochromator_distance) * np.cos(2 * theta0),
+        (sample_ap_distance - monochromator_distance) * np.sin(2 * theta0),
+    ]
+
+    if ap_s is not None:
+        bl.SampleAperture.opening = ap_s
+    else:
+        bl.SampleAperture.opening = [ii * sample_ap_distance / front_end_distance for ii in front_end_opening]
+
+    ap_s = (bl.SampleAperture.opening[3] - bl.SampleAperture.opening[2]) / 2.
+
+    print(
+        '#### Monochromator: E = %.01f keV; Θ = %.03f°; Rx = %.03f°\n'
+        '#### Beamline: E = %.01f keV ± %.01f eV\n'
+        '#### Aperture: Δz = ±%.03f mm' % (
+            en * 1e-3, np.degrees(theta0), np.degrees(bl.MonochromatorCr1.pitch), en * 1e-3, d_en, ap_s,
+        ))
+
+
+def upd_plots(plts, bl: RotatingArmBL, en, d_en):
+    for plot in plts:
+        plot.caxis.offset = en
+        plot.caxis.limits = [en - de_plot_scaling * d_en,
+                             en + de_plot_scaling * d_en]
+
+        # adjusting z' offset
+        if plot.title == 'SCM Slit Directions':
+            plot.yaxis.offset = bl.SampleAperture.center[2] / \
+                                (bl.SampleAperture.center[1] - bl.MonochromatorCr1.center[1])
+            plot.yaxis.limits = [plot.yaxis.offset + xzpr_plot_scaling * front_end_opening[2] / front_end_distance,
+                                 plot.yaxis.offset + xzpr_plot_scaling * front_end_opening[3] / front_end_distance]
+
+        # adjusting xz limits
+        if plot.title == 'SCM Slit Spot':
+            plot.xaxis.limits = [xz_plot_scaling * bl.SampleAperture.opening[0],
+                                 xz_plot_scaling * bl.SampleAperture.opening[1]]
+            plot.yaxis.limits = [xz_plot_scaling * bl.SampleAperture.opening[2],
+                                 xz_plot_scaling * bl.SampleAperture.opening[3]]
+
+        # adjusting the correlation plot
+        if plot.title == 'SCM Slit Corr':
+            plot.xaxis.limits = [xz_plot_scaling * bl.SampleAperture.opening[0],
+                                 xz_plot_scaling * bl.SampleAperture.opening[1]]
+            plot.yaxis.offset = bl.SampleAperture.center[2] / \
+                                (bl.SampleAperture.center[1] - bl.MonochromatorCr1.center[1])
+            plot.yaxis.limits = [plot.yaxis.offset + xzpr_plot_scaling * front_end_opening[2] / front_end_distance,
+                                 plot.yaxis.offset + xzpr_plot_scaling * front_end_opening[3] / front_end_distance]
+
+
 def energy_scan(plts, bl: RotatingArmBL):
-    global d_energies, ap_sizes
+    for energy in energies:
+        align_energy(bl, energy, d_energy, ap_size)
 
-    if d_energies == 'auto' and ap_sizes != 'auto':
-        d_energies = [None] * len(ap_sizes)
-    elif ap_sizes == 'auto' and d_energies != 'auto':
-        ap_sizes = [None] * len(d_energies)
-
-    for ii, (energy, d_energy, ap_size) in enumerate(zip(energies, d_energies, ap_sizes)):
-
-        theta0 = np.arcsin(rm.ch / (2 * bl.MonochromatorCr1.material[0].d * energy))
-        pitch = np.pi / 2 + theta0 + monochromator_asymmetry
-
-        if ap_size is None:
-            theta_min = np.arcsin(rm.ch / (2 * bl.MonochromatorCr1.material[0].d * (energy + d_energy)))
-            theta_max = np.arcsin(rm.ch / (2 * bl.MonochromatorCr1.material[0].d * (energy - d_energy)))
-            slit_min = (sample_ap_distance - monochromator_distance) * np.sin(2 * theta_min)
-            slit_max = (sample_ap_distance - monochromator_distance) * np.sin(2 * theta_max)
-            slit_c = (sample_ap_distance - monochromator_distance) * np.sin(2 * theta0)
-            ap_size = max([slit_c - slit_min, slit_max - slit_c])
-        elif d_energy is None:
-            slit_c = (sample_ap_distance - monochromator_distance) * np.sin(2 * theta0)
-            theta_min = np.arcsin((slit_c - ap_size) / (sample_ap_distance - monochromator_distance)) / 2.
-            theta_max = np.arcsin((slit_c + ap_size) / (sample_ap_distance - monochromator_distance)) / 2.
-            energy_max = rm.ch / (2 * bl.MonochromatorCr1.material[0].d * np.sin(theta_min))
-            energy_min = rm.ch / (2 * bl.MonochromatorCr1.material[0].d * np.sin(theta_max))
-            d_energy = max([energy - energy_min, energy_max - energy])
-
-        # changing energy for the beamline / source
-        bl.alignE = energy
-        bl.SuperCWiggler.eMin = energy - d_energy
-        bl.SuperCWiggler.eMax = energy + d_energy
-
-        # changing monochromator orientation
-        bl.MonochromatorCr1.pitch = pitch
-        bl.MonochromatorCr1.set_alpha(monochromator_asymmetry)
-
-        # changing aperture position / opening
-        bl.SampleAperture.center = [
-            0.,
-            monochromator_distance + (sample_ap_distance - monochromator_distance) * np.cos(2 * theta0),
-            (sample_ap_distance - monochromator_distance) * np.sin(2 * theta0),
-        ]
-        bl.SampleAperture.opening = [*bl.SampleAperture.opening[:2], -ap_size, ap_size]
-
-        print(
-            '#### Monochromator: E%d = %.01f keV; Θ = %.03f°; Rx = %.03f°\n'
-            '#### Aperture: ΔE = ±%.01f eV; Δz = ±%.03f mm' % (
-                ii,
-                energy * 1e-3,
-                np.degrees(theta0),
-                np.degrees(pitch),
-                d_energy,
-                ap_size,
-            )
-        )
-
-        # adjusting plots
-        # rename all
+        # setting plot names
         for plot in plts:
-            plot.saveName = '%s-%.01fkeV.png' % (plot.title, energy * 1e-3)
+            plot.saveName = '%s/%s-%.01fkeV-.png' % (
+                subdir, plot.title, energy * 1e-3
+            )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
 
-        # set XY & E scale for last two
-        for plot in plts[1:]:
-            plot.caxis.offset = energy
-            plot.caxis.limits = [energy - np.ceil(d_energy), energy + np.ceil(d_energy)]
-
-            plot.xaxis.limits = [1.4 * bl.SampleAperture.opening[0], 1.4 * bl.SampleAperture.opening[1]]
-
-        plts[1].yaxis.limits = [1.4 * bl.SampleAperture.opening[2], 1.4 * bl.SampleAperture.opening[3]]
-
-        plts[2].yaxis.limits = [
-            (sample_ap_distance - monochromator_distance + sample_ap_monitor_distance) * np.tan(2 * theta0) +
-            1.4 * bl.SampleAperture.opening[2],
-            (sample_ap_distance - monochromator_distance + sample_ap_monitor_distance) * np.tan(2 * theta0) +
-            1.4 * bl.SampleAperture.opening[3]
-        ]
+        # adjusting plot axes
+        upd_plots(plts, bl, energy, d_energy)
 
         yield
 
 
-def aperture_scan(plts, bl: RotatingArmBL):
-    yield
+def r_scan(plts, bl: RotatingArmBL):
+    global xzpr_plot_scaling
+
+    energy = energies[0]
+    align_energy(bl, energy, d_energy, ap_size)
+
+    rs = np.arange(150., 2050., 50.)
+    # rs = np.concatenate((rs, [np.inf]))
+    # rs = np.concatenate((rs, np.arange(25., 40., 1.)))
+
+    for r in rs:
+
+        if r < 15:
+            xzpr_plot_scaling = 10
+        elif 25 > r >= 15:
+            xzpr_plot_scaling = 5
+        else:
+            xzpr_plot_scaling = 2.5
+
+        bl.MonochromatorCr1.R = r * 1e3
+
+        # setting plot names
+        for plot in plts:
+            plot.saveName = '%s/%s-%.01fm.png' % (
+                subdir, plot.title, r
+            )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
+        # adjusting plot axes
+        upd_plots(plts, bl, energy, d_energy)
+
+        yield
+
+
+def alpha_scan(plts, bl: RotatingArmBL):
+
+    global monochromator_c1_alpha
+    energy = energies[0]
+
+    for alpha in np.linspace(0.1, 30.1, 60):
+
+        monochromator_c1_alpha = np.radians(alpha)
+        align_energy(bl, energy, d_energy, ap_size)
+
+        # adjusting plots
+        for plot in plts:
+            plot.saveName = '%s/%s-%.01fdeg.png' % (
+                subdir, plot.title, alpha
+            )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
+        upd_plots(plts, bl, energy, d_energy)
+
+        yield
+
+
+def d_scan(plts, bl: RotatingArmBL):
+
+    global monochromator_c1_thickness
+    energy = energies[0]
+    align_energy(bl, energy, d_energy, ap_size)
+
+    for monochromator_c1_thickness in np.arange(1.60, 3.3, 0.05):
+
+        bl.MonochromatorCr1.material[0].t = monochromator_c1_thickness
+
+        # adjusting plots
+        for plot in plts:
+            plot.saveName = '%s/%s-%.02fmm.png' % (
+                subdir, plot.title, monochromator_c1_thickness
+            )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
+        upd_plots(plts, bl, energy, d_energy)
+
+        yield
+
+
+def t_alp_maxs(plts, bl: RotatingArmBL):
+    global monochromator_c1_thickness, monochromator_c1_alpha
+    energy = energies[0]
+
+    for alpha in [1., 29]:
+        monochromator_c1_alpha = np.radians(alpha)
+        align_energy(bl, energy, d_energy, ap_size)
+
+        if np.isclose(alpha, 1.):
+            ts = [0.23, 0.40, 0.57, 0.735, 0.90, 1.07, 1.23, 1.40, 1.57, 1.73, 1.90, 2.07, 2.23, 2.40]
+        elif np.isclose(alpha, 29.):
+            ts = [0.2, 0.35, 0.49, 0.64, 0.79, 0.93, 1.08, 1.22, 1.37, 1.51, 1.66, 1.81, 1.95, 2.10, 2.24, 2.38]
+        else:
+            ts = []
+
+        for monochromator_c1_thickness in ts:
+            bl.MonochromatorCr1.material[0].t = monochromator_c1_thickness
+
+            # adjusting plots
+            for plot in plts:
+                plot.saveName = '%s/%s-%.02fmm-%.01fdeg.png' % (
+                    subdir, plot.title, monochromator_c1_thickness, alpha
+                )
+                plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
+            upd_plots(plts, bl, energy, d_energy)
+
+            yield
 
 
 # ###################################################### MAIN ##########################################################
@@ -282,11 +430,11 @@ def aperture_scan(plts, bl: RotatingArmBL):
 
 if __name__ == '__main__':
     beamline = RotatingArmBL()
-    scan = energy_scan
+    scan = vars()[scan]
 
     if show:
         beamline.glow(
-            scale=[1e3, 1e5, 1e3],
+            scale=[1e3, 1e3, 1e3],
             centerAt=r'Si[111] Crystal 1',
             generator=scan,
             generatorArgs=[plots, beamline],

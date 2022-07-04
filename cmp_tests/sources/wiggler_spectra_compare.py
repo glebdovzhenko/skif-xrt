@@ -26,6 +26,8 @@ if __name__ == '__main__':
         )
 
         I0, l1, l2, l3 = source.intensities_on_mesh(energy, theta, psi)
+        # plt.imshow(np.sum(I0, axis=0))
+        # plt.show()
 
         dtheta, dpsi = theta[1] - theta[0], psi[1] - psi[0]
         flux = I0.sum(axis=(1, 2)) * dtheta * dpsi

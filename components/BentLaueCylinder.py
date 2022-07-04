@@ -157,6 +157,12 @@ class BentLaueCylinder(OE):
         """Determines the normal vector of OE at (x, y) position."""
         return self.local_n_cylinder(x, y, self.R, self.alpha)
 
+    def pretty_R(self):
+        if self.R < np.inf:
+            return ('' if self.convergingBend else '-') + ('%.01f' % (self.R * 1e-3))
+        else:
+            return 'inf'
+
 
 if __name__ == '__main__':
     import xrt.backends.raycing.materials as rm
@@ -165,6 +171,7 @@ if __name__ == '__main__':
     from xrt.backends.raycing.oes import BentLaueCylinder as BentLaueCylinder2
 
     cr = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', t=2.)
+
     m1 = BentLaueCylinder(
         name='asfdsad',
         pitch=np.pi / 2.,
@@ -173,18 +180,23 @@ if __name__ == '__main__':
         alpha=0.,
         material=(cr,),
         R=np.inf,
-        targetOpenCL='CPU'
+        targetOpenCL='CPU',
     )
 
-    m1.R = 3000.
-    m1.bendingOrientation = 'sagittal'
-    m1.convergingBend = False
+    for orient in ('meridional', 'sagittal'):
+        m1.bendingOrientation = orient
 
-    xs, ys = np.meshgrid(np.linspace(-5, 5, 10), np.linspace(-5, 5, 10))
-    zs = m1.local_z(xs, ys)
+        for r in [3000, -3000]:
+            m1.R = r
+            print(r, m1.R, m1.convergingBend)
 
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    surf = ax.plot_surface(xs, ys, zs, cmap=cm.coolwarm,
-                           linewidth=0, antialiased=False)
+            xs, ys = np.meshgrid(np.linspace(-5, 5, 10), np.linspace(-5, 5, 10))
+            zs = m1.local_z(xs, ys)
+
+            fig = plt.figure('R = %.01f m; %s' % (r, orient))
+            ax = plt.axes(projection='3d')
+            surf = ax.plot_surface(xs, ys, zs, cmap=cm.coolwarm,
+                                   linewidth=0, antialiased=False)
+            plt.xlabel('local x')
+            plt.ylabel('local y')
     plt.show()

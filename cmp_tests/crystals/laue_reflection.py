@@ -18,7 +18,7 @@ def rocking_curve(t=.1, energy=10000):
     def get_amplitude(alpha):
         alpha = math.radians(alpha)
         theta0 = np.arcsin(rm.ch / (2 * cr.d * energy))
-        theta = theta0 + np.linspace(-5, 5, 5600) * 1e-6
+        theta = theta0 + np.linspace(-10, 10, 5600) * 1e-6
 
         surface_norm = (0., -1., 0.)
         plane_norm = (0., math.sin(alpha), math.cos(alpha))
@@ -37,14 +37,17 @@ def rocking_curve(t=.1, energy=10000):
     cs_data, cp_data, alphas, thetas = [], [], np.linspace(-30., 30., 1000), []
     for alpha in alphas:
         th, c_s, c_p = get_amplitude(alpha)
-        # fig = plt.figure()
-        # fig.suptitle(r'Laue reflectivity: $\alpha$ = %.2f$^{\circ}$, t = %.f $\mu$m, $h\nu$ = %.f keV' %
-        #              (alpha, t * 1e3, energy * 1e-3))
-        # plt.plot(np.array(th) * 3600, np.abs(c_s) ** 2, label=r'$R_{\sigma}$')
-        # plt.plot(np.array(th) * 3600, np.abs(c_p) ** 2, label=r'$R_{\pi}$')
+        fig = plt.figure()
+        fig.suptitle(r'Laue reflectivity: $\chi$ = %.2f$^{\circ}$, t = %.f $\mu$m, $h\nu$ = %.f keV' %
+                     (alpha, t * 1e3, energy * 1e-3))
+        plt.plot(np.array(th) * 3600, np.abs(c_s) ** 2, label=r'$R_{\sigma}^2$')
+        plt.plot(np.array(th) * 3600, np.abs(c_p) ** 2, label=r'$R_{\pi}^2$')
         # plt.plot(np.array(th) * 3600, .5 * (np.abs(c_s) ** 2 + np.abs(c_p) ** 2), label=r'$R_{\sigma} + R_{\pi}$')
-        # plt.ylim((0, 1))
-        # plt.show()
+        plt.ylim((0, 1))
+        plt.xlabel(r'$\theta-\theta_B$ (arcsec)')
+        plt.ylabel(r'$R^2$')
+        plt.legend()
+        plt.show()
         cp_data.append(c_p)
         cs_data.append(c_s)
         thetas = th
@@ -94,28 +97,43 @@ def rocking_curve(t=.1, energy=10000):
     axd['s+p'].set_xlabel(r'$\theta-\theta_B$ (arcsec)')
     axd['s+p'].set_ylabel(r'$\alpha$ (deg)')
 
-    print('At %.f μm, %.f keV: max Rs, Rp: %.03f, %.03f' % (
-        t * 1e3, energy * 1e-3, np.max(np.abs(cp_data) ** 2), np.max(np.abs(cs_data) ** 2)
-    ))
-
     axd['s'].sharex(axd['p'])
     axd['p'].sharex(axd['s+p'])
     axd['s'].sharey(axd['p'])
     axd['p'].sharey(axd['s+p'])
     fig.colorbar(ax2, cax=axd['cb'], orientation='horizontal')
 
+    print('At %.f μm, %.f keV: max Rs, Rp: %.03f, %.03f' % (
+        t * 1e3, energy * 1e-3, np.max(np.abs(cp_data) ** 2), np.max(np.abs(cs_data) ** 2)
+    ))
+
     return 0.5 * (np.abs(cp_data) ** 2 + np.abs(cs_data) ** 2)
 
 
 if __name__ == '__main__':
-    try:
-        result = []
-        for tt in np.arange(0.5, 2.5, 0.01):
-            result.append(rocking_curve(t=tt, energy=70000))
-            plt.show()
-        result = np.stack(result, axis=-1)
-    except KeyboardInterrupt:
-        plt.show()
-    else:
-        np.save(file='result.npy', arr=result)
-        plt.show()
+
+    # rocking_curve(1.5, 70000)
+    # try:
+    #     result = []
+    #     for tt in np.arange(0.5, 2.5, 0.01):
+    #         result.append(rocking_curve(t=tt, energy=70000))
+    #         plt.show()
+    #     result = np.stack(result, axis=-1)
+    # except KeyboardInterrupt:
+    #     plt.show()
+    # else:
+    #     # np.save(file='result.npy', arr=result)
+    #     plt.show()
+
+    # try:
+    #     result = []
+    #     for en in np.arange(25., 125., .5):
+    #         result.append(rocking_curve(t=2.407, energy=1e3 * en))
+    #         # plt.show()
+    #     result = np.stack(result, axis=-1)
+    # except KeyboardInterrupt:
+    #     plt.show()
+    # else:
+    #     np.save(file='result_en.npy', arr=result)
+    #     plt.show()
+    rocking_curve(2.24, 70000)
