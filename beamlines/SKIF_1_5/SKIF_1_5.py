@@ -21,7 +21,7 @@ from params.params_1_5 import front_end_distance, front_end_opening, front_end_v
 
 
 show = False
-repeats = 20
+repeats = 1
 
 """ energy_scan(plts, bl: SKIF15): """
 # scan = 'energy_scan'
@@ -34,7 +34,7 @@ repeats = 20
 
 """ r1r2map """
 scan = 'r1r2_scan'
-subdir = 'img/R1-R2-scan'
+subdir = 'img/test'
 energies = [7.0e4]
 de_over_e = 0.01
 mono = False
@@ -103,6 +103,12 @@ class SKIF15(raycing.BeamLine):
             targetOpenCL='CPU'
         )
 
+        self.Cr1Monitor = rscreens.Screen(
+            bl=self,
+            name=r"Crystal 1-2 Monitor",
+            center=[0, monochromator_distance, .5 * monochromator_z_offset],
+        )
+
         self.MonochromatorCr2 = BentLaueCylinder(
             bl=self,
             name=r'Si[111] Crystal 2',
@@ -157,6 +163,10 @@ def run_process(bl: SKIF15):
         beam=beam_mono_c2_global
     )
 
+    beam_ap3 = bl.Cr1Monitor.expose(
+        beam=beam_mono_c1_global
+    )
+
     if show:
         bl.prepare_flow()
 
@@ -168,6 +178,7 @@ def run_process(bl: SKIF15):
         'BeamMonoC2Local': beam_mono_c2_local,
         'BeamMonoC2Global': beam_mono_c2_global,
         'BeamAperture2Local': beam_ap2,
+        'BeamAperture3Local': beam_ap3,
     }
 
 
@@ -178,6 +189,7 @@ rrun.run_process = run_process
 
 
 plots = [
+    # Front-end
     # xrtplot.XYCPlot(
     #     beam='BeamAperture1Local',
     #     title='Front End Spot',
@@ -197,6 +209,27 @@ plots = [
     #     yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
     #     aspect='auto'),
 
+    # Monitor between crystals
+    xrtplot.XYCPlot(
+        beam='BeamAperture3Local',
+        title='C1C2 Monitor Spot',
+        xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x),
+        yaxis=xrtplot.XYCAxis(label=r'$z$', unit='mm', data=raycing.get_z),
+        aspect='auto'),
+    xrtplot.XYCPlot(
+        beam='BeamAperture3Local',
+        title='C1C2 Monitor Directions',
+        xaxis=xrtplot.XYCAxis(label=r'$x^{\prime}$', unit='', data=raycing.get_xprime),
+        yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
+        aspect='auto'),
+    # xrtplot.XYCPlot(
+    #     beam='BeamAperture3Local',
+    #     title='C1C2 Monitor Corr',
+    #     xaxis=xrtplot.XYCAxis(label=r'$z$', unit='mm', data=raycing.get_z),
+    #     yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
+    #     aspect='auto'),
+
+    # Exit
     xrtplot.XYCPlot(
         beam='BeamAperture2Local',
         title='DCM Slit Spot',
@@ -209,12 +242,12 @@ plots = [
         xaxis=xrtplot.XYCAxis(label=r'$x^{\prime}$', unit='', data=raycing.get_xprime),
         yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
         aspect='auto'),
-    xrtplot.XYCPlot(
-        beam='BeamAperture2Local',
-        title='DCM Slit Corr',
-        xaxis=xrtplot.XYCAxis(label=r'$z$', unit='mm', data=raycing.get_z),
-        yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
-        aspect='auto'),
+    # xrtplot.XYCPlot(
+    #     beam='BeamAperture2Local',
+    #     title='DCM Slit Corr',
+    #     xaxis=xrtplot.XYCAxis(label=r'$z$', unit='mm', data=raycing.get_z),
+    #     yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
+    #     aspect='auto'),
 ]
 
 
@@ -253,6 +286,13 @@ def align_energy(bl: SKIF15, en, d_en):
         monochromator_z_offset
     ]
 
+    # between-crystals monitor
+    bl.Cr1Monitor.center = [
+        0.,
+        monochromator_distance + .5 * monochromator_z_offset / np.tan(2. * theta0),
+        .5 * monochromator_z_offset
+    ]
+
 
 def upd_plots(plts, bl: SKIF15, en, d_en):
     for plot in plts:
@@ -260,7 +300,7 @@ def upd_plots(plts, bl: SKIF15, en, d_en):
         plot.caxis.limits = [en * (1. - de_plot_scaling * d_en),
                              en * (1. + de_plot_scaling * d_en)]
 
-        if plot.title == 'DCM Slit Directions':
+        if plot.title in ('DCM Slit Directions', 'C1C2 Monitor Directions'):
             plot.yaxis.offset = 0.
             plot.yaxis.limits = [plot.yaxis.offset + xzpr_plot_scaling * front_end_opening[2] / front_end_distance,
                                      plot.yaxis.offset + xzpr_plot_scaling * front_end_opening[3] / front_end_distance]
@@ -268,7 +308,7 @@ def upd_plots(plts, bl: SKIF15, en, d_en):
             plot.xaxis.limits = [plot.xaxis.offset + xzpr_plot_scaling * front_end_opening[0] / front_end_distance,
                                  plot.xaxis.offset + xzpr_plot_scaling * front_end_opening[1] / front_end_distance]
 
-        if plot.title == 'DCM Slit Corr':
+        if plot.title == ('DCM Slit Corr', 'C1C2 Monitor Corr'):
             plot.yaxis.offset = 0.
             plot.yaxis.limits = [plot.yaxis.offset + xzpr_plot_scaling * front_end_opening[2] / front_end_distance,
                                  plot.yaxis.offset + xzpr_plot_scaling * front_end_opening[3] / front_end_distance]
@@ -339,7 +379,7 @@ def r1r2_scan(plts, bl: SKIF15):
     bl.MonochromatorCr1.R = np.inf
     bl.MonochromatorCr2.R = np.inf
 
-    rs = np.arange(100., 500., 1.)
+    rs = np.arange(10., 30., 1.)
 
     for r in rs:
         bl.MonochromatorCr1.R = r * 1e3
