@@ -99,7 +99,7 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c1_alpha,
             material=(cr_si_1,),
-            R=30e3,
+            R=np.inf,
             targetOpenCL='CPU'
         )
 
@@ -113,7 +113,7 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c2_alpha,
             material=(cr_si_2,),
-            R=30e3,
+            R=np.inf,
             targetOpenCL='CPU'
         )
 
