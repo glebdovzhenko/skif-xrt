@@ -12,8 +12,8 @@ if __name__ == '__main__':
         md = getattr(params, 'params_' + bl)
         wiggler_kwargs = getattr(params.sources, 'wiggler_' + bl + '_kwargs')
 
-        theta = np.linspace(-md.front_end_h_angle, md.front_end_h_angle, 1000) / 2.
-        psi = np.linspace(-md.front_end_v_angle, md.front_end_v_angle, 500) / 2.
+        theta = np.linspace(-md.front_end_h_angle, md.front_end_h_angle, 100) / 2.
+        psi = np.linspace(-md.front_end_v_angle, md.front_end_v_angle, 50) / 2.
 
         source = rsources.Wiggler(
             eMin=energy[0],

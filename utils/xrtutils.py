@@ -2,7 +2,52 @@ import xrt.plotter as xrtplot
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
+from scipy.signal import convolve
 from uncertainties import ufloat
+
+
+def reflectivity_box_fit(xd, yd):
+
+    def f(x, *args):
+        """
+        FWHM = 2. * np.sqrt(2. * np.log(2)) * sigma
+        :param x:
+        :param args: [0] center, [1] heaviside width, [2] gaussian FWHM, [3] amplitude, [4] skew
+        :return:
+        """
+        result = np.zeros(shape=x.shape)
+
+        gs = args[2] / 2. * np.sqrt(2. * np.log(2))
+        rw = (x - args[0]) > np.abs(.5 * args[1])
+        lw = (x - args[0]) < -np.abs(.5 * args[1])
+        cc = np.abs(x - args[0]) < np.abs(.5 * args[1])
+
+        result[cc] = 1.
+
+        result[rw] = np.exp(-((x[rw] - args[0] - .5 * np.abs(args[1])) / gs) ** 2 / 2.)
+        result[lw] = np.exp(-((x[lw] - args[0] + .5 * np.abs(args[1])) / gs) ** 2 / 2.)
+
+        result *= args[3]
+        result *= args[4] * (x - args[0]) + 1.
+
+        return result
+
+    reflectivity_box_fit.f = f
+
+    br = np.sum((.5 * yd[1:] + .5 * yd[:-1]) * (xd[1:] - xd[:-1])) / np.max(yd)
+    p0 = [
+        np.sum(xd * yd) / np.sum(yd),
+        .5 * br,
+        .5 * br,
+        np.max(yd),
+        0.
+    ]
+
+    try:
+        return curve_fit(f, xd, yd, p0)
+        # raise RuntimeError()
+    except RuntimeError:
+        return p0, None
 
 
 def bell_fit(xd, yd, bckg=False, fn='gauss'):
@@ -25,27 +70,34 @@ def bell_fit(xd, yd, bckg=False, fn='gauss'):
             def f(x, *args):
                 result = np.zeros(shape=x.shape)
                 result[np.abs(x - args[0]) < args[1]] = args[2]
+                result[x - args[0] > args[1]] = np.exp(
+                    -((x[x - args[0] > args[1]] - args[0] - args[1]) / args[3])**2 / 2.) * args[2]
+                result[x - args[0] < -args[1]] = np.exp(
+                    -((x[x - args[0] < -args[1]] - args[0] + args[1]) / args[3]) ** 2 / 2.) * args[2]
                 return result
         else:
-            def f(x, *args):
-                result = np.zeros(shape=x.shape)
-                result[np.abs(x - args[0]) < args[1]] = args[2]
-                return result + args[3]
+            raise NotImplementedError()
     else:
         raise ValueError()
 
     bell_fit.f = f
     br = np.sum((.5 * yd[1:] + .5 * yd[:-1]) * (xd[1:] - xd[:-1])) / np.max(yd)
     p0 = [
-        # xd[np.argmax(yd)], .5 * br, np.max(yd)
-        np.sum(xd * yd) / np.sum(yd), .5 * br, np.max(yd)
+        np.sum(xd * yd) / np.sum(yd),
+        .5 * br,
+        np.max(yd)
     ]
 
     if bckg:
         p0.append(0.)
 
+    if fn == 'heaviside':
+        p0.append(.25 * br,)
+        p0[1] /= 2.
+
     try:
         return curve_fit(f, xd, yd, p0)
+        # raise RuntimeError()
     except RuntimeError:
         return p0, None
 

@@ -17,7 +17,7 @@ from params.params_1_3 import front_end_distance, front_end_h_angle, front_end_v
 # ################################################## SIM PARAMETERS ####################################################
 
 
-show = False
+show = True
 repeats = 10
 
 

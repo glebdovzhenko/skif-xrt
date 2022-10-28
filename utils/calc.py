@@ -51,87 +51,6 @@ def chukhovskii_krisch_r2(r1, theta, c1chi, c2chi, source_c1_y, c1_c2_z, source_
     return r1 + (c * r1 + d * r1 ** 2 + e) / (a + b * r1)
 
 
-class CrystalReflectivity:
-    def __init__(self, geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=False, R=np.inf):
-        self.cr = rm.CrystalSi(geom=geom, hkl=hkl, t=t, factDW=factDW)
-
-        if useTT:
-            self.matCL = mcl.XRT_CL(r'materials.cl', targetOpenCL='CPU')
-            self.R = R
-        else:
-            self.matCL = None
-            self.R = None
-
-    @property
-    def t(self):
-        return self.cr.t
-
-    @property
-    def d(self):
-        return self.cr.d
-
-    @t.setter
-    def t(self, val):
-        self.cr.t = val
-
-    def __call__(self, thetas, energy, alpha):
-        plane_norm = (0., math.sin(alpha), math.cos(alpha))
-        surface_norm = (0., -1., 0.)
-
-        theta0 = np.arcsin(rm.ch / (2 * self.cr.d * energy))
-        k_inc = (np.zeros_like(thetas), np.cos(thetas + theta0 + alpha), -np.sin(thetas + theta0 + alpha))
-        k_ref = (np.zeros_like(thetas), np.cos(thetas + theta0 - alpha), np.sin(thetas + theta0 - alpha))
-        if self.matCL is not None:
-            return self.cr.get_amplitude_TT(
-                E=energy * np.ones_like(thetas),
-                beamInDotNormal=np.dot(surface_norm, k_inc),
-                beamOutDotNormal=np.dot(surface_norm, k_ref),
-                beamInDotHNormal=np.dot(plane_norm, k_inc),
-                ucl=self.matCL,
-                alphaAsym=alpha,
-                Rcurvmm=-self.R
-            )
-        else:
-            return self.cr.get_amplitude(
-                E=energy * np.ones_like(thetas),
-                beamInDotNormal=np.dot(surface_norm, k_inc),
-                beamOutDotNormal=np.dot(surface_norm, k_ref),
-                beamInDotHNormal=np.dot(plane_norm, k_inc),
-            )
-
-
-def max_reflectivity_t(energy, alpha, harmonic_num, dTh=100.e-6, nTh=5600):
-    result = np.zeros(shape=(1000,))
-    cr = CrystalReflectivity()
-
-    ts = np.linspace(.1, 5., result.shape[0])  # mm
-    thetas = np.linspace(-dTh, dTh, nTh)
-
-    for ii, cr.t in enumerate(ts):
-        cur_s, cur_p = cr(thetas, energy, alpha)
-        result[ii] = .5 * np.mean(np.abs(cur_s) ** 2 + np.abs(cur_p) ** 2)
-
-    minimums = ts[argrelextrema(result, np.less)]
-    maximums = ts[argrelextrema(result, np.greater)]
-
-    if minimums[0] > maximums[0]:
-        minimums = np.insert(minimums, 0, ts[0])[:-1]
-
-    def f(x, *args):
-        cr.t = x
-        cur_s, cur_p = cr(thetas, energy, alpha)
-        return -.5 * np.mean(np.abs(cur_s) ** 2 + np.abs(cur_p) ** 2)
-
-    for ii, (lb, rb, x0) in enumerate(zip(minimums[:-1], minimums[1:], maximums[:-1])):
-        if ii != harmonic_num - 1:
-            continue
-
-        # from matplotlib import pyplot as plt
-        # plt.plot(ts, result)
-        # plt.show()
-        return minimize(f, x0, bounds=((lb, rb),)).x
-
-
 if __name__ == '__main__':
     from matplotlib import pyplot as plt
 
@@ -159,5 +78,4 @@ if __name__ == '__main__':
     # plt.plot(r1s, r2s - r1s)
     # plt.plot(xs, ys - xs, '+')
 
-    print(max_reflectivity_t(30e3, np.radians(30.), 1, dTh=100.e-6, nTh=5600))
     plt.show()

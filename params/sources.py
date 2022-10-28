@@ -25,3 +25,7 @@ undulator_1_1_kwargs = {
     'period': 15.6,  # period length [mm]
     'n': 128,  # number of periods
 }
+
+wiggler_nstu_scw_kwargs = {
+    **wiggler_1_5_kwargs
+}

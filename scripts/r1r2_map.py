@@ -45,7 +45,10 @@ if __name__ == '__main__':
 
     plt.figure()
     for ii, r1 in enumerate(u_r1s):
-        plt.semilogy((u_r2s - r1) * 1e3, u_flux[ii], label=r'$R_1 = %.01f$ m' % r1)
+        if not np.isinf(r1):
+            plt.semilogy((u_r2s - r1) * 1e3, u_flux[ii], label=r'$R_1 = %.01f$ m' % r1)
+        else:
+            plt.semilogy([-700., 1300.], [u_flux[-1, -1]] * 2, '--',label=r'$R_1 = %.01f$ m' % r1)
 
     plt.xlabel('$R_2 - R_1$, mm')
     plt.ylabel('Flux, [ph/s]')
