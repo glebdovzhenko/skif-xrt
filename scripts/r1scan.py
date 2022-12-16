@@ -5,7 +5,7 @@ import os
 
 from matplotlib import pyplot as plt
 
-from utils.xrtutils import get_line_kb, get_integral_breadth
+from utils.xrtutils import get_integral_breadth
 from utils.various import datafiles
 
 

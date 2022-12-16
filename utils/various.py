@@ -6,7 +6,7 @@ import numpy as np
 def datafiles(dd):
     f_name_re0 = re.compile(r'.+.pickle$')
     f_name_re1 = re.compile(r'^(?P<name>[^-]+)-(?P<axes>[^-]+)-')
-    f_name_re2 = re.compile(r'^(?P<value>[\d.-]+|inf)(?P<units>mm|m|keV|deg|ddeg)-?')
+    f_name_re2 = re.compile(r'^(?P<value>[\d.-]+|inf|-inf)(?P<units>mm|m|keV|deg|ddeg)-?')
 
     for f_name in os.listdir(dd):
         m0 = f_name_re0.match(f_name)
@@ -34,18 +34,18 @@ def datafiles(dd):
                 break
 
             if m.group('units') == 'keV':
-                result['energy'] = np.float(m.group('value'))
+                result['energy'] = float(m.group('value'))
             elif m.group('units') == 'm':
                 if result['r1'] is None:
-                    result['r1'] = np.float(m.group('value'))
+                    result['r1'] = float(m.group('value'))
                 elif result['r2'] is None:
-                    result['r2'] = np.float(m.group('value'))
+                    result['r2'] = float(m.group('value'))
             elif m.group('units') == 'mm':
-                result['thickness'] = np.float(m.group('value'))
+                result['thickness'] = float(m.group('value'))
             elif m.group('units') == 'deg':
-                result['alpha'] = np.float(m.group('value'))
+                result['alpha'] = float(m.group('value'))
             elif m.group('units') == 'ddeg':
-                result['tth_offset'] = np.float(m.group('value'))
+                result['tth_offset'] = float(m.group('value'))
 
         yield result
 

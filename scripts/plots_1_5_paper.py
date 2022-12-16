@@ -4,7 +4,8 @@ import os
 
 from matplotlib import pyplot as plt
 
-from utils.xrtutils import bell_fit, get_integral_breadth
+from utils.xrtutils import bell_fit, get_integral_breadth, get_line_kb
+
 from utils.various import datafiles
 
 
@@ -175,6 +176,117 @@ def tth_error():
         fig.savefig('/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/16_1-5_DCD_text/tth_error.pgf')
 
 
+def meridional_focusing_c1():
+    dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/beamlines/PLAYGROUND/img/scan3'
+
+    rs, f_dist, flux, br = [], [], [], []
+    for metadata in datafiles(dd):
+        if metadata['name'] != 'C1' or metadata['axes'] != 'ZZpr':
+            continue
+
+        rs.append(metadata['r1'])
+
+        with open(os.path.join(dd, metadata['file']), 'rb') as f:
+            data = pickle.load(f)
+            flux.append(data.flux)
+            k, b = get_line_kb(data, show=False)
+            f_dist.append(-np.sign(k) * np.sqrt((1. / k) ** 2 + (b / k) ** 2))
+            br.append(get_integral_breadth(data, axis='y'))
+            print('R = %f' % metadata['r1'])
+            print('Focus F = %f, 2Θ = %f' % (f_dist[-1], np.degrees(np.arctan(b))))
+
+    rs, f_dist, flux, br = np.array(rs), np.array(f_dist), np.array(flux), np.array(br)
+    ii = np.argsort(rs)
+    rs, f_dist, flux, br = rs[ii], f_dist[ii] * 1e-3, flux[ii], br[ii]
+    
+    fig, ax = plt.subplots()
+    fig.set_size_inches(w=fig_width, h=fig_width * fig_aspect2)
+
+    ax.plot(rs, f_dist, label='Cr-to-F', color='C0')
+    ax.plot([rs[1], rs[-2]], [f_dist[-1], f_dist[-1]], '--', label=r'Cr-to-F $R=\pm\infty$', color='C0')
+    # ax.plot([rs[1], rs[-2]], [f_dist[0], f_dist[0]], '--', label=r'Cr-to-F $R=-\infty$', color='C0')
+    ax.set_ylim(-50, 150)
+    plt.legend(loc='upper left')
+    plt.grid(alpha=.4)
+
+
+    secax = ax.twinx()
+    secax.plot(rs, br, label='Z\' Breadth', color='C1')
+    plt.legend(loc='upper right')
+    
+    plt.xlabel('R, [m]')
+    ax.set_ylabel('F, [м]', color='C0')
+    secax.set_ylabel('Z\' FWHM, рад', color='C1')
+    ax.tick_params(axis='y', labelcolor='C0')
+    secax.tick_params(axis='y', labelcolor='C1')
+
+    plt.title('1 кристалл')
+    plt.tight_layout()
+
+    if save:
+        fig.savefig('/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/16_1-5_DCD_text/merid_f_c1.pgf')
+
+
+def meridional_focusing_c2():
+    dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/beamlines/PLAYGROUND/img/scan3'
+    
+    #################### SKIF 1-5 ####################
+    ##### Superconducting Wiggler at [0, 0, 0]
+    ##### Front End Slit at [0, 15000, 0]
+    ##### Si[111] Crystal 1 at [0.0, 33500, 0.0]
+    ##### Crystal 1 Monitor at [0.0, 33594.21541931476, 12.5]
+    ##### Si[111] Crystal 2 at [0.0, 33688.43083862951, 25]
+    ##### Crystal 2 Monitor at [0, 49990, 25]
+    ##################################################
+
+    rs, f_dist, flux, br = [], [], [], []
+    for metadata in datafiles(dd):
+        if metadata['name'] != 'C2' or metadata['axes'] != 'ZZpr':
+            continue
+
+        rs.append(metadata['r1'])
+
+        with open(os.path.join(dd, metadata['file']), 'rb') as f:
+            data = pickle.load(f)
+            flux.append(data.flux)
+            k, b = get_line_kb(data, show=False)
+            f_dist.append(-np.sign(k) * np.sqrt((1. / k) ** 2 + (b / k) ** 2))
+            br.append(get_integral_breadth(data, axis='y'))
+            print('R = %f' % metadata['r1'])
+            print('Focus F = %f, 2Θ = %f' % (f_dist[-1], np.degrees(np.arctan(b))))
+
+    rs, f_dist, flux, br = np.array(rs), np.array(f_dist), np.array(flux), np.array(br)
+    ii = np.argsort(rs)
+    rs, f_dist, flux, br = rs[ii], f_dist[ii] * 1e-3, flux[ii], br[ii]
+    f_dist += 49.990 - 33.688
+    
+    fig, ax = plt.subplots()
+    fig.set_size_inches(w=fig_width, h=fig_width * fig_aspect2)
+
+    ax.plot(rs, f_dist, label='Cr-to-F', color='C0')
+    ax.plot([rs[1], rs[-2]], [f_dist[-1], f_dist[-1]], '--', label=r'Cr-to-F $R=\pm\infty$', color='C0')
+    ax.set_ylim(-35, -30)
+    plt.legend(loc='upper left')
+    plt.grid(alpha=.4)
+
+
+    secax = ax.twinx()
+    secax.plot(rs, br, label='Z\' Breadth', color='C1')
+    plt.legend(loc='upper right')
+    
+    plt.xlabel('R, [m]')
+    ax.set_ylabel('F, [м]', color='C0')
+    secax.set_ylabel('Z\' FWHM, рад', color='C1')
+    ax.tick_params(axis='y', labelcolor='C0')
+    secax.tick_params(axis='y', labelcolor='C1')
+
+    plt.title('2 кристалл')
+    plt.tight_layout()
+
+    if save:
+        fig.savefig('/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/16_1-5_DCD_text/merid_f_c2.pgf')
+
+
 if __name__ == '__main__':
     save = False
 
@@ -197,7 +309,9 @@ if __name__ == '__main__':
     # flux_vs_e_chis()
     # flux_vs_e_ts()
     # flux_vs_r1r2()
-    tth_error()
+    # tth_error()
+    meridional_focusing_c1()
+    # meridional_focusing_c2()
     # ##################################################################################################################
     if not save:
         plt.show()

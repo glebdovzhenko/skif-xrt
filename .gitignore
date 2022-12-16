@@ -1,4 +1,8 @@
 .idea
 .run
+datasets
 *.npy
 *.pickle
+*.pyc
+*.png
+.DS_Store

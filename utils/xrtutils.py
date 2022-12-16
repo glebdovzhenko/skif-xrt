@@ -1,7 +1,7 @@
 import xrt.plotter as xrtplot
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit, minimize
 from scipy.signal import convolve
 from uncertainties import ufloat
 
@@ -122,62 +122,29 @@ def get_integral_breadth(data: xrtplot.SaveResults, axis: str = 'y'):
     return np.sum((.5 * t1d[1:] + .5 * t1d[:-1]) * (bins[1:] - bins[:-1])) / np.max(t1d)
 
 
-def get_line_kb(data: xrtplot.SaveResults, show=False, uncertainties=True):
+def get_line_kb(data: xrtplot.SaveResults, show=False):
     """
     :param data: assuming that y axis is z', x axis is z, c axis is energy
     :return:
     """
 
-    x_centers = .5 * data.xbinEdges[1:] + .5 * data.xbinEdges[:-1]
-    y_centers = .5 * data.ybinEdges[1:] + .5 * data.ybinEdges[:-1]
+    xvals = .5 * (data.xbinEdges[1:] + data.xbinEdges[:-1])
+    yvals = .5 * (data.ybinEdges[1:] + data.ybinEdges[:-1])
+    xvals_, yvals_ = np.meshgrid(xvals, yvals)
 
-    ks = np.tan(np.linspace(.01 * np.pi, .49 * np.pi, 1000)) * \
-        np.mean(data.ybinEdges[1:] - data.ybinEdges[:-1]) / \
-        np.mean(data.xbinEdges[1:] - data.xbinEdges[:-1])
-    b0 = np.mean(y_centers)
+    def f(x):
+        return np.sum(data.total2D * (yvals_ - xvals_ * np.tan(x[0]) - x[1]) ** 2)
 
-    x_centers, y_centers = np.meshgrid(x_centers, y_centers)
+    min_res = minimize(f, np.array([.1, .1]), bounds=[(-np.pi/2, np.pi/2), (-1., 1.)])
 
     if show:
         plt.imshow(data.total2D, aspect='auto', origin='lower',
                    extent=[data.xbinEdges.min(), data.xbinEdges.max(),
                            data.ybinEdges.min(), data.ybinEdges.max()])
+        plt.plot(xvals, xvals * np.tan(min_res.x[0]) + min_res.x[1])
 
-        prop_cycle = plt.rcParams['axes.prop_cycle']
-        colors = prop_cycle.by_key()['color']
-
-    def scan(k_vals):
-        fs_vals = []
-        for ii, k in enumerate(k_vals):
-            offset = .5 * np.mean(data.ybinEdges[1:] - data.ybinEdges[:-1]) / np.cos(
-                np.arctan(k / (np.mean(data.ybinEdges[1:] - data.ybinEdges[:-1]) / np.mean(
-                    data.xbinEdges[1:] - data.xbinEdges[:-1]))))
-
-            fs_vals.append(np.mean(data.total2D[
-                (y_centers < k * x_centers + b0 + offset) & (y_centers > k * x_centers + b0 - offset)
-            ]))
-
-            if show:
-                plt.plot(data.xbinEdges, k * data.xbinEdges + b0 + offset, color=colors[ii % len(colors)])
-                plt.plot(data.xbinEdges, k * data.xbinEdges + b0 - offset, color=colors[ii % len(colors)])
-
-        return fs_vals
-
-    fs = scan(ks)
-    fs = np.array(fs)
-    k = ks[np.argmax(fs)]
-
-    ks = np.linspace(ks.min(), k + 0.1 * (k + ks.max()), 1000)
-    fs = np.array(scan(ks))
-
-    popt, pcov = bell_fit(ks, fs)
-
-    if show:
         plt.xlim(data.xbinEdges.min(), data.xbinEdges.max())
         plt.ylim(data.ybinEdges.min(), data.ybinEdges.max())
         plt.show()
 
-    if uncertainties:
-        return ufloat(popt[0], popt[1]), b0
-    else:
-        return popt[0], b0
+    return np.tan(min_res.x[0]), min_res.x[1]

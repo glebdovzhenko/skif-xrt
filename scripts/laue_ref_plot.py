@@ -11,7 +11,7 @@ import math
 import re
 from uncertainties import umath
 
-from utils.xrtutils import get_line_kb, bell_fit
+from utils.xrtutils import bell_fit
 
 # import matplotlib
 # matplotlib.use("pgf")
@@ -333,47 +333,6 @@ def r_scan_1cr_widths():
     plt.tight_layout()
 
 
-def chukhovskii_krisch():
-    cph0 = 1.6164981015506414 - np.pi / 2
-    cphH = 2. * 0.02824848223580159 - cph0
-    L0 = 33.500
-
-    dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/beamlines/img/70keV-Rscan-fine'
-    f_name_re = re.compile(r'[^-]+-(?P<r>[\d.-]+)m.pickle')
-
-    rs, s_dist = [], []
-    for f_name in sorted(filter(lambda x: ('Exit Monitor Spot-' in x) and ('.pickle' in x), os.listdir(dd))):
-        m = f_name_re.match(f_name)
-        if m is None:
-            continue
-
-        rs.append(float(m.group('r')))
-        print(f_name)
-
-        with open(os.path.join(dd, f_name.replace(' Spot-', ' Corr-')), 'rb') as f:
-            data = pickle.load(f)
-            k, b = get_line_kb(data)
-            y, z = 33721.01537088534 - 1. / k, 12.5 - b / k  # in bl coordinates
-            s_dist.append(umath.sqrt((y - 33500) ** 2 + (z - 0.) ** 2))  # relative to the crystal center
-
-    rs, s_dist = np.array(rs), np.array(s_dist)
-    ii = np.argsort(rs)
-    rs, s_dist = rs[ii], s_dist[ii]
-
-    fig = plt.figure()
-    plt.title('Зависимость фокусного расстояния от радиуса изгиба кристалла')
-    plt.errorbar(rs, [x.n / 1e3 for x in s_dist], yerr=[x.s / 1e3 for x in s_dist], marker='', linestyle='',
-                 label='Рей-трейсинг', alpha=0.5)
-    plt.plot(rs, np.cos(cphH) ** 2 / ((np.cos(cph0) + np.abs(np.cos(cphH))) / rs - np.cos(cph0) ** 2 / L0),
-             label=r'Формула (\ref{eq:chukh11})')
-    plt.xlabel('Радиус изгиба, м')
-    plt.ylabel('Расстояние до фокуса, м')
-    plt.legend(loc='upper left')
-
-    fig.set_size_inches(w=5.39, h=5.39 * 9 / 16)
-    plt.tight_layout()
-
-
 def two_cr_theory():
     flux, rmax, r_err = [], [], []
     for ii in range(foc0_flux.shape[0]):
@@ -434,8 +393,6 @@ if __name__ == '__main__':
     # plt.savefig('/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/16_1-5_DCD_text/r-scan-1cr-2alp.pgf')
     # r_scan_1cr_widths()
     # plt.savefig('/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/16_1-5_DCD_text/r-scan-1cr-widths.pgf')
-    # chukhovskii_krisch()
-    # plt.savefig('/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/16_1-5_DCD_text/chukhovskii-krisch.pgf')
     two_cr_theory()
     # plt.savefig('/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/16_1-5_DCD_text/two-cr-theory.pgf')
     # rtr_plot_example()

@@ -20,9 +20,13 @@ class CrystalSiPrecalc(rm.CrystalSi):
     db_columns = ['en', 't', 'r', 'chi', 'fit_a', 'fit_c', 'fit_hw', 'fit_gw', 'fit_skew']
 
     def __init__(self, *args, **kwargs):
-        rm.CrystalSi.__init__(self, *args, **kwargs)
+        if 'database' not in kwargs.keys():
+            self.db_addr = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref.csv'
+        else:
+            self.db_addr = kwargs.pop('database')
 
-        self.db_addr = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref.csv'
+        rm.CrystalSi.__init__(self, *args, **kwargs)
+        
         self.db = None
         self.init_db()
 
@@ -69,7 +73,7 @@ class CrystalSiPrecalc(rm.CrystalSi):
 
         print("##### FOUND PARAMS: " +
               ", ".join("%s = %f" % (k, params[k]) for k in ('fit_c', 'fit_hw', 'fit_gw', 'fit_a', 'fit_skew')))
-        return params
+        return params.to_dict()
 
     def db_interpolate(self, **kwargs):
         xs = self.params_to_db_values(**kwargs)
@@ -87,6 +91,9 @@ class CrystalSiPrecalc(rm.CrystalSi):
         return result
 
     def db_add(self, **kwargs):
+        """
+        Calculates a reflectivity curve using CrystalSi.get_amplitude_TT() and adds it to the database.
+        """
         db_pars = self.params_to_db_values(**kwargs)
         calc_pars = self.db_values_to_params(**db_pars)
         print("##### ADDING PARAMS: " + ", ".join("%s = %d" % (k, v) for (k, v) in db_pars.items()))
@@ -109,6 +116,32 @@ class CrystalSiPrecalc(rm.CrystalSi):
         }
         self.db.loc[int(np.nanmax([self.db.shape[0], self.db.index.max() + 1]))] = res
         print("##### ADDED PARAMS: " + ", ".join("%s = %f" % (k, v) for (k, v) in res.items()))
+    
+    def db_add_ext(self, **kwargs):
+        """
+        Adds to the database a reflectivity curve calculated externally.
+        """
+        thetas = kwargs.pop('thetas')
+        ref = kwargs.pop('ref')
+        
+        db_pars = self.params_to_db_values(**kwargs)
+        print("##### ADDING PARAMS: " + ", ".join("%s = %d" % (k, v) for (k, v) in db_pars.items()))
+
+        params = self.db.loc[
+            reduce(lambda a, b: a & b, map(lambda c: self.db[c[0]] == c[1], db_pars.items()))
+        ].squeeze()
+        if params.shape[0] != 0:
+            print("##### PARAMS ALREADY THERE")
+            return
+
+        p = self.calc_params(thetas=thetas, ref=ref)
+        res = {
+            **db_pars,
+            'fit_a': p[3], 'fit_c': p[0], 'fit_hw': np.abs(p[1]), 'fit_gw': np.abs(p[2]), 'fit_skew': p[4]
+        }
+        self.db.loc[int(np.nanmax([self.db.shape[0], self.db.index.max() + 1]))] = res
+        print("##### ADDED PARAMS: " + ", ".join("%s = %f" % (k, v) for (k, v) in res.items()))
+
 
     def calc_reflectivity(self, thetas, **kwargs):
         plane_norm = (0., np.sin(kwargs['chi']), np.cos(kwargs['chi']))
@@ -133,17 +166,24 @@ class CrystalSiPrecalc(rm.CrystalSi):
         self.t = kwargs['t']
         return rm.CrystalSi.get_amplitude_TT(self, **kwgs)
 
-    def calc_params(self, thetas, **kwargs):
-
-        c_s, c_p = self.calc_reflectivity(thetas, **kwargs)
-        ref = np.sqrt(.5 * np.abs(c_s) ** 2 + .5 * np.abs(c_p) ** 2)
+    def calc_params(self, thetas, ref=None, **kwargs):
+        
+        if ref is None:
+            c_s, c_p = self.calc_reflectivity(thetas, **kwargs)
+            ref = np.sqrt(.5 * np.abs(c_s) ** 2 + .5 * np.abs(c_p) ** 2)
 
         br = np.sum((.5 * ref[1:] + .5 * ref[:-1]) * (thetas[1:] - thetas[:-1])) / np.max(ref)
         p0 = [np.sum(thetas * ref) / np.sum(ref), .5 * br, .5 * br, np.max(ref), 0.]
+        
+        # p0[1] = 0.
+        # plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
+        # plt.plot(thetas, self.f(thetas, *p0), label=r'Fit')
+        # plt.legend()
+        # plt.show()
+
         p, _ = curve_fit(self.f, thetas, ref, p0, maxfev=10000)
 
-        plt.plot(thetas, np.abs(c_s), label=r'$\sigma$ TT')
-        plt.plot(thetas, np.abs(c_p), label=r'$\pi$ TT')
+        plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
         plt.plot(thetas, self.f(thetas, *p), label=r'Fit')
         plt.legend()
         plt.show()
@@ -176,12 +216,16 @@ class CrystalSiPrecalc(rm.CrystalSi):
 
     def get_amplitude_TT(self, E, beamInDotNormal, beamOutDotNormal=None, beamInDotHNormal=None, alphaAsym=None,
                          Rcurvmm=None, ucl=None):
-
-        params = self.db_interpolate(en=np.mean(E), t=self.t, r=Rcurvmm, chi=alphaAsym)
+        """
+        Overrides CrystalSi.get_amplitude_TT with database lookup.
+        """
+        params = self.db_locate(en=np.mean(E), t=self.t, r=Rcurvmm, chi=alphaAsym)
+        
         if params is None:
-            raise ValueError('Parameter set not found in DB')
+            params = self.db_interpolate(en=np.mean(E), t=self.t, r=Rcurvmm, chi=alphaAsym)
+
         if any(map(lambda x: x is None or np.isnan(x), params.values())):
-            raise ValueError('Parameter set not found in DB')
+            raise ValueError('##### COULD NOT INTERPOLATE')
 
         thetaB = self.get_Bragg_angle(E)
         if alphaAsym > 0:

@@ -5,7 +5,7 @@ import os
 
 from matplotlib import pyplot as plt
 
-from utils.xrtutils import get_line_kb, get_integral_breadth
+from utils.xrtutils import get_integral_breadth
 from utils.various import datafiles
 
 
@@ -29,7 +29,8 @@ if __name__ == '__main__':
             flux.append(data.flux)
             z_breadth.append(get_integral_breadth(data, 'y'))
 
-    rs, flux, z_breadth, alphas, ts, es = np.array(rs), np.array(flux), np.array(z_breadth), np.array(alphas), np.array(ts), np.array(es)
+    rs, flux, z_breadth, alphas, ts, es = np.array(rs), np.array(flux), np.array(z_breadth), \
+            np.array(alphas), np.array(ts), np.array(es)
     u_alphas, u_es = np.array(sorted(set(alphas))), np.array(sorted(set(es)))
 
     print(u_alphas, u_es)
@@ -42,7 +43,7 @@ if __name__ == '__main__':
             u_z_breadth[jj, ii] = z_breadth[(alphas == alpha) & (es == e)].mean()
 
     for ii, alp in enumerate(u_alphas):
-        plt.semilogy(u_es, u_flux[:, ii], label='$\chi = %.01f ^{\circ}$' % alp)
+        plt.semilogy(u_es, u_flux[:, ii], label=r'$\chi = %.01f ^{\circ}$' % alp)
 
     plt.legend()
     plt.show()

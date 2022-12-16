@@ -22,7 +22,7 @@ from params.params_1_1 import front_end_distance, front_end_opening, front_end_v
 # ################################################## SIM PARAMETERS ####################################################
 
 
-show = False
+show = True
 repeats = 1
 scan = 'energy_scan'
 

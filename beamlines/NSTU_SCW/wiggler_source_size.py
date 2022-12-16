@@ -2,7 +2,6 @@ import json
 import numpy as np
 import os
 from matplotlib import pyplot as plt
-from utils.xrtutils import bell_fit
 
 
 if __name__ == '__main__':
