@@ -17,7 +17,7 @@ class CrystalSiPrecalc(rm.CrystalSi):
     'r': bending radius in mm
     'chi': asymmetry angle in degrees
     """
-    db_columns = ['en', 't', 'r', 'chi', 'fit_a', 'fit_c', 'fit_hw', 'fit_gw', 'fit_skew']
+    db_columns = ['en', 't', 'r', 'chi', 'fit_a', 'fit_c', 'fit_hw', 'fit_gw', 'fit_lw', 'fit_pv', 'fit_skew']
 
     def __init__(self, *args, **kwargs):
         if 'database' not in kwargs.keys():
@@ -38,7 +38,7 @@ class CrystalSiPrecalc(rm.CrystalSi):
         result = kwargs.copy()
         result['en'] = np.around(result['en']).astype(int)
         result['t'] = np.around(1e3 * result['t']).astype(int)
-        result['r'] = np.around(result['r']).astype(int)
+        result['r'] = result['r'] if np.isinf(result['r']) else np.around(result['r']).astype(int)
         result['chi'] = np.around(np.degrees(result['chi'])).astype(int)
         return result
 
@@ -62,7 +62,7 @@ class CrystalSiPrecalc(rm.CrystalSi):
 
     def db_locate(self, **kwargs):
         db_pars = self.params_to_db_values(**kwargs)
-        print("##### LOCATING PARAMS: " + ", ".join("%s = %d" % (k, v) for (k, v) in db_pars.items()))
+        print("##### LOCATING PARAMS: " + ", ".join("%s = %f" % (k, v) for (k, v) in db_pars.items()))
 
         params = self.db.loc[
             reduce(lambda a, b: a & b, map(lambda c: self.db[c[0]] == c[1], db_pars.items()))
@@ -72,22 +72,43 @@ class CrystalSiPrecalc(rm.CrystalSi):
             return None
 
         print("##### FOUND PARAMS: " +
-              ", ".join("%s = %f" % (k, params[k]) for k in ('fit_c', 'fit_hw', 'fit_gw', 'fit_a', 'fit_skew')))
+              ", ".join("%s = %f" % (k, params[k]) for k in 
+                        ('fit_c', 'fit_hw', 'fit_gw', 'fit_lw', 'fit_pv', 'fit_a', 'fit_skew')))
         return params.to_dict()
 
     def db_interpolate(self, **kwargs):
         xs = self.params_to_db_values(**kwargs)
-        if isinstance(xs['en'], np.ndarray):
-            xs = np.array([xs['en'], [xs['t']] * xs['en'].size,
-                           [xs['r']] * xs['en'].size, [xs['chi']] * xs['en'].size]).T
+        inf_r = np.isinf(xs['r'])
+
+        if inf_r:
+            db_xs_fields = 't', 'chi'
         else:
-            xs = np.array([[xs['en'], xs['t'], xs['r'], xs['chi']]])
+            db_xs_fields = 't', 'r', 'chi'
 
-        db_xs = self.db.loc[:, ['en', 't', 'r', 'chi']].to_numpy()
+        if isinstance(xs['en'], np.ndarray):
+            # xs = np.array([xs['en'], [xs['t']] * xs['en'].size,
+            #                [xs['r']] * xs['en'].size, [xs['chi']] * xs['en'].size]).T
+            xs = np.array([xs['en'], *[[xs[f]] * xs['en'].size for f in db_xs_fields]]).T
+        else:
+            # xs = np.array([[xs['en'], xs['t'], xs['r'], xs['chi']]])
+            xs = np.array([[xs['en']] + [xs[f] for f in db_xs_fields]])
+        
+        if inf_r:
+            db_xs = self.db.loc[np.isinf(self.db['r'])]
+        else:
+            db_xs = self.db.loc[~np.isinf(self.db['r'])]
 
+        
+        db_ys = db_xs.loc[:, [col for col in self.db_columns if 'fit_' in col]]
+        db_xs = db_xs.loc[:, ['en', *db_xs_fields]].to_numpy()
+
+        # if not inf_r:
+        #     ii = ~np.isinf(db_xs[:, 2])
+        #     db_xs = db_xs[ii]
+        
         result = dict()
-        for par in ['fit_c', 'fit_hw', 'fit_gw', 'fit_a', 'fit_skew']:
-            result[par] = griddata(db_xs, self.db.loc[:, par].to_numpy(), xs, method='linear').squeeze()[()]
+        for par in ['fit_c', 'fit_hw', 'fit_gw', 'fit_lw', 'fit_pv', 'fit_a', 'fit_skew']:
+            result[par] = griddata(db_xs, db_ys.loc[:, par].to_numpy(), xs, method='linear').squeeze()[()]
         return result
 
     def db_add(self, **kwargs):
@@ -96,7 +117,7 @@ class CrystalSiPrecalc(rm.CrystalSi):
         """
         db_pars = self.params_to_db_values(**kwargs)
         calc_pars = self.db_values_to_params(**db_pars)
-        print("##### ADDING PARAMS: " + ", ".join("%s = %d" % (k, v) for (k, v) in db_pars.items()))
+        print("##### ADDING PARAMS: " + ", ".join("%s = %f" % (k, v) for (k, v) in db_pars.items()))
 
         params = self.db.loc[
             reduce(lambda a, b: a & b, map(lambda c: self.db[c[0]] == c[1], db_pars.items()))
@@ -110,9 +131,11 @@ class CrystalSiPrecalc(rm.CrystalSi):
         thetas_hw = max(np.abs(p1[1]) + 3. * np.abs(p1[2]), 5e-5)
         thetas = np.linspace(p1[0] - thetas_hw, p1[0] + thetas_hw, 10000)
         p = self.calc_params(thetas, **calc_pars)
+        
         res = {
             **db_pars,
-            'fit_a': p[3], 'fit_c': p[0], 'fit_hw': np.abs(p[1]), 'fit_gw': np.abs(p[2]), 'fit_skew': p[4]
+            'fit_c': p[0], 'fit_hw': p[1], 'fit_gw': p[2], 'fit_lw': p[3], 'fit_pv': p[4], 
+            'fit_a': p[5], 'fit_skew': p[6]
         }
         self.db.loc[int(np.nanmax([self.db.shape[0], self.db.index.max() + 1]))] = res
         print("##### ADDED PARAMS: " + ", ".join("%s = %f" % (k, v) for (k, v) in res.items()))
@@ -125,7 +148,7 @@ class CrystalSiPrecalc(rm.CrystalSi):
         ref = kwargs.pop('ref')
         
         db_pars = self.params_to_db_values(**kwargs)
-        print("##### ADDING PARAMS: " + ", ".join("%s = %d" % (k, v) for (k, v) in db_pars.items()))
+        print("##### ADDING PARAMS: " + ", ".join("%s = %f" % (k, v) for (k, v) in db_pars.items()))
 
         params = self.db.loc[
             reduce(lambda a, b: a & b, map(lambda c: self.db[c[0]] == c[1], db_pars.items()))
@@ -137,7 +160,9 @@ class CrystalSiPrecalc(rm.CrystalSi):
         p = self.calc_params(thetas=thetas, ref=ref)
         res = {
             **db_pars,
-            'fit_a': p[3], 'fit_c': p[0], 'fit_hw': np.abs(p[1]), 'fit_gw': np.abs(p[2]), 'fit_skew': p[4]
+            'fit_c': p[0], 'fit_hw': p[1], 'fit_gw': p[2], 'fit_lw': p[3], 'fit_pv': p[4], 
+            'fit_a': p[5], 'fit_skew': p[6]
+
         }
         self.db.loc[int(np.nanmax([self.db.shape[0], self.db.index.max() + 1]))] = res
         print("##### ADDED PARAMS: " + ", ".join("%s = %f" % (k, v) for (k, v) in res.items()))
@@ -173,44 +198,54 @@ class CrystalSiPrecalc(rm.CrystalSi):
             ref = np.sqrt(.5 * np.abs(c_s) ** 2 + .5 * np.abs(c_p) ** 2)
 
         br = np.sum((.5 * ref[1:] + .5 * ref[:-1]) * (thetas[1:] - thetas[:-1])) / np.max(ref)
-        p0 = [np.sum(thetas * ref) / np.sum(ref), .5 * br, .5 * br, np.max(ref), 0.]
-        
-        # p0[1] = 0.
+        p0 = [np.sum(thetas * ref) / np.sum(ref), .5 * br, .5 * br, .5 * br, .5, np.max(ref), 0.]
+        mit, mat = np.min(thetas), np.max(thetas)
+
         # plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
         # plt.plot(thetas, self.f(thetas, *p0), label=r'Fit')
         # plt.legend()
         # plt.show()
 
-        p, _ = curve_fit(self.f, thetas, ref, p0, maxfev=10000)
+        p, _ = curve_fit(
+            self.f, thetas, ref, p0, maxfev=10000, 
+            bounds=((mit, 0.,        0.,        0.,        0., 0., -np.inf), 
+                    (mat, mat - mit, mat - mit, mat - mit, 1., 2.,  np.inf))
+        )
 
-        plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
-        plt.plot(thetas, self.f(thetas, *p), label=r'Fit')
-        plt.legend()
-        plt.show()
+        # plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
+        # plt.plot(thetas, self.f(thetas, *p), label=r'Fit')
+        # plt.legend()
+        # plt.show()
 
         return p
 
     @staticmethod
     def f(x, *args):
         """
-        FWHM = 2. * np.sqrt(2. * np.log(2)) * sigma
+        Gaussian: FWHM = 2. * np.sqrt(2. * np.log(2)) * sigma
+        Lorentzian: FWHM = gamma
         :param x:
-        :param args: [0] center, [1] heaviside width, [2] gaussian FWHM, [3] amplitude, [4] skew
+        :param args: [0] center, [1] heaviside width, [2] gaussian FWHM, [3] Lorentzian FWHM, [4] p-Voigt eta
+        [5] amplitude, [6] skew
         :return:
         """
         result = np.zeros(shape=x.shape)
+
         gs = args[2] / 2. * np.sqrt(2. * np.log(2))
+        lg = args[3]
         rw = (x - args[0]) > np.abs(.5 * args[1])
         lw = (x - args[0]) < -np.abs(.5 * args[1])
         cc = np.abs(x - args[0]) < np.abs(.5 * args[1])
 
         result[cc] = 1.
 
-        result[rw] = np.exp(-((x[rw] - args[0] - .5 * np.abs(args[1])) / gs) ** 2 / 2.)
-        result[lw] = np.exp(-((x[lw] - args[0] + .5 * np.abs(args[1])) / gs) ** 2 / 2.)
+        result[rw] = args[4] * np.exp(-((x[rw] - args[0] - .5 * np.abs(args[1])) / gs) ** 2 / 2.)
+        result[lw] = args[4] * np.exp(-((x[lw] - args[0] + .5 * np.abs(args[1])) / gs) ** 2 / 2.)
+        result[rw] += (1. - args[4]) * lg ** 2. / ((x[rw] - args[0] - .5 * np.abs(args[1]))**2 + lg ** 2)
+        result[lw] += (1. - args[4]) * lg ** 2. / ((x[lw] - args[0] + .5 * np.abs(args[1]))**2 + lg ** 2)
 
-        result *= args[3]
-        result *= args[4] * (x - args[0]) + 1.
+        result *= args[5]
+        result *= args[6] * (x - args[0]) + 1.
 
         return result
 
@@ -234,10 +269,12 @@ class CrystalSiPrecalc(rm.CrystalSi):
             thetas = -(np.arccos(-beamInDotNormal) + alphaAsym + thetaB)
 
         c_s = self.f(
-            thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_a'], params['fit_skew']
+            thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_lw'], params['fit_pv'],
+            params['fit_a'], params['fit_skew']
         )
         c_p = self.f(
-            thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_a'], params['fit_skew']
+            thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_lw'], params['fit_pv'],
+            params['fit_a'], params['fit_skew']
         )
 
         return c_s, c_p
@@ -253,14 +290,17 @@ if __name__ == '__main__':
     # cr.thmin = -5000 * 1e-6
     # cr.thmax = 5000 * 1e-6
 
-    en = 30.e3  # eV
-    alpha = np.radians(-20.)
+    en = 29.5e3  # eV
+    alpha = np.radians(37.)
     crR = 2000.0  # mm
-    crT = 2.2  # mm
-
-    cr.t = crT
-    for crR in [2e3, 4e3, 6e3, 8e3, 10e3, 12e3, 14e3, 16e3, 18e3, 20e3]:
-        cr.db_add(en=en, t=crT, r=crR, chi=alpha)
+    crT = 1.7 # mm
+    
+    for crT in [1.6, 1.8, 2.0, 2.2, 2.4]:
+        cr.t = crT
+        for alpha in [np.radians(35.), np.radians(36.), np.radians(-35.), np.radians(-36.)]:
+            for crR in [18.e3, 20.e3, 22.e3, np.inf]:
+                cr.db_add(en=en, t=crT, r=crR, chi=alpha)
+    
     cr.save_db()
 
     # ################################################### PLOTTING #####################################################
@@ -284,23 +324,25 @@ if __name__ == '__main__':
 
     # ################################################ INTERPOLATION ###################################################
 
-    # en = 25.e3  # eV
-    # alpha = np.radians(20.)
-    # crR = 2000.0  # mm
-    # crT = 2.  # mm
-    # params = cr.db_interpolate(en=np.array([29000, 28000., 27000., 26000.]), t=crT, r=crR, chi=alpha)
-    # params = pd.DataFrame(params)
-    # thetas = np.linspace(-1000, 500, 500) * 1e-6
-    #
-    # for ii in params.index:
-    #     pr = params.loc[ii].to_dict()
-    #     plt.plot(thetas, cr.f(thetas, pr['fit_c'], pr['fit_hw'], pr['fit_gw'], pr['fit_a'],
-    #                           pr['fit_skew']), '--')
+    en = 30.e3  # eV
+    alpha = np.radians(35.3)
+    crR = 20000.  # mm
+    crT = 2.  # mm
+    params = cr.db_interpolate(en=np.array([30.1e3, 29.9e3]), t=crT, r=crR, chi=alpha)
+    params = pd.DataFrame(params)
+    thetas = np.linspace(-1000, 500, 500) * 1e-6
+    print(params) 
+    for ii in params.index:
+        pr = params.loc[ii].to_dict()
+        plt.plot(thetas, cr.f(thetas, pr['fit_c'], pr['fit_hw'], pr['fit_gw'], pr['fit_lw'], pr['fit_pv'], 
+                              pr['fit_a'], pr['fit_skew']), '--')
+
     # for en in [25e3, 30e3]:
     #     params = cr.db_locate(en=en, t=crT, r=crR, chi=alpha)
     #     if params is None:
     #         raise ValueError('Parameter set not found in DB')
-    #
-    #     plt.plot(thetas, cr.f(thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_a'],
-    #                           params['fit_skew']), label='%d keV' % np.round(en * 1e-3))
-    # plt.show()
+    
+    #     plt.plot(thetas, cr.f(thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_lw'], 
+    #                           params['fit_pv'], params['fit_a'], params['fit_skew']), 
+    #              label='%d keV' % np.round(en * 1e-3))
+    plt.show()
