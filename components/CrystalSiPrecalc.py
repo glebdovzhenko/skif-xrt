@@ -4,6 +4,7 @@ from scipy.optimize import curve_fit
 import pandas as pd
 import numpy as np
 import os
+import re
 from functools import reduce
 from scipy.interpolate import griddata
 from matplotlib import pyplot as plt
@@ -157,7 +158,12 @@ class CrystalSiPrecalc(rm.CrystalSi):
             print("##### PARAMS ALREADY THERE")
             return
 
+        p1 = self.calc_params(thetas=thetas, ref=ref)
+        thetas_hw = max(np.abs(p1[1]) + 3. * np.abs(p1[2]), 5e-5)
+        ii = (p1[0] - thetas_hw < thetas) & (thetas < p1[0] + thetas_hw)
+        thetas, ref = thetas[ii], ref[ii]
         p = self.calc_params(thetas=thetas, ref=ref)
+        
         res = {
             **db_pars,
             'fit_c': p[0], 'fit_hw': p[1], 'fit_gw': p[2], 'fit_lw': p[3], 'fit_pv': p[4], 
@@ -207,15 +213,15 @@ class CrystalSiPrecalc(rm.CrystalSi):
         # plt.show()
 
         p, _ = curve_fit(
-            self.f, thetas, ref, p0, maxfev=10000, 
+            self.f, thetas, ref, p0, max_nfev=10000, 
             bounds=((mit, 0.,        0.,        0.,        0., 0., -np.inf), 
                     (mat, mat - mit, mat - mit, mat - mit, 1., 2.,  np.inf))
         )
 
-        plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
-        plt.plot(thetas, self.f(thetas, *p), label=r'Fit')
-        plt.legend()
-        plt.show()
+        # plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
+        # plt.plot(thetas, self.f(thetas, *p), label=r'Fit')
+        # plt.legend()
+        # plt.show()
 
         return p
 
@@ -283,25 +289,25 @@ class CrystalSiPrecalc(rm.CrystalSi):
 if __name__ == '__main__':
     from matplotlib import pyplot as plt
 
-    cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
+    # cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
 
     # ############################################### ADDING INFO TO DB ################################################
 
     # cr.thmin = -5000 * 1e-6
     # cr.thmax = 5000 * 1e-6
 
-    en = 25.5e3  # eV
-    alpha = np.radians(37.)
-    crR = 2000.0  # mm
-    crT = 1.7 # mm
+    # en = 25.5e3  # eV
+    # alpha = np.radians(37.)
+    # crR = 2000.0  # mm
+    # crT = 1.7 # mm
     
-    for crT in [1.6, 1.8, 2.0, 2.2, 2.4]:
-        cr.t = crT
-        for alpha in [np.radians(35.), np.radians(36.), np.radians(-35.), np.radians(-36.)]:
-            for crR in [18.e3, 20.e3, 22.e3, np.inf]:
-                cr.db_add(en=en, t=crT, r=crR, chi=alpha)
+    # for crT in [1.6, 1.8, 2.0, 2.2, 2.4]:
+    #     cr.t = crT
+    #     for alpha in [np.radians(35.), np.radians(36.), np.radians(-35.), np.radians(-36.)]:
+    #         for crR in [18.e3, 20.e3, 22.e3, np.inf]:
+    #             cr.db_add(en=en, t=crT, r=crR, chi=alpha)
     
-    cr.save_db()
+    # cr.save_db()
 
     # ################################################### PLOTTING #####################################################
 
@@ -324,18 +330,18 @@ if __name__ == '__main__':
 
     # ################################################ INTERPOLATION ###################################################
 
-    en = 30.e3  # eV
-    alpha = np.radians(35.3)
-    crR = 20000.  # mm
-    crT = 2.  # mm
-    params = cr.db_interpolate(en=np.array([30.1e3, 29.9e3]), t=crT, r=crR, chi=alpha)
-    params = pd.DataFrame(params)
-    thetas = np.linspace(-1000, 500, 500) * 1e-6
-    print(params) 
-    for ii in params.index:
-        pr = params.loc[ii].to_dict()
-        plt.plot(thetas, cr.f(thetas, pr['fit_c'], pr['fit_hw'], pr['fit_gw'], pr['fit_lw'], pr['fit_pv'], 
-                              pr['fit_a'], pr['fit_skew']), '--')
+    # en = 30.e3  # eV
+    # alpha = np.radians(35.3)
+    # crR = 20000.  # mm
+    # crT = 2.  # mm
+    # params = cr.db_interpolate(en=np.array([30.1e3, 29.9e3]), t=crT, r=crR, chi=alpha)
+    # params = pd.DataFrame(params)
+    # thetas = np.linspace(-1000, 500, 500) * 1e-6
+    # print(params) 
+    # for ii in params.index:
+    #     pr = params.loc[ii].to_dict()
+    #     plt.plot(thetas, cr.f(thetas, pr['fit_c'], pr['fit_hw'], pr['fit_gw'], pr['fit_lw'], pr['fit_pv'], 
+    #                           pr['fit_a'], pr['fit_skew']), '--')
 
     # for en in [25e3, 30e3]:
     #     params = cr.db_locate(en=en, t=crT, r=crR, chi=alpha)
@@ -345,4 +351,48 @@ if __name__ == '__main__':
     #     plt.plot(thetas, cr.f(thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_lw'], 
     #                           params['fit_pv'], params['fit_a'], params['fit_skew']), 
     #              label='%d keV' % np.round(en * 1e-3))
-    plt.show()
+    # plt.show()
+
+    # ############################################### ADDING SAGITTAL ##################################################
+    
+    dd = '/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/09_oasys/SKIF-1-5/wd'
+    cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True, 
+                          database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
+    
+    for f_name in os.listdir(dd):
+        m = re.match(r'^dp_en(?P<en>[\d]+)_t(?P<t>[\d]+)_r(?P<r>[\d]+)_chi(?P<chi>[\d-]+).dat$', f_name)
+        if m is None:
+            continue
+
+        gd = m.groupdict()
+        d = np.loadtxt(os.path.join(dd, f_name), skiprows=5)
+        thetas = d[:, 0] * 1e-6
+        ref = d[:, -1]
+
+        en = float(gd['en'])
+        alpha = np.radians(float(gd['chi']))
+        crR = float(gd['r'])
+        cr.t = 1e-3 * float(gd['t'])
+
+        cr.db_add_ext(en=en, t=cr.t, r=crR, chi=alpha, thetas=thetas, ref=ref)
+    cr.save_db()
+
+
+    # d = np.loadtxt('/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/09_oasys/SKIF-1-5/wd/diff_pat.dat',
+    #                skiprows=5)
+    # thetas = d[:, 0] * 1e-6
+    # ref = d[:, -1]
+
+    # cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True, 
+    #                       database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
+    
+    # en = 35.e3  # eV
+    # alpha = np.radians(-30.)
+    # crR = 100000.0  # mm
+    # crT = .2  # mm
+
+    # cr.t = crT
+    
+    # cr.db_add_ext(en=en, t=crT, r=crR, chi=alpha, thetas=thetas, ref=ref)
+    # cr.save_db()
+
