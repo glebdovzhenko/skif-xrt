@@ -21,4 +21,6 @@ tmux select-pane -t skif-xrt:editor.0
 tmux resize-pane -t skif-xrt:editor.0 -R 22
 tmux resize-pane -t skif-xrt:editor.2 -U 9
 
+tmux send-keys -t skif-xrt:editor.0 "\§"
+
 tmux attach -t skif-xrt
