@@ -5,4 +5,7 @@ datasets
 *.pickle
 *.pyc
 *.png
+*.pgf
+*.ipynb_checkpoints
+*.json
 .DS_Store

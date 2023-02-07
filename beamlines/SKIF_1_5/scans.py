@@ -2,7 +2,7 @@ from typing import List
 import os
 import numpy as np
 import matplotlib
-# matplotlib.use('agg')
+matplotlib.use('agg')
 
 import xrt.runner as xrtrun
 import xrt.plotter as xrtplot
@@ -17,16 +17,45 @@ z_kwds = {r'label': r'$z$', r'unit': r'mm', r'data': raycing.get_z}
 xpr_kwds = {r'label': r'$x^{\prime}$', r'unit': r'', r'data': raycing.get_xprime}
 zpr_kwds = {r'label': r'$z^{\prime}$', r'unit': r'', r'data': raycing.get_zprime}
 
-for beam, t1 in zip(('BeamAperture1Local', 'BeamMonitor1Local', 'BeamMonitor2Local', 'BeamAperture2Local'), 
-                    ('FE', 'C1C2', 'EM', 'ES')):
-    for t2, xkw, ykw in zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds, z_kwds), (z_kwds, xpr_kwds, zpr_kwds)):
-        plots.append(xrtplot.XYCPlot(beam=beam, title='-'.join((t1, t2)), 
-                                     xaxis=xrtplot.XYCAxis(**xkw), yaxis=xrtplot.XYCAxis(**ykw),
-                                     aspect='auto'))
+# for beam, t1 in zip(('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local', 'BeamMonoC2Local', 
+#                      'BeamMonitor2Local', 'BeamAperture2Local'), 
+#                     ('FE', 'C1', 'C1C2', 'C2', 'EM', 'ES')):
+#     for t2, xkw, ykw in zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds, z_kwds), (z_kwds, xpr_kwds, zpr_kwds)):
+#         plots.append(xrtplot.XYCPlot(beam=beam, title='-'.join((t1, t2)), 
+#                                      xaxis=xrtplot.XYCAxis(**xkw), yaxis=xrtplot.XYCAxis(**ykw),
+#                                      aspect='auto'))
+
+for beam in sum([[b_name % (ii + 1) for ii in range(11)] for b_name in 
+                 ('BeamFilter%dLocal1', 'BeamFilter%dLocal2', 'BeamFilter%dLocal2a')], []):
+    
+    t1 = beam.replace('Local1', '').replace('Local2a', '').replace('Local2', '').replace('BeamFilter', 'F')
+
+    if beam[-6:] == 'Local1':
+        plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'I-XZ'), aspect='auto',
+                            xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
+                            yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
+        plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'P-XZ'), aspect='auto', fluxKind='power',
+                            xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
+                            yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
+    elif beam[-6:] == 'Local2':
+        plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'IT-XZ'), aspect='auto',
+                            xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
+                            yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
+    elif beam[-7:] == 'Local2a':
+        plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'PA-XZ'), aspect='auto', fluxKind='power',
+                            xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
+                            yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
+    else:
+        pass
+else:
+    plots.append(xrtplot.XYCPlot(beam='BeamMonoC1Local2a', title=('C1PA-XZ'), aspect='auto', fluxKind='power',
+                 xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
+                 yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
+
 
 def onept(plts: List, bl: SKIF15):
     subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
-    scan_name = 'de_to_e_br'
+    scan_name = 'test'
     
     r = 3.5e3
     en = 30.e3
@@ -69,10 +98,435 @@ def e_scan(plts: List, bl: SKIF15):
         yield
 
 
+def chi_scan(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    scan_name = 'chi_scan'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    with open(os.path.join(subdir, scan_name + '.txt'), 'w') as f:
+        tmp = bl.dumps()
+        tmp += 'METADATA\n'
+        tmp += 'SCAN: CHI\n'
+        tmp += 'FILES: NAME-E-CHI-R1-R2\n'
+        f.write(tmp)
+    
+    bl.MonochromatorCr1.R = 30.e3
+    bl.MonochromatorCr2.R = 30.e3
+
+    for en in [30.e3, 90.e3, 150.e3]:
+                      
+        for chi in [5., 35., 0., 10., 15., 20., 25., 30.]:
+            bl.MonochromatorCr1.set_alpha(np.radians(chi))
+            bl.MonochromatorCr2.set_alpha(-np.radians(chi))
+            
+            bl.align_energy(en, bl.get_de_over_e(20.e3, en))
+            bl.set_plot_limits(plts)
+
+            for plot in plts:
+                plot.saveName = '%s-%dkeV-%ddeg-%sm-%sm.png' % (
+                        os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), int(chi),
+                        bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+                )
+                plot.persistentName = plot.saveName.replace('.png', '.pickle')
+            yield
+
+        for chi in [40., 45., 50., 55., 60.]:
+            bl.MonochromatorCr1.set_alpha(np.radians(chi))
+            bl.MonochromatorCr2.set_alpha(-np.radians(chi))
+            
+            bl.align_energy(en, bl.get_de_over_e(12.e3, en))
+            bl.set_plot_limits(plts)
+
+            for plot in plts:
+                plot.saveName = '%s-%dkeV-%ddeg-%sm-%sm.png' % (
+                        os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), int(chi),
+                        bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+                )
+                plot.persistentName = plot.saveName.replace('.png', '.pickle')
+            yield
+
+
+
+def t_scan(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    scan_name = 't_scan'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    with open(os.path.join(subdir, scan_name + '.txt'), 'w') as f:
+        tmp = bl.dumps()
+        tmp += 'METADATA\n'
+        tmp += 'SCAN: T\n'
+        tmp += 'FILES: NAME-E-T-R1-R2\n'
+        f.write(tmp)
+    
+    bl.MonochromatorCr1.R = 30.e3
+    bl.MonochromatorCr2.R = 30.e3
+    bl.MonochromatorCr1.set_alpha(np.radians(35.3))
+    bl.MonochromatorCr2.set_alpha(-np.radians(35.3))
+
+
+    for en in [30.e3, 90.e3, 150.e3]:          
+        for t in [2.5, 3.0, 3.5, 4.0]: # [1.25, 1.75, 2.25, 2.5, 0.5, 2.5, 1.0, 1.5, 2.0]:
+            bl.MonochromatorCr1.material[0].t = t
+            bl.MonochromatorCr2.material[0].t = t
+
+            bl.align_energy(en, bl.get_de_over_e(20.e3, en))
+            bl.set_plot_limits(plts)
+
+            for plot in plts:
+                plot.saveName = '%s-%dkeV-%.01fmm-%sm-%sm.png' % (
+                        os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), t,
+                        bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+                )
+                plot.persistentName = plot.saveName.replace('.png', '.pickle')
+            yield
+
+
+def r_scan(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    scan_name = 'r_scan'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    with open(os.path.join(subdir, scan_name + '.txt'), 'w') as f:
+        tmp = bl.dumps()
+        tmp += 'METADATA\n'
+        tmp += 'SCAN: R\n'
+        tmp += 'FILES: NAME-E-T-R1-R2\n'
+        f.write(tmp)
+    
+    bl.MonochromatorCr1.set_alpha(np.radians(35.3))
+    bl.MonochromatorCr2.set_alpha(-np.radians(35.3))
+    bl.MonochromatorCr1.material[0].t = 1.8
+    bl.MonochromatorCr2.material[0].t = 2.2
+
+    for en, ml in zip([30.e3, 90.e3, 150.e3], [3., 4., 4.]):
+        for r in [60.e3, 70.e3, 80.e3, 90.e3, 100.e3]: 
+            bl.MonochromatorCr1.R = r
+            bl.MonochromatorCr2.R = r
+
+            bl.align_energy(en, ml * bl.get_de_over_e(r, en))
+            bl.set_plot_limits(plts)
+
+            for plot in plts:
+                plot.saveName = '%s-%dkeV-%sm-%sm.png' % (
+                        os.path.join(subdir, scan_name, plot.title), int(en * 1e-3),
+                        bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+                )
+                plot.persistentName = plot.saveName.replace('.png', '.pickle')
+            yield
+
+def r_map(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    scan_name = 'r_map'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    with open(os.path.join(subdir, scan_name + '.txt'), 'w') as f:
+        tmp = bl.dumps()
+        tmp += 'METADATA\n'
+        tmp += 'SCAN: R\n'
+        tmp += 'FILES: NAME-E-T-R1-R2\n'
+        f.write(tmp)
+    
+    bl.MonochromatorCr1.set_alpha(np.radians(35.3))
+    bl.MonochromatorCr2.set_alpha(-np.radians(35.3))
+    bl.MonochromatorCr1.material[0].t = 1.8
+    bl.MonochromatorCr2.material[0].t = 2.2
+
+    for en, ml in zip([30.e3, 90.e3, 150.e3], [1., 3., 3.]):          
+        for r1 in [5.e3, 10.e3, 20.e3, 30.e3, 40.e3, 50.e3]:
+            for r2 in np.linspace(r1 -2.e3, r1 + 2.e3, 11):
+
+                bl.MonochromatorCr1.R = r1
+                bl.MonochromatorCr2.R = r2
+                
+                bl.align_energy(en, 2. * ml * bl.get_de_over_e(r1, en))
+                bl.set_plot_limits(plts)
+
+                for plot in plts:
+                    plot.saveName = '%s-%dkeV-%sm-%sm.png' % (
+                            os.path.join(subdir, scan_name, plot.title), int(en * 1e-3),
+                            bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+                    )
+                    plot.persistentName = plot.saveName.replace('.png', '.pickle')
+                yield
+
+
+def tth_offset_scan(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    scan_name = 'tth_offset_scan2'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    with open(os.path.join(subdir, scan_name + '.txt'), 'w') as f:
+        tmp = bl.dumps()
+        tmp += 'METADATA\n'
+        tmp += 'SCAN: T\n'
+        tmp += 'FILES: NAME-E-TTH-R1-R2\n'
+        f.write(tmp)
+    
+    bl.MonochromatorCr1.R = 30.e3
+    bl.MonochromatorCr2.R = 30.e3
+    bl.MonochromatorCr1.set_alpha(np.radians(35.3))
+    bl.MonochromatorCr2.set_alpha(-np.radians(35.3))
+
+
+    for en, ml in zip([30.e3, 90.e3, 150.e3], [2., 2., 2.]):          
+        for r in [np.inf, 20.e3]:
+            bl.MonochromatorCr1.R = r
+            bl.MonochromatorCr2.R = r
+
+            bl.align_energy(en, ml * bl.get_de_over_e(r, en))
+            bl.set_plot_limits(plts)
+            
+            tths = np.concatenate((
+                np.linspace(-70., 70., 40) * 1e-6,
+                np.linspace(-10., 10., 20) * 1e-6))
+            tths = np.linspace(-2.5, 2.5, 40) * 1e-6
+
+            for tth in tths:
+                bl.MonochromatorCr1.extraPitch = tth
+
+                for plot in plts:
+                    plot.saveName = '%s-%dkeV-%.03farcsec-%sm-%sm.png' % (
+                            os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), np.degrees(tth) * 3600.,
+                            bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+                    )
+                    plot.persistentName = plot.saveName.replace('.png', '.pickle')
+                yield
+
+
+def roll_offset_scan(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    scan_name = 'roll_offset_scan'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    with open(os.path.join(subdir, scan_name + '.txt'), 'w') as f:
+        tmp = bl.dumps()
+        tmp += 'METADATA\n'
+        tmp += 'SCAN: T\n'
+        tmp += 'FILES: NAME-E-TTH-R1-R2\n'
+        f.write(tmp)
+    
+    bl.MonochromatorCr1.R = 30.e3
+    bl.MonochromatorCr2.R = 30.e3
+    bl.MonochromatorCr1.set_alpha(np.radians(35.3))
+    bl.MonochromatorCr2.set_alpha(-np.radians(35.3))
+    
+    bl.MonochromatorCr1.rotationSequence = 'RyRxRz'
+
+    for en, ml in zip([30.e3, 90.e3, 150.e3], [2., 2., 2.]):          
+        for r in [np.inf, 20.e3]:
+            bl.MonochromatorCr1.R = r
+            bl.MonochromatorCr2.R = r
+
+            bl.align_energy(en, ml * bl.get_de_over_e(r, en))
+            bl.set_plot_limits(plts)
+            
+            # tths = np.concatenate((
+            #     np.linspace(-70., 70., 40) * 1e-6,
+            #     np.linspace(-10., 10., 20) * 1e-6))
+            tths = np.concatenate((
+                np.linspace(-8.5, 8.5, 40) * 1e-2,
+                np.linspace(-8.5, 8.5, 40) * 1e-3))
+
+            for tth in tths:
+                bl.MonochromatorCr1.roll = tth
+
+                for plot in plts:
+                    plot.saveName = '%s-%dkeV-%.03farcsec-%sm-%sm.png' % (
+                            os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), np.degrees(tth) * 3600.,
+                            bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+                    )
+                    plot.persistentName = plot.saveName.replace('.png', '.pickle')
+                yield
+
+
+def yaw_offset_scan(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    scan_name = 'yaw_offset_scan'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    with open(os.path.join(subdir, scan_name + '.txt'), 'w') as f:
+        tmp = bl.dumps()
+        tmp += 'METADATA\n'
+        tmp += 'SCAN: T\n'
+        tmp += 'FILES: NAME-E-TTH-R1-R2\n'
+        f.write(tmp)
+    
+    bl.MonochromatorCr1.R = 30.e3
+    bl.MonochromatorCr2.R = 30.e3
+    bl.MonochromatorCr1.set_alpha(np.radians(35.3))
+    bl.MonochromatorCr2.set_alpha(-np.radians(35.3))
+    
+    bl.MonochromatorCr1.rotationSequence = 'RzRxRy'
+
+    for en, ml in zip([30.e3, 90.e3, 150.e3], [2., 2., 2.]):          
+        for r in [np.inf, 20.e3]:
+            bl.MonochromatorCr1.R = r
+            bl.MonochromatorCr2.R = r
+
+            bl.align_energy(en, ml * bl.get_de_over_e(r, en))
+            bl.set_plot_limits(plts)
+            
+            # tths = np.concatenate((
+            #     np.linspace(-70., 70., 40) * 1e-6,
+            #     np.linspace(-10., 10., 20) * 1e-6))
+            tths = np.concatenate((
+                np.linspace(-8.5, 8.5, 40) * 1e-2,
+                np.linspace(-8.5, 8.5, 40) * 1e-3))
+
+            for tth in tths:
+                bl.MonochromatorCr1.yaw = tth
+
+                for plot in plts:
+                    plot.saveName = '%s-%dkeV-%.03farcsec-%sm-%sm.png' % (
+                            os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), np.degrees(tth) * 3600.,
+                            bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+                    )
+                    plot.persistentName = plot.saveName.replace('.png', '.pickle')
+                yield
+
+
+def y_offset_scan(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    scan_name = 'y_offset_scan'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    with open(os.path.join(subdir, scan_name + '.txt'), 'w') as f:
+        tmp = bl.dumps()
+        tmp += 'METADATA\n'
+        tmp += 'SCAN: T\n'
+        tmp += 'FILES: NAME-E-TTH-R1-R2\n'
+        f.write(tmp)
+    
+    bl.MonochromatorCr1.R = 30.e3
+    bl.MonochromatorCr2.R = 30.e3
+    bl.MonochromatorCr1.set_alpha(np.radians(35.3))
+    bl.MonochromatorCr2.set_alpha(-np.radians(35.3))
+
+
+    for en, ml in zip([30.e3, 90.e3, 150.e3], [2., 2., 2.]):          
+        for r in [np.inf, 20.e3]:
+            bl.MonochromatorCr1.R = r
+            bl.MonochromatorCr2.R = r
+
+            bl.align_energy(en, ml * bl.get_de_over_e(r, en))
+            bl.set_plot_limits(plts)
+            
+            # tths = np.concatenate((
+            #     np.linspace(-70., 70., 40) * 1e-6,
+            #     np.linspace(-10., 10., 20) * 1e-6))
+            # tths = np.linspace(-2.5, 2.5, 40) * 1e-6
+
+            dys = np.linspace(-10., 10., 50)
+
+            for dy in dys:
+                bl.align_energy(en, ml * bl.get_de_over_e(r, en))
+                bl.MonochromatorCr2.center[1] += dy
+
+                for plot in plts:
+                    plot.saveName = '%s-%dkeV-%.03fdmcm-%sm-%sm.png' % (
+                            os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), dy * 1e3,
+                            bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+                    )
+                    plot.persistentName = plot.saveName.replace('.png', '.pickle')
+                yield
+
+
+def z_offset_scan(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    scan_name = 'test'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    with open(os.path.join(subdir, scan_name + '.txt'), 'w') as f:
+        tmp = bl.dumps()
+        tmp += 'METADATA\n'
+        tmp += 'SCAN: T\n'
+        tmp += 'FILES: NAME-E-TTH-R1-R2\n'
+        f.write(tmp)
+    
+    bl.MonochromatorCr1.R = 30.e3
+    bl.MonochromatorCr2.R = 30.e3
+    bl.MonochromatorCr1.set_alpha(np.radians(35.3))
+    bl.MonochromatorCr2.set_alpha(-np.radians(35.3))
+
+
+    for en, ml in zip([30.e3, 90.e3, 150.e3], [2., 2., 2.]):          
+        for r in [np.inf, 20.e3]:
+            bl.MonochromatorCr1.R = r
+            bl.MonochromatorCr2.R = r
+
+            bl.align_energy(en, ml * bl.get_de_over_e(r, en))
+            bl.set_plot_limits(plts)
+            
+            # tths = np.concatenate((
+            #     np.linspace(-70., 70., 40) * 1e-6,
+            #     np.linspace(-10., 10., 20) * 1e-6))
+            # tths = np.linspace(-2.5, 2.5, 40) * 1e-6
+
+            dzs = np.linspace(-2., 2., 50)
+
+            for dz in dzs:
+                bl.align_energy(en, ml * bl.get_de_over_e(r, en))
+                bl.MonochromatorCr2.center[2] += dz
+
+                for plot in plts:
+                    plot.saveName = '%s-%dkeV-%.03fdmcm-%sm-%sm.png' % (
+                            os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), dz * 1e3,
+                            bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+                    )
+                    plot.persistentName = plot.saveName.replace('.png', '.pickle')
+                yield
+
+
+def calc_abs(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    scan_name = 'absorption'
+    
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+    
+    r = np.inf
+    en = 30.e3
+    bl.MonochromatorCr1.R = r
+    bl.MonochromatorCr2.R = r
+
+    bl.align_energy(en, bl.get_de_over_e(r, en))
+    bl.SuperCWiggler.eMin, bl.SuperCWiggler.eMax = 10., 500000.
+    bl.SuperCWiggler.nrays = 10000
+    # bl.set_plot_limits(plts)
+
+    for plt in plts:
+        plt.caxis.offset = 0.
+        plt.caxis.limits = [0., 100000.]
+
+    for plot in plts:
+        plot.saveName = '%s.png' % os.path.join(subdir, scan_name, plot.title)
+        plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
+    yield
+
 
 if __name__ == '__main__':
     beamline = SKIF15()
-    scan = onept
+    scan = calc_abs
     show = False
     repeats = 1
 

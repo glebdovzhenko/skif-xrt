@@ -6,7 +6,7 @@ import numpy as np
 def datafiles(dd):
     f_name_re0 = re.compile(r'.+.pickle$')
     f_name_re1 = re.compile(r'^(?P<name>[^-]+)-(?P<axes>[^-]+)-')
-    f_name_re2 = re.compile(r'^(?P<value>[\d.-]+|inf|-inf)(?P<units>mm|m|keV|deg|ddeg)-?')
+    f_name_re2 = re.compile(r'^(?P<value>[\d.-]+|inf|-inf)(?P<units>mm|m|keV|deg|ddeg|arcsec|dmcm)-?')
 
     for f_name in os.listdir(dd):
         m0 = f_name_re0.match(f_name)
@@ -23,7 +23,8 @@ def datafiles(dd):
             'r1': None,
             'r2': None,
             'thickness': None,
-            'tth_offset': None
+            'tth_offset': None,
+            'xyz_offset': None
         }
 
         while m is not None:
@@ -46,6 +47,10 @@ def datafiles(dd):
                 result['alpha'] = float(m.group('value'))
             elif m.group('units') == 'ddeg':
                 result['tth_offset'] = float(m.group('value'))
+            elif m.group('units') == 'arcsec':
+                result['tth_offset'] = float(m.group('value'))
+            elif m.group('units') == 'dmcm':
+                result['xyz_offset'] = float(m.group('value'))
 
         yield result
 

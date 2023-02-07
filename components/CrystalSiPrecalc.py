@@ -212,10 +212,10 @@ class CrystalSiPrecalc(rm.CrystalSi):
                     (mat, mat - mit, mat - mit, mat - mit, 1., 2.,  np.inf))
         )
 
-        # plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
-        # plt.plot(thetas, self.f(thetas, *p), label=r'Fit')
-        # plt.legend()
-        # plt.show()
+        plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
+        plt.plot(thetas, self.f(thetas, *p), label=r'Fit')
+        plt.legend()
+        plt.show()
 
         return p
 
@@ -290,7 +290,7 @@ if __name__ == '__main__':
     # cr.thmin = -5000 * 1e-6
     # cr.thmax = 5000 * 1e-6
 
-    en = 29.5e3  # eV
+    en = 25.5e3  # eV
     alpha = np.radians(37.)
     crR = 2000.0  # mm
     crT = 1.7 # mm
