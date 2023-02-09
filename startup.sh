@@ -14,7 +14,7 @@ sleep 2
 
 tmux send-keys -t skif-xrt:editor.0 "conda activate xrt && export PYTHONPATH=$PWD && nvim" C-m
 tmux send-keys -t skif-xrt:editor.1 "htop" C-m
-tmux send-keys -t skif-xrt:editor.2 "conda activate xrt && clear" C-m
+tmux send-keys -t skif-xrt:editor.2 "conda activate xrt && export PYTHONPATH=$PWD && clear" C-m
 
 tmux select-pane -t skif-xrt:editor.0
 
