@@ -26,10 +26,20 @@ class CrystalSiPrecalc(rm.CrystalSi):
         else:
             self.db_addr = kwargs.pop('database')
 
+        if 'mirrorRs' in kwargs.keys():
+            mirrorRs = kwargs.pop('mirrorRs')
+        else:
+            mirrorRs = False
+
         rm.CrystalSi.__init__(self, *args, **kwargs)
         
         self.db = None
         self.init_db()
+
+        if mirrorRs:
+            db_cp = self.db.copy()
+            db_cp['r'] *= -1.
+            self.db = pd.concat((self.db, db_cp), ignore_index=True)
 
         self.thmin = -2000 * 1e-6
         self.thmax = 2000 * 1e-6
@@ -289,24 +299,25 @@ class CrystalSiPrecalc(rm.CrystalSi):
 if __name__ == '__main__':
     from matplotlib import pyplot as plt
 
-    # cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
+    # ############################################### ADDING MERIDIONAL ################################################
 
-    # ############################################### ADDING INFO TO DB ################################################
+    # cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
 
     # cr.thmin = -5000 * 1e-6
     # cr.thmax = 5000 * 1e-6
+    
+    # for k in ['en', 't', 'r', 'chi']: 
+    #     print(k, list(sorted(set(cr.db[k]))))
+    
+    # for en in sorted(set(cr.db['en'])):
+    #     for t in sorted(set(cr.db['t'])):
+    #         t *= 1e-3
+    #         cr.t = t
+    #         for alpha in sorted(set(cr.db['chi'])):
+    #             alpha = np.radians(alpha)
+    #             for r in list(sorted(set(cr.db['r']))):
+    #                 cr.db_add(en=en, t=cr.t, r=-r, chi=alpha)
 
-    # en = 25.5e3  # eV
-    # alpha = np.radians(37.)
-    # crR = 2000.0  # mm
-    # crT = 1.7 # mm
-    
-    # for crT in [1.6, 1.8, 2.0, 2.2, 2.4]:
-    #     cr.t = crT
-    #     for alpha in [np.radians(35.), np.radians(36.), np.radians(-35.), np.radians(-36.)]:
-    #         for crR in [18.e3, 20.e3, 22.e3, np.inf]:
-    #             cr.db_add(en=en, t=crT, r=crR, chi=alpha)
-    
     # cr.save_db()
 
     # ################################################### PLOTTING #####################################################
@@ -358,7 +369,8 @@ if __name__ == '__main__':
     dd = '/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/09_oasys/SKIF-1-5/wd'
     cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True, 
                           database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
-    
+    for k in ['en', 't', 'r', 'chi']: 
+        print(k, list(sorted(set(cr.db[k]))))
     for f_name in os.listdir(dd):
         m = re.match(r'^dp_en(?P<en>[\d]+)_t(?P<t>[\d]+)_r(?P<r>[\d]+)_chi(?P<chi>[\d-]+).dat$', f_name)
         if m is None:
@@ -376,23 +388,4 @@ if __name__ == '__main__':
 
         cr.db_add_ext(en=en, t=cr.t, r=crR, chi=alpha, thetas=thetas, ref=ref)
     cr.save_db()
-
-
-    # d = np.loadtxt('/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/09_oasys/SKIF-1-5/wd/diff_pat.dat',
-    #                skiprows=5)
-    # thetas = d[:, 0] * 1e-6
-    # ref = d[:, -1]
-
-    # cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True, 
-    #                       database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
-    
-    # en = 35.e3  # eV
-    # alpha = np.radians(-30.)
-    # crR = 100000.0  # mm
-    # crT = .2  # mm
-
-    # cr.t = crT
-    
-    # cr.db_add_ext(en=en, t=crT, r=crR, chi=alpha, thetas=thetas, ref=ref)
-    # cr.save_db()
 

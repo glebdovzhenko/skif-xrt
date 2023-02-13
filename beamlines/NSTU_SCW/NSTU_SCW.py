@@ -28,16 +28,18 @@ monochromator_alignment_energy = 30.e3
 monochromator_c1_alpha = np.radians(35.3)
 monochromator_c1_thickness = .2
 monochromator_c2_alpha = np.radians(35.3)
-monochromator_c2_thickness = .2
+monochromator_c2_thickness = 2.0
 
 
 # #################################################### MATERIALS #######################################################
 
 
 cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness, 
-                       database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
-cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness, 
-                       database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
+                           database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv',
+                           mirrorRs=True)
+# cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness, 
+#                        database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
+cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
 
 
 # #################################################### BEAMLINE ########################################################
@@ -105,7 +107,7 @@ class NSTU_SCW(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c2_alpha,
             material=(cr_si_2,),
-            bendingOrientation='sagittal',
+            bendingOrientation='meridional',
             R=np.inf,
             targetOpenCL='CPU',
             limPhysY=monochromator_y_lim,
