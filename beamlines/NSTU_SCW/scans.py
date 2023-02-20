@@ -4,7 +4,7 @@ import numpy as np
 import pickle
 import matplotlib
 
-# matplotlib.use('agg')
+matplotlib.use('agg')
 
 import xrt.runner as xrtrun
 import xrt.plotter as xrtplot
@@ -76,47 +76,32 @@ def get_focus(plts: List, bl: NSTU_SCW):
     subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/nstu-scw'
     scan_name = 'get_focus'
 
-    if not os.path.exists(os.path.join(subdir, scan_name)):
-        os.mkdir(os.path.join(subdir, scan_name))
-    else:
-        for f_name in os.listdir(os.path.join(subdir, scan_name)):
-            os.remove(os.path.join(subdir, scan_name, f_name))
+    # if not os.path.exists(os.path.join(subdir, scan_name)):
+    #     os.mkdir(os.path.join(subdir, scan_name))
+    # else:
+    #     for f_name in os.listdir(os.path.join(subdir, scan_name)):
+    #         os.remove(os.path.join(subdir, scan_name, f_name))
     
     en = 30.e3
-    bl.MonochromatorCr1.R = -2.e3
-    bl.MonochromatorCr2.R = np.inf
-    bl.align_energy(en, 5e-3)
+    # for r in [2., 4., 6., 8., 10., 15., 20., 25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35.]:
+    for r in [2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 
+              4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5., 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9]:
+        bl.MonochromatorCr1.R = 1e3 * r
+        bl.MonochromatorCr2.R = 1e3 * r
+        bl.align_energy(en, 5e-3)
 
-    for plot in plts:
-        el, crd = plot.title.split('-')
-        if (el not in ('FE', 'EM', 'C1C2')) or (crd not in ('XXpr', 'ZZpr')):
-            continue
+        for plot in plts:
+            el, crd = plot.title.split('-')
+            if (el not in ('FE', 'EM', 'C1C2')) or (crd not in ('XXpr', 'ZZpr')):
+                continue
 
-        plot.saveName = os.path.join(subdir, scan_name, plot.title + '.png')
-        plot.persistentName = plot.saveName.replace('.png', '.pickle')
-    else:
+            plot.saveName = os.path.join(subdir, scan_name, 
+                                     plot.title + '-%sm' % bl.MonochromatorCr1.pretty_R() + '.png'
+                                     )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+        
         yield
 
-    for f_name in sorted(filter(lambda x: x[-7:] == '.pickle', os.listdir(os.path.join(subdir, scan_name)))):
-        with open(os.path.join(subdir, scan_name, f_name), 'rb') as f:
-            data = pickle.load(f)
-            k, b = get_line_kb(data)
-            dist = -np.sign(k) * np.sqrt((1. / k) ** 2 + (b / k) ** 2)
-
-            if f_name.split('-')[0] == 'C1C2':
-                dist -= np.sqrt(np.sum((np.array(bl.Cr1Monitor.center) - np.array(bl.MonochromatorCr1.center))**2))
-            elif f_name.split('-')[0] == 'EM':
-                dist -= np.sqrt(np.sum((np.array(bl.Cr2Monitor.center) - np.array(bl.MonochromatorCr2.center))**2))
-
-            print(f_name, dist)
-
-
-def focus_scan(plts: List, bl: NSTU_SCW):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/nstu-scw'
-    scan_name = 'focus_scan'
-
-    yield
-    
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()

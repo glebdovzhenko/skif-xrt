@@ -1,12 +1,16 @@
 from typing import List
 import os
 import numpy as np
+import pandas as pd
+import pickle
 import matplotlib
 matplotlib.use('agg')
 
 import xrt.runner as xrtrun
 import xrt.plotter as xrtplot
 import xrt.backends.raycing as raycing
+
+from utils.xrtutils import get_line_kb
 
 from SKIF_1_5 import SKIF15
 
@@ -17,44 +21,44 @@ z_kwds = {r'label': r'$z$', r'unit': r'mm', r'data': raycing.get_z}
 xpr_kwds = {r'label': r'$x^{\prime}$', r'unit': r'', r'data': raycing.get_xprime}
 zpr_kwds = {r'label': r'$z^{\prime}$', r'unit': r'', r'data': raycing.get_zprime}
 
-# for beam, t1 in zip(('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local', 'BeamMonoC2Local', 
-#                      'BeamMonitor2Local', 'BeamAperture2Local'), 
-#                     ('FE', 'C1', 'C1C2', 'C2', 'EM', 'ES')):
-#     for t2, xkw, ykw in zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds, z_kwds), (z_kwds, xpr_kwds, zpr_kwds)):
-#         plots.append(xrtplot.XYCPlot(beam=beam, title='-'.join((t1, t2)), 
-#                                      xaxis=xrtplot.XYCAxis(**xkw), yaxis=xrtplot.XYCAxis(**ykw),
-#                                      aspect='auto'))
+for beam, t1 in zip(('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local', 'BeamMonoC2Local', 
+                     'BeamMonitor2Local', 'BeamAperture2Local'), 
+                    ('FE', 'C1', 'C1C2', 'C2', 'EM', 'ES')):
+    for t2, xkw, ykw in zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds, z_kwds), (z_kwds, xpr_kwds, zpr_kwds)):
+        plots.append(xrtplot.XYCPlot(beam=beam, title='-'.join((t1, t2)), 
+                                     xaxis=xrtplot.XYCAxis(**xkw), yaxis=xrtplot.XYCAxis(**ykw),
+                                     aspect='auto'))
 
-for beam in sum([[b_name % (ii + 1) for ii in range(11)] for b_name in 
-                 ('BeamFilter%dLocal1', 'BeamFilter%dLocal2', 'BeamFilter%dLocal2a')], []):
+# for beam in sum([[b_name % (ii + 1) for ii in range(11)] for b_name in 
+#                  ('BeamFilter%dLocal1', 'BeamFilter%dLocal2', 'BeamFilter%dLocal2a')], []):
     
-    t1 = beam.replace('Local1', '').replace('Local2a', '').replace('Local2', '').replace('BeamFilter', 'F')
+#     t1 = beam.replace('Local1', '').replace('Local2a', '').replace('Local2', '').replace('BeamFilter', 'F')
 
-    if beam[-6:] == 'Local1':
-        plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'I-XZ'), aspect='auto',
-                            xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
-                            yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
-        plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'P-XZ'), aspect='auto', fluxKind='power',
-                            xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
-                            yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
-    elif beam[-6:] == 'Local2':
-        plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'IT-XZ'), aspect='auto',
-                            xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
-                            yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
-    elif beam[-7:] == 'Local2a':
-        plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'PA-XZ'), aspect='auto', fluxKind='power',
-                            xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
-                            yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
-    else:
-        pass
-else:
-    plots.append(xrtplot.XYCPlot(beam='BeamMonoC1Local2a', title=('C1PA-XZ'), aspect='auto', fluxKind='power',
-                 xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
-                 yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
+#     if beam[-6:] == 'Local1':
+#         plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'I-XZ'), aspect='auto',
+#                             xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
+#                             yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
+#         plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'P-XZ'), aspect='auto', fluxKind='power',
+#                             xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
+#                             yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
+#     elif beam[-6:] == 'Local2':
+#         plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'IT-XZ'), aspect='auto',
+#                             xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
+#                             yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
+#     elif beam[-7:] == 'Local2a':
+#         plots.append(xrtplot.XYCPlot(beam=beam, title=(t1+'PA-XZ'), aspect='auto', fluxKind='power',
+#                             xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
+#                             yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
+#     else:
+#         pass
+# else:
+#     plots.append(xrtplot.XYCPlot(beam='BeamMonoC1Local2a', title=('C1PA-XZ'), aspect='auto', fluxKind='power',
+#                  xaxis=xrtplot.XYCAxis(label='$x$', unit='mm', data=raycing.get_x),
+#                  yaxis=xrtplot.XYCAxis(label='$y$', unit='mm', data=raycing.get_y)))
 
 
 def onept(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'test'
     
     r = 3.5e3
@@ -68,8 +72,41 @@ def onept(plts: List, bl: SKIF15):
     yield
     
 
+def get_focus(plts: List, bl: SKIF15):
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
+    scan_name = 'get_focus'
+
+    # if not os.path.exists(os.path.join(subdir, scan_name)):
+    #     os.mkdir(os.path.join(subdir, scan_name))
+    # else:
+    #     for f_name in os.listdir(os.path.join(subdir, scan_name)):
+    #         os.remove(os.path.join(subdir, scan_name, f_name))
+    
+    en = 30.e3
+    # for r in [np.inf, 10., 15., 20., 25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35., 
+    #           40., 45., 50., 55., 60., 65., 70., 75., 80., 85., 90., 95., 100., 110., 120., 130., 
+    #           140., 150., 160., 170., 180., 190., 200.]:
+    for r in [71., 72., 73., 74., 76., 77., 78., 79., 81., 82., 83., 84., 86., 87., 88., 89.,
+              91., 92., 93., 94., 96., 97., 98., 99., 101., 102., 103., 104., 105., 106., 107., 108., 109.]:
+        bl.MonochromatorCr1.R = 1e3 * r
+        bl.MonochromatorCr2.R = 1e3 * r
+        bl.align_energy(en, bl.get_de_over_e(bl.MonochromatorCr1.R, 30.e3))
+
+        for plot in plts:
+            el, crd = plot.title.split('-')
+            if (el not in ('FE', 'EM', 'C1C2')) or (crd not in ('XXpr', 'ZZpr')):
+                continue
+
+            plot.saveName = os.path.join(subdir, scan_name, 
+                                     plot.title + '-%sm' % bl.MonochromatorCr1.pretty_R() + '.png'
+                                     )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+        
+        yield
+        
+
 def e_scan(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'e_scan'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -99,7 +136,7 @@ def e_scan(plts: List, bl: SKIF15):
 
 
 def chi_scan(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'chi_scan'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -150,7 +187,7 @@ def chi_scan(plts: List, bl: SKIF15):
 
 
 def t_scan(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 't_scan'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -187,7 +224,7 @@ def t_scan(plts: List, bl: SKIF15):
 
 
 def r_scan(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'r_scan'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -222,7 +259,7 @@ def r_scan(plts: List, bl: SKIF15):
             yield
 
 def r_map(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'r_map'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -260,7 +297,7 @@ def r_map(plts: List, bl: SKIF15):
 
 
 def tth_offset_scan(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'tth_offset_scan2'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -305,7 +342,7 @@ def tth_offset_scan(plts: List, bl: SKIF15):
 
 
 def roll_offset_scan(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'roll_offset_scan'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -353,7 +390,7 @@ def roll_offset_scan(plts: List, bl: SKIF15):
 
 
 def yaw_offset_scan(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'yaw_offset_scan'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -401,7 +438,7 @@ def yaw_offset_scan(plts: List, bl: SKIF15):
 
 
 def y_offset_scan(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'y_offset_scan'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -449,7 +486,7 @@ def y_offset_scan(plts: List, bl: SKIF15):
 
 
 def z_offset_scan(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'test'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -497,7 +534,7 @@ def z_offset_scan(plts: List, bl: SKIF15):
 
 
 def calc_abs(plts: List, bl: SKIF15):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
     scan_name = 'absorption'
     
     if not os.path.exists(os.path.join(subdir, scan_name)):
@@ -526,7 +563,7 @@ def calc_abs(plts: List, bl: SKIF15):
 
 if __name__ == '__main__':
     beamline = SKIF15()
-    scan = calc_abs
+    scan = get_focus
     show = False
     repeats = 1
 

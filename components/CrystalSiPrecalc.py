@@ -301,24 +301,25 @@ if __name__ == '__main__':
 
     # ############################################### ADDING MERIDIONAL ################################################
 
-    # cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
+    cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
 
-    # cr.thmin = -5000 * 1e-6
-    # cr.thmax = 5000 * 1e-6
+    cr.thmin = -5000 * 1e-6
+    cr.thmax = 5000 * 1e-6
     
-    # for k in ['en', 't', 'r', 'chi']: 
-    #     print(k, list(sorted(set(cr.db[k]))))
+    for k in ['en', 't', 'r', 'chi']: 
+        print(k, list(sorted(set(cr.db[k]))))
     
-    # for en in sorted(set(cr.db['en'])):
-    #     for t in sorted(set(cr.db['t'])):
-    #         t *= 1e-3
-    #         cr.t = t
-    #         for alpha in sorted(set(cr.db['chi'])):
-    #             alpha = np.radians(alpha)
-    #             for r in list(sorted(set(cr.db['r']))):
-    #                 cr.db_add(en=en, t=cr.t, r=-r, chi=alpha)
+    for en in sorted(set(cr.db['en'])):
+        for t in sorted(set(cr.db['t'])):
+            t *= 1e-3
+            cr.t = t
+            for alpha in sorted(set(cr.db['chi'])):
+                alpha = np.radians(alpha)
+                for r in (65000., 70000., 75000., 80000., 85000., 90000., 95000., 100000., 110000., 120000., 130000., 140000., 15000.):
+                    cr.db_add(en=en, t=cr.t, r=r, chi=alpha)
+                    cr.db_add(en=en, t=cr.t, r=-r, chi=alpha)
 
-    # cr.save_db()
+    cr.save_db()
 
     # ################################################### PLOTTING #####################################################
 
@@ -366,26 +367,26 @@ if __name__ == '__main__':
 
     # ############################################### ADDING SAGITTAL ##################################################
     
-    dd = '/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/09_oasys/SKIF-1-5/wd'
-    cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True, 
-                          database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
-    for k in ['en', 't', 'r', 'chi']: 
-        print(k, list(sorted(set(cr.db[k]))))
-    for f_name in os.listdir(dd):
-        m = re.match(r'^dp_en(?P<en>[\d]+)_t(?P<t>[\d]+)_r(?P<r>[\d]+)_chi(?P<chi>[\d-]+).dat$', f_name)
-        if m is None:
-            continue
+    # dd = '/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/09_oasys/SKIF-1-5/wd'
+    # cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True, 
+    #                       database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
+    # for k in ['en', 't', 'r', 'chi']: 
+    #     print(k, list(sorted(set(cr.db[k]))))
+    # for f_name in os.listdir(dd):
+    #     m = re.match(r'^dp_en(?P<en>[\d]+)_t(?P<t>[\d]+)_r(?P<r>[\d]+)_chi(?P<chi>[\d-]+).dat$', f_name)
+    #     if m is None:
+    #         continue
 
-        gd = m.groupdict()
-        d = np.loadtxt(os.path.join(dd, f_name), skiprows=5)
-        thetas = d[:, 0] * 1e-6
-        ref = d[:, -1]
+    #     gd = m.groupdict()
+    #     d = np.loadtxt(os.path.join(dd, f_name), skiprows=5)
+    #     thetas = d[:, 0] * 1e-6
+    #     ref = d[:, -1]
 
-        en = float(gd['en'])
-        alpha = np.radians(float(gd['chi']))
-        crR = float(gd['r'])
-        cr.t = 1e-3 * float(gd['t'])
+    #     en = float(gd['en'])
+    #     alpha = np.radians(float(gd['chi']))
+    #     crR = float(gd['r'])
+    #     cr.t = 1e-3 * float(gd['t'])
 
-        cr.db_add_ext(en=en, t=cr.t, r=crR, chi=alpha, thetas=thetas, ref=ref)
-    cr.save_db()
+    #     cr.db_add_ext(en=en, t=cr.t, r=crR, chi=alpha, thetas=thetas, ref=ref)
+    # cr.save_db()
 

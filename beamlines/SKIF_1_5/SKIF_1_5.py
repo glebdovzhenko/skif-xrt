@@ -38,10 +38,10 @@ monochromator_c2_thickness = 2.2
 # #################################################### MATERIALS #######################################################
 
 
-cr_si_1 = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
-cr_si_2 = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
-# cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
-# cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
+# cr_si_1 = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
+# cr_si_2 = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
+cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
+cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
 filter_diamond = rm.Material('C', rho=3.5)
 filter_si_c = rm.Material(('Si', 'C'), quantities=(1, 1), rho=3.16)
 filter_si = rm.Material('Si', rho=2.33)
@@ -244,7 +244,7 @@ class SKIF15(raycing.BeamLine):
         For meridional bend with focus behind the crystal.
         Can be used as wiggler energy limits, plot limits, etc.
         """
-        dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/de_to_e_br'
+        dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15/de_to_e_br'
 
         
         rs, de = [], []
@@ -266,7 +266,7 @@ class SKIF15(raycing.BeamLine):
 
     @staticmethod
     def get_dzpr(r):
-        dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/de_to_e_br'
+        dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15/de_to_e_br'
 
         rs, dzpr = [], []
         for metadata in datafiles(dd):
@@ -511,5 +511,5 @@ def run_process(bl: SKIF15):
     }
 
 
-rrun.run_process = run_process_filters
+rrun.run_process = run_process
 
