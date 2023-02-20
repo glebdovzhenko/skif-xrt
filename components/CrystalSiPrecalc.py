@@ -90,33 +90,42 @@ class CrystalSiPrecalc(rm.CrystalSi):
     def db_interpolate(self, **kwargs):
         xs = self.params_to_db_values(**kwargs)
         inf_r = np.isinf(xs['r'])
-
+        
+        # checking if r is finite or infinite
         if inf_r:
             db_xs_fields = 't', 'chi'
         else:
             db_xs_fields = 't', 'r', 'chi'
-
-        if isinstance(xs['en'], np.ndarray):
-            # xs = np.array([xs['en'], [xs['t']] * xs['en'].size,
-            #                [xs['r']] * xs['en'].size, [xs['chi']] * xs['en'].size]).T
-            xs = np.array([xs['en'], *[[xs[f]] * xs['en'].size for f in db_xs_fields]]).T
-        else:
-            # xs = np.array([[xs['en'], xs['t'], xs['r'], xs['chi']]])
-            xs = np.array([[xs['en']] + [xs[f] for f in db_xs_fields]])
         
+        # selecting only finite or only infinite r values
         if inf_r:
             db_xs = self.db.loc[np.isinf(self.db['r'])]
         else:
             db_xs = self.db.loc[~np.isinf(self.db['r'])]
-
         
+        # selecting only positive / negative chi and r values
+        for xf in ['r', 'chi']:
+            if xs[xf] > 0:
+                db_xs = db_xs.loc[db_xs[xf] > 0]
+            else:
+                db_xs = db_xs.loc[db_xs[xf] < 0]
+        
+        # only selecting 3 closest values to the interpolated one
+        for xf, xfvs in zip(db_xs_fields, [set(db_xs[x]) for x in db_xs_fields]):
+            xfvs = list(sorted(xfvs, key=lambda x: (x - xs[xf])**2))[:3]
+            db_xs = db_xs.loc[(db_xs[xf] == xfvs[0]) | (db_xs[xf] == xfvs[1]) | (db_xs[xf] == xfvs[2])]
+        
+        # constructing xdata / ydata arrays for griddata
         db_ys = db_xs.loc[:, [col for col in self.db_columns if 'fit_' in col]]
-        db_xs = db_xs.loc[:, ['en', *db_xs_fields]].to_numpy()
-
-        # if not inf_r:
-        #     ii = ~np.isinf(db_xs[:, 2])
-        #     db_xs = db_xs[ii]
+        db_xs = db_xs.loc[:, ['en', *db_xs_fields]].to_numpy()       
         
+        # constructing xs array for griddata
+        if isinstance(xs['en'], np.ndarray):
+            xs = np.array([xs['en'], *[[xs[f]] * xs['en'].size for f in db_xs_fields]]).T
+        else:
+            xs = np.array([[xs['en']] + [xs[f] for f in db_xs_fields]])
+        
+        # interpolating each parameter
         result = dict()
         for par in ['fit_c', 'fit_hw', 'fit_gw', 'fit_lw', 'fit_pv', 'fit_a', 'fit_skew']:
             result[par] = griddata(db_xs, db_ys.loc[:, par].to_numpy(), xs, method='linear').squeeze()[()]
@@ -301,44 +310,45 @@ if __name__ == '__main__':
 
     # ############################################### ADDING MERIDIONAL ################################################
 
-    cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
+    # cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
 
-    cr.thmin = -5000 * 1e-6
-    cr.thmax = 5000 * 1e-6
+    # cr.thmin = -5000 * 1e-6
+    # cr.thmax = 5000 * 1e-6
     
-    for k in ['en', 't', 'r', 'chi']: 
-        print(k, list(sorted(set(cr.db[k]))))
+    # for k in ['en', 't', 'r', 'chi']: 
+    #     print(k, list(sorted(set(cr.db[k]))))
     
-    for en in sorted(set(cr.db['en'])):
-        for t in sorted(set(cr.db['t'])):
-            t *= 1e-3
-            cr.t = t
-            for alpha in sorted(set(cr.db['chi'])):
-                alpha = np.radians(alpha)
-                for r in (65000., 70000., 75000., 80000., 85000., 90000., 95000., 100000., 110000., 120000., 130000., 140000., 15000.):
-                    cr.db_add(en=en, t=cr.t, r=r, chi=alpha)
-                    cr.db_add(en=en, t=cr.t, r=-r, chi=alpha)
+    # for en in sorted(set(cr.db['en'])):
+    #     for t in sorted(set(cr.db['t'])):
+    #         t *= 1e-3
+    #         cr.t = t
+    #         for alpha in sorted(set(cr.db['chi'])):
+    #             alpha = np.radians(alpha)
+    #             for r in (65000., 70000., 75000., 80000., 85000., 90000., 95000., 100000., 110000., 120000., 130000., 140000., 15000.):
+    #                 cr.db_add(en=en, t=cr.t, r=r, chi=alpha)
+    #                 cr.db_add(en=en, t=cr.t, r=-r, chi=alpha)
 
-    cr.save_db()
+    # cr.save_db()
 
     # ################################################### PLOTTING #####################################################
+    
+    cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
 
-    # en = 25.e3  # eV
-    # alpha = np.radians(20.)
-    # crR = 2000.0  # mm
-    # crT = 2.  # mm
-    #
-    # for en in [25e3, 30e3, 35e3, 40e3]:
-    #     params = cr.db_locate(en=en, t=crT, r=crR, chi=alpha)
-    #     if params is None:
-    #         raise ValueError('Parameter set not found in DB')
-    #
-    #     thetas = np.linspace(-1000, 500, 500) * 1e-6
-    #
-    #     plt.plot(thetas, cr.f(thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_a'],
-    #                           params['fit_skew']), label='%d keV' % np.round(en * 1e-3))
-    # plt.legend()
-    # plt.show()
+    en = 30.e3  # eV
+    alpha = np.radians(35.3)
+    crR = 20000.0  # mm
+    crT = 2.  # mm
+    
+    params = cr.db_interpolate(en=en, t=crT, r=crR, chi=alpha)
+    if params is None:
+        raise ValueError('Parameter set not found in DB')
+    
+    thetas = np.linspace(-1000, 500, 500) * 1e-6
+    plt.plot(thetas, cr.f(thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_lw'], 
+                          params['fit_pv'], params['fit_a'], params['fit_skew']), 
+             label='%d keV' % np.round(en * 1e-3))
+    plt.legend()
+    plt.show()
 
     # ################################################ INTERPOLATION ###################################################
 
