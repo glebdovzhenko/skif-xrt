@@ -113,7 +113,8 @@ class CrystalSiPrecalc(rm.CrystalSi):
         # only selecting 3 closest values to the interpolated one
         for xf, xfvs in zip(db_xs_fields, [set(db_xs[x]) for x in db_xs_fields]):
             xfvs = list(sorted(xfvs, key=lambda x: (x - xs[xf])**2))[:3]
-            db_xs = db_xs.loc[(db_xs[xf] == xfvs[0]) | (db_xs[xf] == xfvs[1]) | (db_xs[xf] == xfvs[2])]
+            # db_xs = db_xs.loc[(db_xs[xf] == xfvs[0]) | (db_xs[xf] == xfvs[1]) | (db_xs[xf] == xfvs[2])]
+            db_xs = db_xs.loc[reduce(lambda a, b: a | b, ((db_xs[xf] == xfvs[ii]) for ii in range(len(xfvs))))]
         
         # constructing xdata / ydata arrays for griddata
         db_ys = db_xs.loc[:, [col for col in self.db_columns if 'fit_' in col]]
@@ -178,10 +179,14 @@ class CrystalSiPrecalc(rm.CrystalSi):
             return
 
         p1 = self.calc_params(thetas=thetas, ref=ref)
+        if p1 is None:
+            return
         thetas_hw = max(np.abs(p1[1]) + 3. * np.abs(p1[2]), 5e-5)
         ii = (p1[0] - thetas_hw < thetas) & (thetas < p1[0] + thetas_hw)
         thetas, ref = thetas[ii], ref[ii]
         p = self.calc_params(thetas=thetas, ref=ref)
+        if p is None:
+            return
         
         res = {
             **db_pars,
@@ -230,15 +235,27 @@ class CrystalSiPrecalc(rm.CrystalSi):
         # plt.plot(thetas, self.f(thetas, *p0), label=r'Fit')
         # plt.legend()
         # plt.show()
+        
+        try: 
+            p, _ = curve_fit(
+                self.f, thetas, ref, p0, max_nfev=10000, 
+                bounds=((mit, 0.,        0.,        0.,        0., 0., -np.inf), 
+                        (mat, mat - mit, mat - mit, mat - mit, 1., 2.,  np.inf))
+            )
+        except RuntimeError:
+            plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
+            plt.plot(thetas, self.f(thetas, *p0), label=r'Guess')
+            plt.legend()
+            plt.show()
 
-        p, _ = curve_fit(
-            self.f, thetas, ref, p0, max_nfev=10000, 
-            bounds=((mit, 0.,        0.,        0.,        0., 0., -np.inf), 
-                    (mat, mat - mit, mat - mit, mat - mit, 1., 2.,  np.inf))
-        )
+            td = input('What do? [s]kip / [a]dd')
+            if td == 's':
+                return None
+            elif td == 'a':
+                return p0
 
         # plt.plot(thetas, np.abs(ref), label=r'$R_{TT}$')
-        # plt.plot(thetas, self.f(thetas, *p), label=r'Fit')
+        # plt.plot(thetas, self.f(thetas, *p), label=r'Guess')
         # plt.legend()
         # plt.show()
 
@@ -324,7 +341,7 @@ if __name__ == '__main__':
     #         cr.t = t
     #         for alpha in sorted(set(cr.db['chi'])):
     #             alpha = np.radians(alpha)
-    #             for r in (65000., 70000., 75000., 80000., 85000., 90000., 95000., 100000., 110000., 120000., 130000., 140000., 15000.):
+    #             for r in (150.e3, 160.e3, 170.e3, 180.e3, 190.e3, 200.e3, 220.e3, 240.e3, 260.e3, 280.e3, 300.e3):
     #                 cr.db_add(en=en, t=cr.t, r=r, chi=alpha)
     #                 cr.db_add(en=en, t=cr.t, r=-r, chi=alpha)
 
@@ -332,23 +349,21 @@ if __name__ == '__main__':
 
     # ################################################### PLOTTING #####################################################
     
-    cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
+    # cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True)
 
-    en = 30.e3  # eV
-    alpha = np.radians(35.3)
-    crR = 20000.0  # mm
-    crT = 2.  # mm
-    
-    params = cr.db_interpolate(en=en, t=crT, r=crR, chi=alpha)
-    if params is None:
-        raise ValueError('Parameter set not found in DB')
-    
-    thetas = np.linspace(-1000, 500, 500) * 1e-6
-    plt.plot(thetas, cr.f(thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_lw'], 
-                          params['fit_pv'], params['fit_a'], params['fit_skew']), 
-             label='%d keV' % np.round(en * 1e-3))
-    plt.legend()
-    plt.show()
+    # en = 30.e3  # eV
+    # alpha = np.radians(35.3)
+    # crR = 20000.0  # mm
+    # crT = 2.  # mm
+       
+    # thetas = np.linspace(-1000, 500, 500) * 1e-6
+    # for crR in [-np.inf, np.inf]:
+    #     params = cr.db_interpolate(en=en, t=crT, r=crR, chi=alpha) 
+    #     plt.plot(thetas, cr.f(thetas, params['fit_c'], params['fit_hw'], params['fit_gw'], params['fit_lw'], 
+    #                           params['fit_pv'], params['fit_a'], params['fit_skew']), 
+    #              label='%d keV' % np.round(en * 1e-3))
+    # plt.legend()
+    # plt.show()
 
     # ################################################ INTERPOLATION ###################################################
 
@@ -377,26 +392,40 @@ if __name__ == '__main__':
 
     # ############################################### ADDING SAGITTAL ##################################################
     
-    # dd = '/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/09_oasys/SKIF-1-5/wd'
-    # cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True, 
-    #                       database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
-    # for k in ['en', 't', 'r', 'chi']: 
-    #     print(k, list(sorted(set(cr.db[k]))))
-    # for f_name in os.listdir(dd):
-    #     m = re.match(r'^dp_en(?P<en>[\d]+)_t(?P<t>[\d]+)_r(?P<r>[\d]+)_chi(?P<chi>[\d-]+).dat$', f_name)
-    #     if m is None:
-    #         continue
+    dd = '/Users/glebdovzhenko/Dropbox/Documents/07_SKIF/09_oasys/SKIF-1-5/wd'
+    cr = CrystalSiPrecalc(geom='Laue reflected', hkl=(1, 1, 1), t=1., factDW=1., useTT=True, 
+                          database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
+    for k in ['en', 't', 'r', 'chi']: 
+        print(k, list(sorted(set(cr.db[k]))))
 
-    #     gd = m.groupdict()
-    #     d = np.loadtxt(os.path.join(dd, f_name), skiprows=5)
-    #     thetas = d[:, 0] * 1e-6
-    #     ref = d[:, -1]
+    for en in sorted(set(cr.db['en'])):
+        for t in sorted(set(cr.db['t'])):
+            t *= 1e-3
+            cr.t = t
+            for alpha in sorted(set(cr.db['chi'])):
+                alpha = np.radians(alpha)
+                for r in [np.inf, ]:
+                    cr.db_add(en=en, t=cr.t, r=r, chi=alpha)
+                    cr.db_add(en=en, t=cr.t, r=-r, chi=alpha)
 
-    #     en = float(gd['en'])
-    #     alpha = np.radians(float(gd['chi']))
-    #     crR = float(gd['r'])
-    #     cr.t = 1e-3 * float(gd['t'])
+    cr.save_db()
 
-    #     cr.db_add_ext(en=en, t=cr.t, r=crR, chi=alpha, thetas=thetas, ref=ref)
-    # cr.save_db()
+    for f_name in os.listdir(dd):
+        m = re.match(r'^dp_en(?P<en>[\d]+)_t(?P<t>[\d]+)_r(?P<r>[\d-]+)_chi(?P<chi>[\d-]+).dat$', f_name)
+        if m is None:
+            continue
+
+        gd = m.groupdict()
+        d = np.loadtxt(os.path.join(dd, f_name), skiprows=5)
+        thetas = d[:, 0] * 1e-6
+        ref = d[:, -1]
+
+        en = float(gd['en'])
+        alpha = np.radians(float(gd['chi']))
+        crR = float(gd['r'])
+        cr.t = 1e-3 * float(gd['t'])
+
+        cr.db_add_ext(en=en, t=cr.t, r=crR, chi=alpha, thetas=thetas, ref=ref)
+        os.remove(os.path.join(dd, f_name))
+    cr.save_db()
 

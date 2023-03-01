@@ -64,6 +64,7 @@ class BentLaueCylinder(OE):
             '-' if self.R > 0 else '+',
             'y' if self.bendingOrientation == 'meridional' else 'x'
         )
+        # print(self.R, '\n', self.bendingOrientation, '\n', self.cl_local_z)
 
     def local_z(self, x, y):
         """Determines the surface of OE at (*x*, *y*) position."""
@@ -114,11 +115,62 @@ class BentLaueCylinder(OE):
             c = 1. / norm
         else:
             raise ValueError('unknown crossSection!')
-        if alpha:
-            bB, cB = raycing.rotate_x(b, c, -self.sinalpha, -self.cosalpha)
-        else:
+        
+        # by this point we have [a, b, c] as norm vector with Abs == 1.
+        # now we need to figure out the rotation.
+        
+        if not alpha:
             bB, cB = c, -b
-        return [a, bB, cB, a, b, c]
+            return [a, bB, cB, a, b, c]
+
+        if np.isinf(R):
+            if alpha:
+                bB, cB = raycing.rotate_x(b, c, -self.sinalpha, -self.cosalpha)
+            else:
+                bB, cB = c, -b
+            return [a, bB, cB, a, b, c]
+
+        # this is the deformation (rotation) we need to apply to bragg norm
+        cosrot = c
+        sinrot = np.sqrt(a**2 + b**2)
+        aRD = -b
+        bRD = a
+        cRD = np.zeros_like(x)
+        
+        # this is undeformed state of bragg norm
+        aB = np.zeros_like(x)
+        bB, cB = raycing.rotate_x(np.zeros_like(x), np.ones_like(x), 
+                                  -self.sinalpha, -self.cosalpha)
+
+        # rotation
+        aB, bB, cB = (1. / (aRD**2 + bRD**2 + cRD**2)) * (aRD * (aB * aRD + bB * bRD + cB * cRD) + (-aRD * (bB * bRD + cB * cRD) + aB * (bRD**2 + cRD**2)) * cosrot + (bRD * cB - bB * cRD) * np.sqrt(aRD**2 + bRD**2 + cRD**2) * sinrot), \
+            (1. / (aRD**2 + bRD**2 + cRD**2)) * (bRD * (aB * aRD + bB * bRD + cB * cRD) + (aRD**2 * bB - aB * aRD * bRD + cRD * (-bRD * cB + bB * cRD)) * cosrot - (aRD * cB - aB * cRD) * np.sqrt(aRD**2 + bRD**2 + cRD**2) * sinrot), \
+             (1. / (aRD**2 + bRD**2 + cRD**2)) * (cRD * (aB * aRD + bB * bRD + cB * cRD) + (aRD**2 * cB - aB * aRD * cRD + bRD * (bRD * cB - bB * cRD)) * cosrot + (aRD * bB - aB * bRD) * np.sqrt(aRD**2 + bRD**2 + cRD**2) * sinrot)
+
+        return [aB, bB, cB, a, b, c]
+
+
+        # if alpha:
+        #     bB, cB = raycing.rotate_x(b, c, -self.sinalpha, -self.cosalpha)
+        # else:
+        #     bB, cB = c, -b
+        # return [a, bB, cB, a, b, c]
+
+    # def _local_coord_system(self, x, y, R, alpha):
+    #     """
+    #     My own function for testing purposes.
+    #     Eq for the surface: z = R - np.sign(R) * np.sqrt(R**2 - V**2) where
+    #     V is y for meridional and
+    #     V is x for sagittal bend.
+
+    #     This gives us the normal vector [dz/dx, dz/dy, -1] as
+    #     [0, np.sign(R) * y / np.sqrt(R**2 - y**2), -1] for meridional and 
+    #     [np.sign(R) * x / np.sqrt(R**2 - x**2), 0, -1] for sagittal
+    #     Which after normalization becomes
+    #     [0, np.sign(R) * y / R, -np.sqrt(R**2 - y**2) / R] for meridional and
+    #     [np.sign(R) * x / R, 0, -np.sqrt(R**2 - x**2) / R] for sagittal.
+
+    #     """
 
     def local_n(self, x, y):
         """Determines the normal vector of OE at (x, y) position."""
@@ -164,57 +216,58 @@ if __name__ == '__main__':
 
     # for orient in ('meridional', 'sagittal'):
     #     m1.bendingOrientation = orient
-    #
+    
     #     for r in [3000, -3000, np.inf]:
     #         m1.R = r
     #         print(r, m1.R)
-    #
+    
     #         xs, ys = np.meshgrid(np.linspace(-5, 5, 10), np.linspace(-5, 5, 10))
     #         zs = m1.local_z(xs, ys)
-    #
+    
     #         fig = plt.figure('My class: R = %.01f m; %s' % (r, orient))
     #         ax = plt.axes(projection='3d')
     #         surf = ax.plot_surface(xs, ys, zs, cmap=cm.coolwarm,
     #                                linewidth=0, antialiased=False)
     #         plt.xlabel('local x')
     #         plt.ylabel('local y')
-    #
+    
     # for r in [3000, -3000, np.inf]:
     #     m2.R = r
     #     print(r, m2.R)
-    #
+    
     #     xs, ys = np.meshgrid(np.linspace(-5, 5, 10), np.linspace(-5, 5, 10))
     #     zs = m2.local_z(xs, ys)
-    #
+    
     #     fig = plt.figure('Original class: R = %.01f m' % r)
     #     ax = plt.axes(projection='3d')
     #     surf = ax.plot_surface(xs, ys, zs, cmap=cm.coolwarm,
     #                            linewidth=0, antialiased=False)
     #     plt.xlabel('local x')
     #     plt.ylabel('local y')
+    
+    for rr in [-10., 10.]:
+        for orient in ['meridional', 'sagittal']:
+            for mi, name in zip((m1, m2), ('My', 'Original')):
+                ax = plt.figure(name + ' ' + orient + ' R=%d mm' % rr).add_subplot(projection='3d')
 
-    ax = plt.figure().add_subplot(projection='3d')
+                # Make the grid
+                x, y, z = np.meshgrid(np.linspace(-5, 5, 10), np.linspace(-5, 5, 10), [0.])
 
-    # Make the grid
-    x, y, z = np.meshgrid(np.linspace(-5, 5, 10), np.linspace(-5, 5, 10),
-                          [0.])
-    m1.R = -10.
-    m1.set_alpha(0.)
-    z = m1.local_z(x, y)
+                mi.R = rr
+                mi.set_alpha(np.radians(-35.3))
+                mi.bendingOrientation = orient
+                z = mi.local_z(x, y)
 
-    # Make the direction data for the arrows
-    # u = np.zeros_like(x)
-    # v = np.zeros_like(x)
-    # w = np.ones_like(x) * .25 * np.max(np.abs(z))
-    u1, v1, w1, u2, v2, w2 = m1.local_n(x, y)
+                # Make the direction data for the arrows
+                u1, v1, w1, u2, v2, w2 = m1.local_n(x, y)
 
-    ax.quiver(x, y, z, u1, v1, w1, normalize=False, color='r')
-    ax.quiver(x, y, z, u2, v2, w2, normalize=False, color='g')
+                ax.quiver(x, y, z, u1, v1, w1, normalize=False, color='r')
+                ax.quiver(x, y, z, u2, v2, w2, normalize=False, color='g')
 
-    plt.xlabel('local x')
-    plt.ylabel('local y')
-    ax.set_xlim(-5., 5.)
-    ax.set_ylim(-5., 5.)
-    ax.set_zlim(0., 10.)
+                plt.xlabel('local x')
+                plt.ylabel('local y')
+                ax.set_xlim(-5., 5.)
+                ax.set_ylim(-5., 5.)
+                ax.set_zlim(0., 10.)
 
     plt.show()

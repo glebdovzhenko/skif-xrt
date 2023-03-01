@@ -26,7 +26,7 @@ from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_
 """ Monochromator """
 monochromator_alignment_energy = 30.e3
 monochromator_c1_alpha = np.radians(35.3)
-monochromator_c1_thickness = .2
+monochromator_c1_thickness = 2.0
 monochromator_c2_alpha = np.radians(35.3)
 monochromator_c2_thickness = 2.0
 

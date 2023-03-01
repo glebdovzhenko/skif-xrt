@@ -138,6 +138,7 @@ def get_line_kb(data: xrtplot.SaveResults, show=False):
     min_res = minimize(f, np.array([.1, .1]), bounds=[(-np.pi/2, np.pi/2), (-1., 1.)])
 
     if show:
+        _, ax = plt.subplots()
         plt.imshow(data.total2D, aspect='auto', origin='lower',
                    extent=[data.xbinEdges.min(), data.xbinEdges.max(),
                            data.ybinEdges.min(), data.ybinEdges.max()])
@@ -145,6 +146,8 @@ def get_line_kb(data: xrtplot.SaveResults, show=False):
 
         plt.xlim(data.xbinEdges.min(), data.xbinEdges.max())
         plt.ylim(data.ybinEdges.min(), data.ybinEdges.max())
+        ax.text(.5 * (data.xbinEdges.min() + data.xbinEdges.max()), data.ybinEdges.max(), 
+                'k=%e, \nb=%e' % (np.tan(min_res.x[0]), min_res.x[1]))
         plt.show()
 
     return np.tan(min_res.x[0]), min_res.x[1]

@@ -22,8 +22,8 @@ xpr_kwds = {r'label': r'$x^{\prime}$', r'unit': r'', r'data': raycing.get_xprime
 zpr_kwds = {r'label': r'$z^{\prime}$', r'unit': r'', r'data': raycing.get_zprime}
 
 for beam, t1 in zip(('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local', 'BeamMonoC2Local', 
-                     'BeamMonitor2Local', 'BeamAperture2Local'), 
-                    ('FE', 'C1', 'C1C2', 'C2', 'EM', 'ES')):
+                     'BeamFocusingMonitorLocal', 'BeamMonitor2Local', 'BeamAperture2Local'), 
+                    ('FE', 'C1', 'C1C2', 'C2', 'FM', 'EM', 'ES')):
     for t2, xkw, ykw in zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds, z_kwds), (z_kwds, xpr_kwds, zpr_kwds)):
         plots.append(xrtplot.XYCPlot(beam=beam, title='-'.join((t1, t2)), 
                                      xaxis=xrtplot.XYCAxis(**xkw), yaxis=xrtplot.XYCAxis(**ykw),
@@ -74,35 +74,61 @@ def onept(plts: List, bl: SKIF15):
 
 def get_focus(plts: List, bl: SKIF15):
     subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
-    scan_name = 'get_focus'
+    scan_name = 'get_focus_s'
 
-    # if not os.path.exists(os.path.join(subdir, scan_name)):
-    #     os.mkdir(os.path.join(subdir, scan_name))
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
     # else:
     #     for f_name in os.listdir(os.path.join(subdir, scan_name)):
     #         os.remove(os.path.join(subdir, scan_name, f_name))
     
     en = 30.e3
-    # for r in [np.inf, 10., 15., 20., 25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35., 
-    #           40., 45., 50., 55., 60., 65., 70., 75., 80., 85., 90., 95., 100., 110., 120., 130., 
-    #           140., 150., 160., 170., 180., 190., 200.]:
-    for r in [71., 72., 73., 74., 76., 77., 78., 79., 81., 82., 83., 84., 86., 87., 88., 89.,
-              91., 92., 93., 94., 96., 97., 98., 99., 101., 102., 103., 104., 105., 106., 107., 108., 109.]:
+    # for r in [np.inf, -np.inf, .5, -.5, 1., -1., 2., -2., 3., -3., 4., -4.,  5., -5., 6., -6., 7., -7., 
+    #           8., -8., 9., -9., 10., -10., 11., -11., 12., -12., 13., -13., 14., -14., 15., -15., 16., -16., 
+    #           17., -17., 18., -18., 19., -19., 20., -20., 21., -21., 25., -25., 29., -29.]:  # sagittal
+    for r in [-1.61, -1.62, -1.63, -1.64, -1.65, -1.66, -1.67, -1.68, -1.69]:
+    # for r in [np.inf, -np.inf, -140., -130., -120., -110., -100., -90., -80., -70., -60., -50., -40., 
+    #           -30., -20., -10., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 
+    #           120., 130., 140., 150., 160., 170., 180., 190., 200., 210., 220., 230., 240., 
+    #           250., 260., 270., 280., 290., 300.]: # meridional
         bl.MonochromatorCr1.R = 1e3 * r
         bl.MonochromatorCr2.R = 1e3 * r
-        bl.align_energy(en, bl.get_de_over_e(bl.MonochromatorCr1.R, 30.e3))
+        bl.align_energy(en, 1e-2)
 
         for plot in plts:
             el, crd = plot.title.split('-')
-            if (el not in ('FE', 'EM', 'C1C2')) or (crd not in ('XXpr', 'ZZpr')):
+            if (el not in ('FE', 'EM', 'FM', 'C1C2')) or (crd not in ('XZ', 'XXpr', 'ZZpr')):
                 continue
-
+            
+            plot.xaxis.limits = None
+            plot.yaxis.limits = None
+            plot.caxis.limits = None
             plot.saveName = os.path.join(subdir, scan_name, 
                                      plot.title + '-%sm' % bl.MonochromatorCr1.pretty_R() + '.png'
                                      )
             plot.persistentName = plot.saveName.replace('.png', '.pickle')
         
         yield
+
+        # for plot in plts:
+        #     el, crd = plot.title.split('-')
+        #     if (el not in ('FE', 'EM', 'C1C2')) or (crd not in ('XXpr', 'ZZpr')):
+        #         continue
+
+        #     with pickle.load(plot.persistentName) as data:
+        #         xbs = .5 * (data.xbinEdges[1:] + data.xbinEdges[:-1])
+        #         ybs = .5 * (data.ybinEdges[1:] + data.ybinEdges[:-1])
+        #         xbs = xbs[data.xtotal1D > 0]
+        #         ybs = ybs[data.ytotal1D > 0]
+
+        #         plot.xaxis.limits = [np.min(xbs), np.max(xbs)]
+        #         plot.yaxis.limits = [np.min(ybs), np.max(ybs)]
+
+        #     os.remove(plot.persistentName)
+
+        # yield
+
+
         
 
 def e_scan(plts: List, bl: SKIF15):
@@ -565,7 +591,7 @@ if __name__ == '__main__':
     beamline = SKIF15()
     scan = get_focus
     show = False
-    repeats = 1
+    repeats = 10
 
     if show:
         beamline.glow(

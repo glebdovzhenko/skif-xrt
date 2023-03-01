@@ -59,7 +59,7 @@ for beam, t1 in zip(('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local
 
 
 def onept(plts: List, bl: NSTU_SCW):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets'
+    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/nstu-scw'
     scan_name = 'test'
     
     en = 30.e3
@@ -76,25 +76,29 @@ def get_focus(plts: List, bl: NSTU_SCW):
     subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/nstu-scw'
     scan_name = 'get_focus'
 
-    # if not os.path.exists(os.path.join(subdir, scan_name)):
-    #     os.mkdir(os.path.join(subdir, scan_name))
-    # else:
-    #     for f_name in os.listdir(os.path.join(subdir, scan_name)):
-    #         os.remove(os.path.join(subdir, scan_name, f_name))
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+    else:
+        for f_name in os.listdir(os.path.join(subdir, scan_name)):
+            os.remove(os.path.join(subdir, scan_name, f_name))
     
     en = 30.e3
-    # for r in [2., 4., 6., 8., 10., 15., 20., 25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35.]:
-    for r in [2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 
-              4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5., 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9]:
-        bl.MonochromatorCr1.R = 1e3 * r
-        bl.MonochromatorCr2.R = 1e3 * r
-        bl.align_energy(en, 5e-3)
+    for r1, r2 in zip(np.linspace(2., 10., 30), np.linspace(110, 200, 30)):
+    # [2., 4., 6., 8., 10., 15., 20., 25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35.]:
+    # for r in [2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 
+    #           4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5., 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9]:
+        bl.MonochromatorCr1.R = 1e3 * r1
+        bl.MonochromatorCr2.R = 1e3 * r2
+        bl.align_energy(en, 1e-2)
 
         for plot in plts:
             el, crd = plot.title.split('-')
             if (el not in ('FE', 'EM', 'C1C2')) or (crd not in ('XXpr', 'ZZpr')):
                 continue
-
+            
+            plot.xaxis.limits = None
+            plot.yaxis.limits = None
+            plot.caxis.limits = None
             plot.saveName = os.path.join(subdir, scan_name, 
                                      plot.title + '-%sm' % bl.MonochromatorCr1.pretty_R() + '.png'
                                      )

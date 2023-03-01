@@ -20,7 +20,7 @@ from params.sources import ring_kwargs, wiggler_1_5_kwargs
 from params.params_1_5 import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
     monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim, \
     exit_slit_distance, exit_slit_opening, filter1_distance, filter2_distance, filter3_distance, filter4_distance, \
-    filter5_distance, diamond_filter_thickness, sic_filter_thickness
+    filter5_distance, diamond_filter_thickness, sic_filter_thickness, focusing_distance
 
 
 
@@ -30,9 +30,11 @@ from params.params_1_5 import front_end_distance, front_end_opening, front_end_v
 """ Monochromator """
 monochromator_alignment_energy = 30.e3
 monochromator_c1_alpha = np.radians(35.3)
-monochromator_c1_thickness = 1.8
+monochromator_c1_thickness = 1.8   # meridional
+monochromator_c1_thickness_s = .5  # sagittal
 monochromator_c2_alpha = np.radians(35.3)
-monochromator_c2_thickness = 2.2
+monochromator_c2_thickness = 2.2   # meridional
+monochromator_c2_thickness_s = .5  # sagittal
 
 
 # #################################################### MATERIALS #######################################################
@@ -40,8 +42,12 @@ monochromator_c2_thickness = 2.2
 
 # cr_si_1 = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
 # cr_si_2 = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
-cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
-cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
+# cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
+# cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
+cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness_s, 
+                           database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
+cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness_s, 
+                           database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
 filter_diamond = rm.Material('C', rho=3.5)
 filter_si_c = rm.Material(('Si', 'C'), quantities=(1, 1), rho=3.16)
 filter_si = rm.Material('Si', rho=2.33)
@@ -127,6 +133,7 @@ class SKIF15(raycing.BeamLine):
             material=(cr_si_1,),
             R=np.inf,
             targetOpenCL='CPU',
+            bendingOrientation='sagittal',
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
             limPhysX=monochromator_x_lim,
@@ -152,12 +159,19 @@ class SKIF15(raycing.BeamLine):
             material=(cr_si_2,),
             R=np.inf,
             targetOpenCL='CPU',
+            bendingOrientation='sagittal',
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
         )
         self.MonochromatorCr2.ucl = mcl.XRT_CL(r'materials.cl', targetOpenCL='CPU')
+        
+        self.FocusingMonitor = rscreens.Screen(
+            bl=self,
+            name=r"Focusing Monitor",
+            center=[0, focusing_distance, monochromator_z_offset],
+        )
 
         self.ExitMonitor = rscreens.Screen(
             bl=self,
@@ -456,18 +470,6 @@ def run_process(bl: SKIF15):
         beam=beam_source
     )
 
-    # beam_filter1_global, beam_filter1_local1, beam_filter1_local2 = bl.Filter1.double_refract(
-    #         beam=beam_source
-    # )
-    # beam_filter1_local2a = raycing.sources.Beam(copyFrom=beam_filter1_local2)
-    # beam_filter1_local2a.absorb_intensity(beam_source)
-
-    # beam_filter2_global, beam_filter2_local1, beam_filter2_local2 = bl.Filter2.double_refract(
-    #         beam=beam_filter1_global
-    # )
-    # beam_filter2_local2a = raycing.sources.Beam(copyFrom=beam_filter2_local2)
-    # beam_filter2_local2a.absorb_intensity(beam_filter1_global)
-
     beam_mono_c1_global, beam_mono_c1_local = bl.MonochromatorCr1.reflect(
         beam=beam_source #, returnLocalAbsorbed=True
     )
@@ -478,6 +480,10 @@ def run_process(bl: SKIF15):
 
     beam_mono_c2_global, beam_mono_c2_local = bl.MonochromatorCr2.reflect(
         beam=beam_mono_c1_global #, returnLocalAbsorbed=True
+    )
+    
+    beam_monf = bl.FocusingMonitor.expose(
+        beam=beam_mono_c2_global
     )
 
     beam_mon2 = bl.ExitMonitor.expose(
@@ -508,6 +514,7 @@ def run_process(bl: SKIF15):
         'BeamMonoC2Global': beam_mono_c2_global,
         'BeamAperture2Local': beam_ap2,
         'BeamMonitor2Local': beam_mon2,
+        'BeamFocusingMonitorLocal': beam_monf,
     }
 
 
