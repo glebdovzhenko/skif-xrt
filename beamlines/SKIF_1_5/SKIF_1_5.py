@@ -15,7 +15,7 @@ import xrt.backends.raycing as raycing
 
 from utils.xrtutils import get_integral_breadth
 from utils.various import datafiles
-from components import BentLaueCylinder, CrystalSiPrecalc
+from components import BentLaueCylinder, CrystalSiPrecalc, BentLaueParaboloid
 from params.sources import ring_kwargs, wiggler_1_5_kwargs
 from params.params_1_5 import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
     monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim, \
@@ -122,7 +122,7 @@ class SKIF15(raycing.BeamLine):
                     t=1.8 / np.cos(np.radians(35.3))
                 ) 
 
-        self.MonochromatorCr1 = BentLaueCylinder(
+        self.MonochromatorCr1 = BentLaueParaboloid(
             bl=self,
             name=r'Si[111] Crystal 1',
             center=[0., monochromator_distance, 0.],
@@ -131,9 +131,10 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c1_alpha,
             material=(cr_si_1,),
-            R=np.inf,
+            # R=np.inf,
             targetOpenCL='CPU',
-            bendingOrientation='sagittal',
+            # bendingOrientation='sagittal',
+            r_for_refl='x',
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
             limPhysX=monochromator_x_lim,
@@ -147,7 +148,7 @@ class SKIF15(raycing.BeamLine):
             center=[0, monochromator_distance, .5 * monochromator_z_offset],
         )
 
-        self.MonochromatorCr2 = BentLaueCylinder(
+        self.MonochromatorCr2 = BentLaueParaboloid(
             bl=self,
             name=r'Si[111] Crystal 2',
             center=[0., monochromator_distance, monochromator_z_offset],
@@ -157,9 +158,10 @@ class SKIF15(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c2_alpha,
             material=(cr_si_2,),
-            R=np.inf,
+            # R=np.inf,
             targetOpenCL='CPU',
-            bendingOrientation='sagittal',
+            # bendingOrientation='sagittal',
+            r_for_refl='x',
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
             limPhysX=monochromator_x_lim,
