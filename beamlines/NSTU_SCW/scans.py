@@ -10,7 +10,7 @@ import xrt.runner as xrtrun
 import xrt.plotter as xrtplot
 import xrt.backends.raycing as raycing
 
-from utils.xrtutils import get_line_kb
+from utils.xrtutils import get_minmax
 
 from NSTU_SCW import NSTU_SCW
 
@@ -24,7 +24,7 @@ zpr_kwds = {r'label': r'$z^{\prime}$', r'unit': r'', r'data': raycing.get_zprime
 
 for beam, t1 in zip(('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local', 'BeamMonoC2Local', 
                      'BeamMonitor2Local'), 
-                    ('FE', 'C1', 'C1C2', 'C2', 'EM')):
+                    ('FE', 'C1', 'C1C2', 'C2', 'FM')):
     for t2, xkw, ykw in zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds, z_kwds), (z_kwds, xpr_kwds, zpr_kwds)):
         plots.append(xrtplot.XYCPlot(beam=beam, title='-'.join((t1, t2)), 
                                      xaxis=xrtplot.XYCAxis(**xkw), yaxis=xrtplot.XYCAxis(**ykw),
@@ -74,37 +74,73 @@ def onept(plts: List, bl: NSTU_SCW):
 
 def get_focus(plts: List, bl: NSTU_SCW):
     subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/nstu-scw'
-    scan_name = 'get_focus'
+    scan_name = 'r1r2map3'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
-    else:
-        for f_name in os.listdir(os.path.join(subdir, scan_name)):
-            os.remove(os.path.join(subdir, scan_name, f_name))
-    
+    if not os.path.exists(os.path.join(subdir, scan_name + '_')):
+        os.mkdir(os.path.join(subdir, scan_name + '_'))
     en = 30.e3
-    for r1, r2 in zip(np.linspace(2., 10., 30), np.linspace(110, 200, 30)):
-    # [2., 4., 6., 8., 10., 15., 20., 25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35.]:
-    # for r in [2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 
-    #           4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5., 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9]:
-        bl.MonochromatorCr1.R = 1e3 * r1
-        bl.MonochromatorCr2.R = 1e3 * r2
-        bl.align_energy(en, 1e-2)
+    # cr1_rs = [25., 30., 35., 40., 45., 50., 55., 60., 65., 70., 75., 80., 85., 90.]
+    # r2 = -1.5
+    # for r1 in cr1_rs:
+    # r1 = 35.
+    # cr2_rs = [-.6, -.7, -.8, -.9, -1.1, -1.2, -1.3, -1.4, -1.5, -1.6, -1.7, -1.8, -1.9, -2.1, -2.2, -2.3, -2.4, -2.5, -2.6, -2.7, -2.8, -2.9]
+    # for r2 in cr2_rs:
+    for r1 in np.linspace(-1.5, -2.5, 10):
+        for r2 in np.linspace(-1.5, -2.5, 10):
+            bl.MonochromatorCr2.Rx = 1e3 * r2
+            bl.MonochromatorCr2.Ry = -6e3 * r2
+            bl.MonochromatorCr1.Ry = 1e3 * r1
+            bl.align_energy(en, 1e-1)
 
-        for plot in plts:
-            el, crd = plot.title.split('-')
-            if (el not in ('FE', 'EM', 'C1C2')) or (crd not in ('XXpr', 'ZZpr')):
-                continue
+            for plot in plts:
+                el, crd = plot.title.split('-')
+                if (el not in ('FM', 'EM', 'C1C2')) or (crd not in ('XXpr', 'ZZpr', 'XZ')):
+                    continue
             
-            plot.xaxis.limits = None
-            plot.yaxis.limits = None
-            plot.caxis.limits = None
-            plot.saveName = os.path.join(subdir, scan_name, 
-                                     plot.title + '-%sm' % bl.MonochromatorCr1.pretty_R() + '.png'
-                                     )
-            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+                plot.xaxis.limits = None
+                plot.yaxis.limits = None
+                plot.caxis.limits = None
+                plot.saveName = os.path.join(subdir, scan_name, 
+                                        plot.title  + '-%sm' % bl.MonochromatorCr1.pretty_R() + \
+                                                '-%sm' % bl.MonochromatorCr2.pretty_R() + '.png'
+                                        )
+                plot.persistentName = plot.saveName.replace('.png', '.pickle')
+            if os.path.exists(plot.saveName):
+                continue
         
-        yield
+            yield
+        
+            bl.align_energy(en, 1e-10)
+            ax_mul = 1.1
+
+            for plot in plts:
+                el, crd = plot.title.split('-')
+                if plot.saveName:
+                    data = pickle.load(open(plot.persistentName, 'rb'))
+                
+                    x1, x2 = get_minmax(data, axis='x')
+                    y1, y2 = get_minmax(data, axis='y')
+                    e1, e2 = get_minmax(data, axis='e')
+
+                    x1, x2 = x2 - ax_mul * np.abs(x1 - x2), x1 + ax_mul * np.abs(x1 - x2)
+                    y1, y2 = y2 - ax_mul * np.abs(y1 - y2), y1 + ax_mul * np.abs(y1 - y2)
+                    e1, e2 = e2 - ax_mul * np.abs(e1 - e2), e1 + ax_mul * np.abs(e1 - e2)
+
+                    plot.xaxis.limits = [x1, x2]
+                    plot.yaxis.limits = [y1, y2]
+                    plot.caxis.limits = [e1, e2]
+
+                    if bl.SuperCWiggler.eMin > e1:
+                        bl.SuperCWiggler.eMin = e1
+                    if bl.SuperCWiggler.eMax < e2:
+                        bl.SuperCWiggler.eMax = e2
+
+                    plot.persistentName = plot.persistentName.replace(scan_name, scan_name + '_')
+                    plot.saveName = plot.saveName.replace(scan_name, scan_name + '_')
+
+            yield
 
 
 if __name__ == '__main__':

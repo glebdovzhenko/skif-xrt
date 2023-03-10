@@ -151,3 +151,28 @@ def get_line_kb(data: xrtplot.SaveResults, show=False):
         plt.show()
 
     return np.tan(min_res.x[0]), min_res.x[1]
+
+
+def get_minmax(data: xrtplot.SaveResults, axis: str ='x', fadeout: float=1e-3):
+    if axis not in ('x', 'y', 'e'):
+        raise ValueError()
+
+    if axis == 'x':
+        be = data.xbinEdges
+        t1d = data.xtotal1D
+    elif axis == 'y':
+        be = data.ybinEdges
+        t1d = data.ytotal1D
+    elif axis == 'e':
+        be = data.ebinEdges
+        t1d = data.etotal1D
+    else:
+        return 0.
+
+    t1d_xs = .5 * (be[1:] + be[:-1])
+    t1d_dx = np.mean(be[1:] - be[:-1])
+    t1d_xs = t1d_xs[t1d > fadeout * np.max(t1d)]
+    
+    return np.min(t1d_xs) - t1d_dx, np.max(t1d_xs) + t1d_dx
+
+

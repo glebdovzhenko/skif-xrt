@@ -14,7 +14,7 @@ import xrt.backends.raycing as raycing
 import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
 
-from components import BentLaueCylinder, CrystalSiPrecalc
+from components import CrystalSiPrecalc, BentLaueParaboloid
 from params.sources import ring_kwargs, wiggler_nstu_scw_kwargs
 from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
     monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim, crl_distance
@@ -26,7 +26,7 @@ from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_
 """ Monochromator """
 monochromator_alignment_energy = 30.e3
 monochromator_c1_alpha = np.radians(35.3)
-monochromator_c1_thickness = 2.0
+monochromator_c1_thickness = .5
 monochromator_c2_alpha = np.radians(35.3)
 monochromator_c2_thickness = 2.0
 
@@ -35,8 +35,7 @@ monochromator_c2_thickness = 2.0
 
 
 cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness, 
-                           database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv',
-                           mirrorRs=True)
+                           database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
 # cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness, 
 #                        database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
 cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
@@ -72,7 +71,7 @@ class NSTU_SCW(raycing.BeamLine):
             opening=front_end_opening
         )
 
-        self.MonochromatorCr1 = BentLaueCylinder(
+        self.MonochromatorCr1 = BentLaueParaboloid(
             bl=self,
             name=r'Si[111] Crystal 1',
             center=[0., monochromator_distance, 0.],
@@ -80,16 +79,14 @@ class NSTU_SCW(raycing.BeamLine):
             roll=0.,
             yaw=0.,
             alpha=monochromator_c1_alpha,
-            material=(cr_si_1,),
-            bendingOrientation='sagittal',
-            R=np.inf,
+            material=(cr_si_2,),
+            r_for_refl='y',
             targetOpenCL='CPU',
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
         )
-        self.MonochromatorCr1.ucl = mcl.XRT_CL(r'materials.cl', targetOpenCL='CPU')
 
         self.Cr1Monitor = rscreens.Screen(
             bl=self,
@@ -97,7 +94,7 @@ class NSTU_SCW(raycing.BeamLine):
             center=[0, monochromator_distance, .5 * monochromator_z_offset],
         )
 
-        self.MonochromatorCr2 = BentLaueCylinder(
+        self.MonochromatorCr2 = BentLaueParaboloid(
             bl=self,
             name=r'Si[111] Crystal 2',
             center=[0., monochromator_distance, monochromator_z_offset],
@@ -106,28 +103,26 @@ class NSTU_SCW(raycing.BeamLine):
             roll=0.,
             yaw=0.,
             alpha=monochromator_c2_alpha,
-            material=(cr_si_2,),
-            bendingOrientation='meridional',
-            R=np.inf,
+            material=(cr_si_1,),
+            r_for_refl='x',
             targetOpenCL='CPU',
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
         )
-        self.MonochromatorCr2.ucl = mcl.XRT_CL(r'materials.cl', targetOpenCL='CPU')
 
         self.Cr2Monitor = rscreens.Screen(
             bl=self,
             name=r"Crystal 2 Monitor",
-            center=[0, crl_distance - 10, monochromator_z_offset],
+            center=[0, crl_distance, monochromator_z_offset],
         )
 
     def print_positions(self):
         print('#' * 20, self.name, '#' * 20)
 
         for element in (self.SuperCWiggler, self.FrontEnd,
-                        self.MonochromatorCr1, self.Cr1Monitor, self.MonochromatorCr2):
+                        self.MonochromatorCr1, self.Cr1Monitor, self.MonochromatorCr2, self.Cr2Monitor):
             print('#' * 5, element.name, 'at', element.center)
 
         for element in (self.MonochromatorCr1, self.MonochromatorCr2):

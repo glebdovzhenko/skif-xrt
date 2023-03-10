@@ -10,7 +10,7 @@ import xrt.runner as xrtrun
 import xrt.plotter as xrtplot
 import xrt.backends.raycing as raycing
 
-from utils.xrtutils import get_line_kb
+from utils.xrtutils import get_line_kb, get_minmax
 
 from SKIF_1_5 import SKIF15
 
@@ -74,7 +74,7 @@ def onept(plts: List, bl: SKIF15):
 
 def get_focus(plts: List, bl: SKIF15):
     subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
-    scan_name = 'get_focus_s_'
+    scan_name = 'get_focus_m'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
@@ -83,25 +83,27 @@ def get_focus(plts: List, bl: SKIF15):
     #         os.remove(os.path.join(subdir, scan_name, f_name))
     
     en = 30.e3
-    # for r in [np.inf, -np.inf, .5, -.5, 1., -1., -1.5, 1.5, 2., -2., 2.5, -2.5, 3., -3., 3.5, -3.5, 4., -4., 
+    # for r in [np.inf, -np.inf, .5, -.5, 1., -1., 1.5, -1.5, 2., -2., 2.5, -2.5, 3., -3., 3.5, -3.5, 4., -4., 
     #           4.5, -4.5, 5., -5., 6., -6., 7., -7., 8., -8., 9., -9., 10., -10., 11., -11., 12., -12., 
-    #           13., -13., 14., -14., 15., -15., 16., -16., 
-    #           17., -17., 18., -18., 19., -19., 20., -20., 21., -21., 25., -25., 29., -29.]:  # sagittal
-    for r in [-1.71, -1.72, -1.73, -1.74, -1.75, -1.76, -1.77, -1.78, -1.79, -1.8, 
-              -1.81, -1.82, -1.83, -1.84, -1.85, -1.86, -1.87, -1.88, -1.89, -1.9]:
+    #           13., -13., 14., -14., 15., -15., 16., -16., 17., -17., 18., -18., 19., -19., 20., -20., 
+    #           21., -21., 25., -25., 29., -29., -1.6, -1.61, -1.62, -1.63, -1.64, -1.65, -1.66, -1.67, 
+    #           -1.68, -1.69, -1.7, -1.71, -1.72, -1.73, -1.74, -1.75, -1.76, -1.77, -1.78, -1.79, -1.8,
+    #           -1.731, -1.732, -1.733, -1.734, -1.735, -1.736, -1.737, -1.738, -1.739, 
+    #           -1.741, -1.742, -1.743, -1.744, -1.745, -1.746, -1.747, -1.748, -1.749]:  # sagittal
     # for r in [np.inf, -np.inf, -140., -130., -120., -110., -100., -90., -80., -70., -60., -50., -40., 
     #           -30., -20., -10., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 
     #           120., 130., 140., 150., 160., 170., 180., 190., 200., 210., 220., 230., 240., 
     #           250., 260., 270., 280., 290., 300.]: # meridional
-        bl.MonochromatorCr1.Rx = 1e3 * r
-        bl.MonochromatorCr1.Ry = -6e3 * r
-        bl.MonochromatorCr2.Rx = 1e3 * r
-        bl.MonochromatorCr2.Ry = -6e3 * r
+    for r in np.arange(81, 89, 0.5):
+        bl.MonochromatorCr1.Ry = 1e3 * r
+        #bl.MonochromatorCr1.Ry = -6e3 * r
+        bl.MonochromatorCr2.Ry = 1e3 * r
+        #bl.MonochromatorCr2.Ry = -6e3 * r
         bl.align_energy(en, 1e-1)
 
         for plot in plts:
             el, crd = plot.title.split('-')
-            if (el not in ('FE', 'EM', 'FM', 'C1C2')) or (crd not in ('XZ', 'XXpr', 'ZZpr')):
+            if (el not in ('EM', 'FM', 'C1C2')) or (crd not in ('XZ', 'XXpr', 'ZZpr')):
                 continue
             
             plot.xaxis.limits = None
@@ -112,6 +114,37 @@ def get_focus(plts: List, bl: SKIF15):
                                      )
             plot.persistentName = plot.saveName.replace('.png', '.pickle')
         
+        # yield
+        
+        bl.align_energy(en, 1e-10)
+        ax_mul = 1.1
+        for plot in plts:
+            el, crd = plot.title.split('-')
+            if plot.saveName:
+                data = pickle.load(open(plot.persistentName, 'rb'))
+                
+                x1, x2 = get_minmax(data, axis='x')
+                y1, y2 = get_minmax(data, axis='y')
+                e1, e2 = get_minmax(data, axis='e')
+
+                x1, x2 = x2 - ax_mul * np.abs(x1 - x2), x1 + ax_mul * np.abs(x1 - x2)
+                y1, y2 = y2 - ax_mul * np.abs(y1 - y2), y1 + ax_mul * np.abs(y1 - y2)
+                e1, e2 = e2 - ax_mul * np.abs(e1 - e2), e1 + ax_mul * np.abs(e1 - e2)
+
+                plot.xaxis.limits = [x1, x2]
+                plot.yaxis.limits = [y1, y2]
+                plot.caxis.limits = [e1, e2]
+
+                if bl.SuperCWiggler.eMin > e1:
+                    bl.SuperCWiggler.eMin = e1
+                if bl.SuperCWiggler.eMax < e2:
+                    bl.SuperCWiggler.eMax = e2
+
+                #os.remove(plot.persistentName)
+                #os.remove(plot.saveName)
+                plot.persistentName = plot.persistentName.replace(scan_name, scan_name + '_')
+                plot.saveName = plot.saveName.replace(scan_name, scan_name + '_')
+
         yield
 
 

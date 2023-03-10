@@ -42,12 +42,12 @@ monochromator_c2_thickness_s = .5  # sagittal
 
 # cr_si_1 = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
 # cr_si_2 = rm.CrystalSi(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
-# cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
-# cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
-cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness_s, 
-                           database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
-cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness_s, 
-                           database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
+cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
+cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
+# cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness_s, 
+#                            database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
+# cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness_s, 
+#                            database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
 filter_diamond = rm.Material('C', rho=3.5)
 filter_si_c = rm.Material(('Si', 'C'), quantities=(1, 1), rho=3.16)
 filter_si = rm.Material('Si', rho=2.33)
@@ -134,7 +134,7 @@ class SKIF15(raycing.BeamLine):
             # R=np.inf,
             targetOpenCL='CPU',
             # bendingOrientation='sagittal',
-            r_for_refl='x',
+            r_for_refl='y',
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
             limPhysX=monochromator_x_lim,
@@ -161,7 +161,7 @@ class SKIF15(raycing.BeamLine):
             # R=np.inf,
             targetOpenCL='CPU',
             # bendingOrientation='sagittal',
-            r_for_refl='x',
+            r_for_refl='y',
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
             limPhysX=monochromator_x_lim,
