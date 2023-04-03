@@ -74,7 +74,7 @@ def onept(plts: List, bl: SKIF15):
 
 def get_focus(plts: List, bl: SKIF15):
     subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15'
-    scan_name = 'get_focus_m'
+    scan_name = 'get_focus_m_test_inf'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
@@ -94,11 +94,13 @@ def get_focus(plts: List, bl: SKIF15):
     #           -30., -20., -10., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 110., 
     #           120., 130., 140., 150., 160., 170., 180., 190., 200., 210., 220., 230., 240., 
     #           250., 260., 270., 280., 290., 300.]: # meridional
-    for r in np.arange(81, 89, 0.5):
+
+    bl.MonochromatorCr2.Ry = np.inf
+    for r in [-2.1, -2.3, -2.5, -2.7, -2.45, -2.55, -2.65, -2.45]:
+        # bl.MonochromatorCr1.Ry = 1e3 * r
         bl.MonochromatorCr1.Ry = 1e3 * r
-        #bl.MonochromatorCr1.Ry = -6e3 * r
-        bl.MonochromatorCr2.Ry = 1e3 * r
-        #bl.MonochromatorCr2.Ry = -6e3 * r
+        # bl.MonochromatorCr2.Ry = 1e3 * r
+        # bl.MonochromatorCr2.Ry = -6e3 * r
         bl.align_energy(en, 1e-1)
 
         for plot in plts:
@@ -114,7 +116,7 @@ def get_focus(plts: List, bl: SKIF15):
                                      )
             plot.persistentName = plot.saveName.replace('.png', '.pickle')
         
-        # yield
+        yield
         
         bl.align_energy(en, 1e-10)
         ax_mul = 1.1

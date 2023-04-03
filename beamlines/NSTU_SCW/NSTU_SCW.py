@@ -26,19 +26,17 @@ from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_
 """ Monochromator """
 monochromator_alignment_energy = 30.e3
 monochromator_c1_alpha = np.radians(35.3)
-monochromator_c1_thickness = .5
+monochromator_c1_thickness = 2.
 monochromator_c2_alpha = np.radians(35.3)
-monochromator_c2_thickness = 2.0
+monochromator_c2_thickness = .5
 
 
 # #################################################### MATERIALS #######################################################
 
 
-cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness, 
+cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
+cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness,
                            database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
-# cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness, 
-#                        database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
-cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness)
 
 
 # #################################################### BEAMLINE ########################################################
@@ -79,7 +77,7 @@ class NSTU_SCW(raycing.BeamLine):
             roll=0.,
             yaw=0.,
             alpha=monochromator_c1_alpha,
-            material=(cr_si_2,),
+            material=(cr_si_1,),
             r_for_refl='y',
             targetOpenCL='CPU',
             limPhysY=monochromator_y_lim,
@@ -103,7 +101,7 @@ class NSTU_SCW(raycing.BeamLine):
             roll=0.,
             yaw=0.,
             alpha=monochromator_c2_alpha,
-            material=(cr_si_1,),
+            material=(cr_si_2,),
             r_for_refl='x',
             targetOpenCL='CPU',
             limPhysY=monochromator_y_lim,
