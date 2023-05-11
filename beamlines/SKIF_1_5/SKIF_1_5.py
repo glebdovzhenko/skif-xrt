@@ -15,7 +15,7 @@ import xrt.backends.raycing as raycing
 
 from utils.xrtutils import get_integral_breadth
 from utils.various import datafiles
-from components import BentLaueCylinder, CrystalSiPrecalc, BentLaueParaboloid
+from components import CrystalSiPrecalc, BentLaueParaboloid, BentLaueParaboloidWithBump
 from params.sources import ring_kwargs, wiggler_1_5_kwargs
 from params.params_1_5 import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
     monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim, \
@@ -122,7 +122,8 @@ class SKIF15(raycing.BeamLine):
                     t=1.8 / np.cos(np.radians(35.3))
                 ) 
 
-        self.MonochromatorCr1 = BentLaueParaboloid(
+        # self.MonochromatorCr1 = BentLaueParaboloid(
+        self.MonochromatorCr1 = BentLaueParaboloidWithBump(
             bl=self,
             name=r'Si[111] Crystal 1',
             center=[0., monochromator_distance, 0.],
@@ -260,7 +261,7 @@ class SKIF15(raycing.BeamLine):
         For meridional bend with focus behind the crystal.
         Can be used as wiggler energy limits, plot limits, etc.
         """
-        dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15/de_to_e_br'
+        dd = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'skif15', 'de_to_e_br')
 
         
         rs, de = [], []
@@ -282,7 +283,7 @@ class SKIF15(raycing.BeamLine):
 
     @staticmethod
     def get_dzpr(r):
-        dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/skif15/de_to_e_br'
+        dd = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'skif15', 'de_to_e_br')
 
         rs, dzpr = [], []
         for metadata in datafiles(dd):

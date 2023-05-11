@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 from scipy.spatial.transform import Rotation
 from scipy.optimize import curve_fit
+from components.bump_eqs import crs, crs_x, crs_y, crs_xy
 import os
 
 
@@ -34,36 +35,8 @@ class Normalization:
         return x_r, y_r, z_r
 
 
-def multigaussian(x_, K, A, C, C0):
-    """
-    Calculates multidimensional Gaussian distribution as
-    C * (det[K / 2pi])^{-1/2} * exp{A.K^{-1}A / 2} * exp{-x.Kx / 2 + A.x}.
-    If x is n-dimensional, C is a constant, A is n-dimensional, K is a n by n matrix.
-    """
-    if x_.ndim == 1:
-        x_ = x_.reshape((1, ) + x_.shape)
-    elif x_.ndim == 2:
-        x_ = x_.reshape((x_.shape[0], 1, x_.shape[1]))
-    else:
-        raise ValueError('x_ arg can only be 1- or 2-dimensional')
-        
-    xKx = np.matmul(x_, np.matmul(K, np.swapaxes(x_, -1, -2))).flatten()
-    Ax = np.matmul(A, np.swapaxes(x_, -1, -2)).flatten()
-    AKm1A = np.matmul(A, np.matmul(np.linalg.inv(K), A.T))
-    mgn = np.linalg.det(K / (2. * np.pi)) ** (.5)
-      
-    return C * (mgn / np.exp(.5 * AKm1A)) * np.exp(-.5 * xKx + Ax) + C0
-
-
-def digaussian(x_, cx, cy, sx, sy, a):
-    """
-    exp{}
-    """
-    return a * np.exp(-.5 * ((x_[0] - cx) / sx)**2 - .5 * ((x_[1] - cy) / sy)**2)
-
-
 if __name__ == '__main__':
-    wd = r'/Users/glebdovzhenko/Downloads/Нагрузка на 1-й кристалл/exp_data'
+    wd = r'/Users/glebdovzhenko/Downloads/Нагрузка на 1-й кристалл-1/exp_data'
     save_d = r'/Users/glebdovzhenko/Yandex.Disk.localized/Dev/skif-xrt/datasets/bump'
     
     for sd, _, fs in os.walk(wd):
@@ -84,13 +57,15 @@ if __name__ == '__main__':
             
             # defining a digaussian
             def dg(arg, *args):
-                return digaussian(
-                    arg,
-                    cx=args[0],
-                    cy=args[1],
-                    sx=args[2],
-                    sy=args[3],
-                    a=args[4]
+                return crs_xy(
+                    arg[0], arg[1],
+                    Cx=args[0],
+                    Cy=args[1],
+                    Sx=args[2],
+                    Sy=args[3],
+                    Rx=0.,
+                    Ry=0.,
+                    Axy=args[4]
                 )
 
             # optimizing digaussian fit
@@ -102,66 +77,11 @@ if __name__ == '__main__':
             )
             print(popt)
 
-            # defining 2D MultiGaussian function
-            # def mg(arg, *args):
-            #     return multigaussian(
-            #         arg, 
-            #         K=np.array([[args[0], args[1]], [args[2], args[3]]]), 
-            #         A=np.array([args[4], args[5]]), 
-            #         C=args[6],
-            #         C0=args[7]
-            #     )
-            
-            # optimizing 2D MultiGaussian fit
-            # popt, pcov = curve_fit(
-            #     mg, 
-            #     xdata=np.array([x1, y1]).T, 
-            #     ydata=z1,
-            #     p0=[.1, 0., 0., .1, 0., 0., 1., 0.]
-            # )
-            # print(popt)
-            
-            # polynomial optimization
-            # deg_max, A = 5, []
-            # for deg in range(deg_max + 1):
-            #     for ii in range(deg + 1):
-            #         A.append(x1**ii * y1**(deg-ii))
-            # A = np.array(A).T
-            # coeffA, r, rank, s = np.linalg.lstsq(A, z1)
-            # print(coeffA, r, rank, s)
-            
-            # sine-cosine optimization
-            # deg_max, B = 50, [np.ones(shape=x1.shape)]
-            # for deg in range(1, deg_max + 1):
-            #     B.append(
-            #         np.sin(deg * x1 * np.pi / (np.max(x1) - np.min(x1))) * 
-            #         np.sin(deg * y1 * np.pi / (np.max(y1) - np.min(y1)))
-            #     )
-            #     B.append(
-            #         np.cos(deg * x1 * np.pi / (np.max(x1) - np.min(x1))) * 
-            #         np.cos(deg * y1 * np.pi / (np.max(y1) - np.min(y1)))
-            #     )
-            #     B.append(
-            #         np.sin(deg * x1 * np.pi / (np.max(x1) - np.min(x1))) * 
-            #         np.cos(deg * y1 * np.pi / (np.max(y1) - np.min(y1)))
-            #     )
-            #     B.append(
-            #         np.cos(deg * x1 * np.pi / (np.max(x1) - np.min(x1))) * 
-            #         np.sin(deg * y1 * np.pi / (np.max(y1) - np.min(y1)))
-            #     )
-            # B = np.array(B).T
-            # coeffB, r, rank, s = np.linalg.lstsq(B, z1)
-            # print(coeffB, r, rank, s)
-
-            # np.savetxt(os.path.join(save_d, '_'.join((os.path.basename(sd), fpath))), np.array([x1, y1, z1]))
+            # np.save(os.path.join(save_d, fpath.replace('.txt', '') + os.path.basename(sd) + '.npy'), np.array(popt))
 
             fig = plt.figure()
             ax = fig.add_subplot(projection='3d')
-            ax.scatter(x1, y1, z1)  # Init
-            ax.scatter(x1, y1, dg(np.array([x1, y1]), *popt))  # DiGauss
-            # ax.scatter(x1, y1, mg(np.array([x1, y1]).T, *popt))  # 2D MultiGauss
-            # ax.scatter(x1, y1, np.matmul(A, coeffA))  # Poly
-            # ax.scatter(x1, y1, np.matmul(B, coeffB))  # Fourier
+            ax.scatter(x1, y1, z1)
+            ax.scatter(x1, y1, dg(np.array([x1, y1]), *popt)) 
             plt.show()
-
 

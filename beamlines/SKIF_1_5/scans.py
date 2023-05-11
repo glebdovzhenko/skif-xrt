@@ -606,9 +606,51 @@ def calc_abs(plts: List, bl: SKIF15):
     yield
 
 
+def bump_size_scan(plts: List, bl: SKIF15):
+    subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'skif15')
+    scan_name = 'bump_size'
+    
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+    
+    en = 30.e3
+    bl.MonochromatorCr1.R = np.inf
+    bl.MonochromatorCr2.R = np.inf
+
+    bl.align_energy(en, 10 * bl.get_de_over_e(np.inf, en))
+
+    for plot in plts:
+        plot.xaxis.limits = None
+        plot.yaxis.limits = None
+        plot.caxis.limits = None
+    
+    wd = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'bump')
+    for fpath in filter(lambda x: x[-4:] == '.npy', os.listdir(wd)):
+        params = np.load(os.path.join(wd, fpath))
+        bl.MonochromatorCr1.bump_pars = {
+            'Cx': params[0],
+            'Cy': params[1],
+            'Sx': params[2],
+            'Sy': params[3], 
+            'Axy': params[4], 
+        }
+
+        for plot in plts:
+            # plot.xaxis.limits = None
+            # plot.yaxis.limits = None
+            # plot.caxis.limits = None
+
+            plot.saveName = '%s-%dkeV-%s.png' % (
+                os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), fpath.replace('.npy', '')
+            )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+        yield
+
+
+
 if __name__ == '__main__':
     beamline = SKIF15()
-    scan = get_focus
+    scan = bump_size_scan
     show = False
     repeats = 10
 

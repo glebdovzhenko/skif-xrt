@@ -22,7 +22,7 @@ class CrystalSiPrecalc(rm.CrystalSi):
 
     def __init__(self, *args, **kwargs):
         if 'database' not in kwargs.keys():
-            self.db_addr = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref.csv'
+            self.db_addr = os.path.join(os.getenv('BASE_DIR'), 'components', 'Si111ref.csv')
         else:
             self.db_addr = kwargs.pop('database')
 
