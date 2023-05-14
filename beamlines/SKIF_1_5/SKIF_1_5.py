@@ -329,8 +329,8 @@ class SKIF15(raycing.BeamLine):
             elif re.match(r'^F[\d]+(I|P|PA|IT)$', name):
                 dist = self.MonochromatorCr1.center[1]
             else:
-                raise ValueError('Unknown plot type: %s' % plot.title)
-
+                pass
+            
             for ax, ax_name in zip((plot.xaxis, plot.yaxis), axes):
                 if (name == 'C1C2') and (ax_name == 'Zpr'):
                     ax.offset = self.Cr1Monitor.center[2] / \

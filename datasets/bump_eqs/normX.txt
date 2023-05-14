@@ -1,0 +1,21 @@
+{((Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) (-Cx + xS))/
+  Sx^2 - (xS Abs[Rx])/(Rx Sqrt[Rx^2 - xS^2]))/Sqrt[
+ 1 + E^(2 Re[-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)])
+    Abs[(Axy (Cy - yS))/Sy^2]^2 + 
+  Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+      2 Sy^2)) (-Cx + xS))/Sx^2 - (xS Abs[Rx])/(
+    Rx Sqrt[Rx^2 - xS^2])]^2], (
+ Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) (-Cy + yS))/(
+ Sy^2 Sqrt[
+  1 + E^(2 Re[-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)])
+     Abs[(Axy (Cy - yS))/Sy^2]^2 + 
+   Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+       2 Sy^2)) (-Cx + xS))/Sx^2 - (xS Abs[Rx])/(
+     Rx Sqrt[Rx^2 - xS^2])]^2]), 1/Sqrt[
+ 1 + E^(2 Re[-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)])
+    Abs[(Axy (Cy - yS))/Sy^2]^2 + 
+  Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+      2 Sy^2)) (-Cx + xS))/Sx^2 - (xS Abs[Rx])/(
+    Rx Sqrt[Rx^2 - xS^2])]^2]}
+
+

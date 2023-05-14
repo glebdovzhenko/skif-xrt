@@ -257,28 +257,28 @@ if __name__ == '__main__':
         f.write('    return ' + surf + '\n\n\n')
         f.write('def crn(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy):\n')
         f.write('    return ' + norm.replace('{', '[').replace('}', ']') + '\n\n\n')
-        f.write('def crbn(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy, Chi):\n')
+        f.write('def crbn(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy, SinAlpha, CosAlpha):\n')
         f.write('    return ' + bnorm.replace('{', '[').replace('}', ']') + '\n\n\n')
         # Ry is infinite 
         f.write('def crs_x(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy):\n')
         f.write('    return ' + surf_x + '\n\n\n')
         f.write('def crn_x(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy):\n')
         f.write('    return ' + norm_x.replace('{', '[').replace('}', ']') + '\n\n\n')
-        f.write('def crbn_x(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy, Chi):\n')
+        f.write('def crbn_x(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy, SinAlpha, CosAlpha):\n')
         f.write('    return ' + bnorm_x.replace('{', '[').replace('}', ']') + '\n\n\n')
         # Rx is infinite
         f.write('def crs_y(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy):\n')
         f.write('    return ' + surf_y + '\n\n\n')
         f.write('def crn_y(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy):\n')
         f.write('    return ' + norm_y.replace('{', '[').replace('}', ']') + '\n\n\n')
-        f.write('def crbn_y(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy, Chi):\n')
+        f.write('def crbn_y(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy, SinAlpha, CosAlpha):\n')
         f.write('    return ' + bnorm_y.replace('{', '[').replace('}', ']') + '\n\n\n')
         # Rx, Ry are infinite
         f.write('def crs_xy(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy):\n')
         f.write('    return ' + surf_xy + '\n\n\n')
         f.write('def crn_xy(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy):\n')
         f.write('    return ' + norm_xy.replace('{', '[').replace('}', ']') + '\n\n\n')
-        f.write('def crbn_xy(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy, Chi):\n')
+        f.write('def crbn_xy(xS, yS, Cx, Cy, Rx, Ry, Sx, Sy, Axy, SinAlpha, CosAlpha):\n')
         f.write('    return ' + bnorm_xy.replace('{', '[').replace('}', ']') + '\n\n\n')
 
         f.write('if __name__ == \'__main__\':')
@@ -286,10 +286,10 @@ if __name__ == '__main__':
     from matplotlib import pyplot as plt
 
     x, y, z = np.meshgrid(np.linspace(-5, 5, 15), np.linspace(-5, 5, 15), [0.])
-    args = [x, y, 0., 0., -10., 10., 1., 1., 2., np.radians(35.3)]
+    args = [x, y, 0., 0., -10., 10., 1., 1., 2., np.sin(np.radians(35.3)), np.cos(np.radians(35.3))]
 
-    z = crs(*args[:-1])
-    u1, v1, w1 = crn(*args[:-1])
+    z = crs(*args[:-2])
+    u1, v1, w1 = crn(*args[:-2])
     u2, v2, w2 = crbn(*args)
     ax = plt.figure().add_subplot(projection='3d')      
     ax.plot_surface(x[:, :, 0], y[:, :, 0], z[:, :, 0])
@@ -301,8 +301,8 @@ if __name__ == '__main__':
     ax.set_ylim(-5., 5.)
     ax.set_zlim(0., 10.)
 
-    z = crs_x(*args[:-1])
-    u1, v1, w1 = crn_x(*args[:-1])
+    z = crs_x(*args[:-2])
+    u1, v1, w1 = crn_x(*args[:-2])
     u2, v2, w2 = crbn_x(*args)   
     ax = plt.figure().add_subplot(projection='3d')      
     ax.plot_surface(x[:, :, 0], y[:, :, 0], z[:, :, 0])
@@ -314,8 +314,8 @@ if __name__ == '__main__':
     ax.set_ylim(-5., 5.)
     ax.set_zlim(0., 10.)
 
-    z = crs_y(*args[:-1])
-    u1, v1, w1 = crn_y(*args[:-1])
+    z = crs_y(*args[:-2])
+    u1, v1, w1 = crn_y(*args[:-2])
     u2, v2, w2 = crbn_y(*args)      
     ax = plt.figure().add_subplot(projection='3d')      
     ax.plot_surface(x[:, :, 0], y[:, :, 0], z[:, :, 0])
@@ -327,8 +327,8 @@ if __name__ == '__main__':
     ax.set_ylim(-5., 5.)
     ax.set_zlim(0., 10.)
 
-    z = crs_xy(*args[:-1])
-    u1, v1, w1 = crn_xy(*args[:-1])
+    z = crs_xy(*args[:-2])
+    u1, v1, w1 = crn_xy(*args[:-2])
     u2, v2, w2 = crbn_xy(*args)   
     ax = plt.figure().add_subplot(projection='3d')      
     ax.plot_surface(x[:, :, 0], y[:, :, 0], z[:, :, 0])

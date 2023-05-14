@@ -3,8 +3,9 @@ from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 from scipy.spatial.transform import Rotation
 from scipy.optimize import curve_fit
-from components.bump_eqs import crs, crs_x, crs_y, crs_xy
+from components.bump_eqs import crs_xy
 import os
+import pandas as pd
 
 
 class Normalization:
@@ -36,9 +37,10 @@ class Normalization:
 
 
 if __name__ == '__main__':
-    wd = r'/Users/glebdovzhenko/Downloads/Нагрузка на 1-й кристалл-1/exp_data'
-    save_d = r'/Users/glebdovzhenko/Yandex.Disk.localized/Dev/skif-xrt/datasets/bump'
-    
+    wd = r'/Users/glebdovzhenko/Downloads/Нагрузка на 1-й кристалл/exp_data'
+    save_path = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'bump.csv')
+    dataset = pd.DataFrame(columns=['pt', 'surface', 'Cx', 'Cy', 'Sx', 'Sy', 'Axy', 'Rx', 'Ry'])
+
     for sd, _, fs in os.walk(wd):
         for fpath in filter(lambda x: x[-4:] == '.txt', fs):
             print(os.path.join(os.path.basename(sd), fpath))
@@ -76,12 +78,22 @@ if __name__ == '__main__':
                 p0=[0., 0., 21.5, 4.87, 1e-3]
             )
             print(popt)
-
-            # np.save(os.path.join(save_d, fpath.replace('.txt', '') + os.path.basename(sd) + '.npy'), np.array(popt))
-
+            dataset.loc[dataset.shape[0]] = {
+                'Cx': popt[0],
+                'Cy': popt[1],
+                'Sx': popt[2],
+                'Sy': popt[3],
+                'Rx': 0.,
+                'Ry': 0.,
+                'Axy': popt[4],
+                'pt': int(os.path.basename(sd)),
+                'surface': fpath.replace('.txt', '').replace('_surface', '')
+            }
+            
             fig = plt.figure()
             ax = fig.add_subplot(projection='3d')
             ax.scatter(x1, y1, z1)
             ax.scatter(x1, y1, dg(np.array([x1, y1]), *popt)) 
             plt.show()
-
+    
+    dataset.to_csv(save_path)

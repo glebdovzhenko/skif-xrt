@@ -30,6 +30,8 @@ class BentLaueParaboloidWithBump(BentLaueParaboloid):
         Rx, Ry: bending radii in x and y directions. 
         Can be positive or negative, also np.inf or -np.inf.
         """
+        BentLaueParaboloid.__init__(self, *args, **kwargs)
+
         self.bump_pars = {
             'Cx': 0.,
             'Cy': 0.,
@@ -37,7 +39,6 @@ class BentLaueParaboloidWithBump(BentLaueParaboloid):
             'Sy': 1., 
             'Axy': 3., 
         }
-        BentLaueParaboloid.__init__(self, *args, **kwargs)
 
     def local_z(self, x, y):
         """Determines the surface of OE at (*x*, *y*) position."""
@@ -67,15 +68,16 @@ class BentLaueParaboloidWithBump(BentLaueParaboloid):
         if not self.alpha:
             bB, cB = c, -b
             return [a, bB, cB, a, b, c]
-
+        
+        sa, ca = np.sin(self.alpha + np.pi / 2), np.cos(self.alpha + np.pi / 2)
         if np.isinf(self.Rx) and np.isinf(self.Ry):
-            aB, bB, cB = crbn_xy(x, y, Rx=self._Rx, Ry=self._Ry, Chi=-self.alpha, **self.bump_pars)
+            aB, bB, cB = crbn_xy(x, y, Rx=self._Rx, Ry=self._Ry, SinAlpha=sa, CosAlpha=ca, **self.bump_pars)
         elif np.isinf(self.Rx):
-            aB, bB, cB = crbn_y(x, y, Rx=self._Rx, Ry=self._Ry, Chi=-self.alpha, **self.bump_pars)
+            aB, bB, cB = crbn_y(x, y, Rx=self._Rx, Ry=self._Ry, SinAlpha=sa, CosAlpha=ca, **self.bump_pars)
         elif np.isinf(self.Ry):
-            aB, bB, cB = crbn_x(x, y, Rx=self._Rx, Ry=self._Ry, Chi=-self.alpha, **self.bump_pars)
+            aB, bB, cB = crbn_x(x, y, Rx=self._Rx, Ry=self._Ry, SinAlpha=sa, CosAlpha=ca, **self.bump_pars)
         else:
-            aB, bB, cB = crbn(x, y, Rx=self._Rx, Ry=self._Ry, Chi=-self.alpha, **self.bump_pars)
+            aB, bB, cB = crbn(x, y, Rx=self._Rx, Ry=self._Ry, SinAlpha=sa, CosAlpha=ca, **self.bump_pars)
         
         nan_ii = np.isnan(aB) | np.isnan(bB) | np.isnan(cB)
         aB[nan_ii] = a[nan_ii]

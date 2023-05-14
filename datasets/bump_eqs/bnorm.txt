@@ -1,0 +1,1494 @@
+{((SinAlpha (-((
+          Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+          Sx^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])) ((
+         Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])) (1 - 1/Sqrt[
+         Abs[1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]]))/(Abs[(
+         Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+       Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+            2 Sy^2)))/(
+          Sy^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2) + 
+    CosAlpha (-((
+        Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+        Sx^2 Sqrt[
+         1 + Abs[(
+            Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+            Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+          Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+            Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+       Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+       Sx^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) - (Rx xS)/(
+       Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2])) \[Sqrt]((-((
+            Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)))/(
+            Sx^2 Sqrt[
+             1 + Abs[(
+                Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+              Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             xS)/(Sx^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+             Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)))/(
+             Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               xS)/(Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+           Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)))/(
+              Sy^2 Sqrt[
+               1 + Abs[(
+                  Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                  Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+                Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                  Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               yS)/(Sy^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+             Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2) + ((
+           Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)))/(
+           Sy^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             yS)/(Sy^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+           Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+             Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)))/(
+             Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               xS)/(Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+           Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)))/(
+              Sy^2 Sqrt[
+               1 + Abs[(
+                  Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                  Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+                Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                  Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               yS)/(Sy^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+             Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2)))/((-((
+        Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+        Sx^2 Sqrt[
+         1 + Abs[(
+            Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+            Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+          Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+            Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+       Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+       Sx^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) - (Rx xS)/(
+       Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+         Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+       Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+            2 Sy^2)))/(
+          Sy^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2) + ((
+       Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+       Sy^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+       Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+       Sy^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+       Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+         Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+       Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+            2 Sy^2)))/(
+          Sy^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2)), ((SinAlpha (-((
+          Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+          Sx^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]))^2)/(Abs[(
+         Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+       Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+            2 Sy^2)))/(
+          Sy^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2) + (SinAlpha ((
+         Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]))^2)/(Sqrt[
+       Abs[1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]] (Abs[(
+           Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)))/(
+           Sx^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             xS)/(Sx^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+         Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)))/(
+            Sy^2 Sqrt[
+             1 + Abs[(
+                Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+              Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             yS)/(Sy^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+           Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2])]^2)) - 
+    CosAlpha ((
+       Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+       Sy^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+       Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+       Sy^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+       Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2])) \[Sqrt]((-((
+            Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)))/(
+            Sx^2 Sqrt[
+             1 + Abs[(
+                Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+              Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             xS)/(Sx^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+             Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)))/(
+             Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               xS)/(Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+           Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)))/(
+              Sy^2 Sqrt[
+               1 + Abs[(
+                  Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                  Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+                Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                  Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               yS)/(Sy^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+             Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2) + ((
+           Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)))/(
+           Sy^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             yS)/(Sy^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+           Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+             Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)))/(
+             Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               xS)/(Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+           Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)))/(
+              Sy^2 Sqrt[
+               1 + Abs[(
+                  Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                  Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+                Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                  Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               yS)/(Sy^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+             Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2)))/((-((
+        Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+        Sx^2 Sqrt[
+         1 + Abs[(
+            Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+            Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+          Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+            Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+       Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+       Sx^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) - (Rx xS)/(
+       Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+         Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+       Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+            2 Sy^2)))/(
+          Sy^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2) + ((
+       Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+       Sy^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+       Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+       Sy^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+       Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+         Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+       Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+            2 Sy^2)))/(
+          Sy^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2)), ((CosAlpha (-((
+          Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+          Sx^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)
+                ) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]))^2)/(Sqrt[
+       Abs[1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]] (Abs[(
+           Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)))/(
+           Sx^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             xS)/(Sx^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+         Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)))/(
+            Sy^2 Sqrt[
+             1 + Abs[(
+                Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+              Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             yS)/(Sy^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+           Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2])]^2)) + (CosAlpha ((
+         Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]))^2)/(Sqrt[
+       Abs[1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]] (Abs[(
+           Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)))/(
+           Sx^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             xS)/(Sx^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+         Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)))/(
+            Sy^2 Sqrt[
+             1 + Abs[(
+                Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+              Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             yS)/(Sy^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+           Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2])]^2)) + 
+    SinAlpha ((
+       Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+       Sy^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+       Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+       Sy^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+       Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2])) \[Sqrt]((-((
+            Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)))/(
+            Sx^2 Sqrt[
+             1 + Abs[(
+                Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+              Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                  2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             xS)/(Sx^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+             Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)))/(
+             Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               xS)/(Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+           Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)))/(
+              Sy^2 Sqrt[
+               1 + Abs[(
+                  Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                  Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+                Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                  Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               yS)/(Sy^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+             Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2) + ((
+           Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)))/(
+           Sy^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+             yS)/(Sy^2 Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+           Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+            1 + Abs[(
+               Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+               Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+             Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                 2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+               Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+             Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)))/(
+             Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               xS)/(Sx^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+           Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)))/(
+              Sy^2 Sqrt[
+               1 + Abs[(
+                  Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                  Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+                Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                    2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                  Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2))
+               yS)/(Sy^2 Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+             Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+              1 + Abs[(
+                 Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+                 Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+               Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                   2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+                 Ry Sqrt[Ry^2 - yS^2])]^2])]^2)))/((-((
+        Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+        Sx^2 Sqrt[
+         1 + Abs[(
+            Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+            Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+          Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+              2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+            Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+       Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+       Sx^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) - (Rx xS)/(
+       Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+         Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+       Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+            2 Sy^2)))/(
+          Sy^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2) + ((
+       Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+       Sy^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+       Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+       Sy^2 Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]) + (Ry yS)/(
+       Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+        1 + Abs[(
+           Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+           Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+         Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+             2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+           Ry Sqrt[Ry^2 - yS^2])]^2]))^2/(Abs[(
+         Axy Cx E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)))/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) xS)/(
+         Sx^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) + (Rx xS)/(
+         Sqrt[Rx^2 - xS^2] Abs[Rx] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2 + 
+       Abs[-((Axy Cy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+            2 Sy^2)))/(
+          Sy^2 Sqrt[
+           1 + Abs[(
+              Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+              Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+            Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+                2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+              Ry Sqrt[Ry^2 - yS^2])]^2])) + (
+         Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(2 Sy^2)) yS)/(
+         Sy^2 Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2]) - (Ry yS)/(
+         Sqrt[Ry^2 - yS^2] Abs[Ry] Sqrt[
+          1 + Abs[(
+             Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cx + xS))/Sx^2 - (Rx xS)/(
+             Sqrt[Rx^2 - xS^2] Abs[Rx])]^2 + 
+           Abs[(Axy E^(-((Cx - xS)^2/(2 Sx^2)) - (Cy - yS)^2/(
+               2 Sy^2)) (-Cy + yS))/Sy^2 - (yS Abs[Ry])/(
+             Ry Sqrt[Ry^2 - yS^2])]^2])]^2))}
