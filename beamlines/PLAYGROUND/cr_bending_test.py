@@ -17,7 +17,7 @@ import xrt.runner as xrtrun
 from components import BentLaueCylinder
 from components import CrystalSiPrecalc
 from params.sources import ring_kwargs, wiggler_1_5_kwargs
-from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
+from params.params_nstu_scw import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
     monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim, \
     crl_distance
 

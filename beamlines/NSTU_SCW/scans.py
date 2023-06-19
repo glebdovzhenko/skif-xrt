@@ -1,5 +1,6 @@
 from typing import List
 import os
+import shutil
 import numpy as np
 import pickle
 import matplotlib
@@ -10,13 +11,14 @@ import xrt.runner as xrtrun
 import xrt.plotter as xrtplot
 import xrt.backends.raycing as raycing
 
-from utils.xrtutils import get_minmax
+from utils.xrtutils import get_minmax, get_line_kb, get_integral_breadth
 
 from NSTU_SCW import NSTU_SCW
 
 
 plots = []
 x_kwds = {r'label': r'$x$', r'unit': r'mm', r'data': raycing.get_x}
+y_kwds = {r'label': r'$y$', r'unit': r'mm', r'data': raycing.get_y}
 z_kwds = {r'label': r'$z$', r'unit': r'mm', r'data': raycing.get_z}
 xpr_kwds = {r'label': r'$x^{\prime}$', r'unit': r'', r'data': raycing.get_xprime}
 zpr_kwds = {r'label': r'$z^{\prime}$', r'unit': r'', r'data': raycing.get_zprime}
@@ -25,7 +27,12 @@ zpr_kwds = {r'label': r'$z^{\prime}$', r'unit': r'', r'data': raycing.get_zprime
 for beam, t1 in zip(('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local', 'BeamMonoC2Local', 
                      'BeamMonitor2Local'), 
                     ('FE', 'C1', 'C1C2', 'C2', 'FM')):
-    for t2, xkw, ykw in zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds, z_kwds), (z_kwds, xpr_kwds, zpr_kwds)):
+    if t1 not in ('C1', 'C2'):
+        params = zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds, z_kwds), (z_kwds, xpr_kwds, zpr_kwds))
+    else:
+        params = zip(('XY', 'XXpr'), (x_kwds, x_kwds), (y_kwds, xpr_kwds))
+
+    for t2, xkw, ykw in params:
         plots.append(xrtplot.XYCPlot(beam=beam, title='-'.join((t1, t2)), 
                                      xaxis=xrtplot.XYCAxis(**xkw), yaxis=xrtplot.XYCAxis(**ykw),
                                      aspect='auto'))
@@ -59,17 +66,125 @@ for beam, t1 in zip(('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local
 
 
 def onept(plts: List, bl: NSTU_SCW):
-    subdir = r'/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/datasets/nstu-scw'
+    subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'nstu-scw')
     scan_name = 'test'
-    
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
     en = 30.e3
-    bl.MonochromatorCr1.R = 10.e3
-    bl.MonochromatorCr2.R = 20.e3
+    r1, r2 = -.5, -.5
+    bl.MonochromatorCr1.Rx = r1 * 1e3
+    bl.MonochromatorCr1.Ry = -r1 * 6e3
+
+    bl.MonochromatorCr2.Rx = r2 * 1.e3
+    bl.MonochromatorCr2.Ry = -r2 * 6.e3
 
     bl.align_energy(en, 5e-3)
-    # bl.set_plot_limits(plts)
+    
+    for plot in plts:
+        plot.xaxis.limits = None
+        plot.yaxis.limits = None
+        plot.caxis.limits = None
+        plot.saveName = os.path.join(subdir, scan_name, plot.title + '.png')
 
     yield
+
+
+def r1r2_match(plts: List, bl: NSTU_SCW):
+    subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'nstu-scw')
+    scan_name = 'r1r2_match'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    en = 30.e3
+
+    r1 = -1.
+    for r2 in np.linspace(-.8, -1.2, 20):
+
+        bl.MonochromatorCr1.Rx = r1 * 1e3
+        bl.MonochromatorCr1.Ry = -r1 * 6e3
+
+        bl.MonochromatorCr2.Rx = r2 * 1.e3
+        bl.MonochromatorCr2.Ry = -r2 * 6.e3
+
+        bl.align_energy(en, 2e-2)
+    
+        for plot in plts:
+            plot.xaxis.limits = None
+            plot.yaxis.limits = None
+            plot.caxis.limits = None
+            plot.saveName = '%s-%dkeV-%sm-%sm.png' % (
+                os.path.join(subdir, scan_name, plot.title), int(en * 1e-3),
+                bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+            )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
+        yield
+
+
+def r1r2_scan(plts: List, bl: NSTU_SCW):
+    subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'nstu-scw')
+    scan_name = 'r1r2_scan'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+    
+    en = 70e3
+
+    for r in np.linspace(-1., -.9, 40):
+        bl.MonochromatorCr1.Rx = r * 1e3
+        bl.MonochromatorCr1.Ry = -r * 6e3
+
+        bl.MonochromatorCr2.Rx = r * 1.e3
+        bl.MonochromatorCr2.Ry = -r * 6.e3
+
+        bl.align_energy(en, 5e-2)
+    
+        for plot in plts:
+            plot.xaxis.limits = None
+            plot.yaxis.limits = None
+            plot.caxis.limits = None
+            plot.saveName = '%s-%dkeV-%sm-%sm.png' % (
+                os.path.join(subdir, scan_name, plot.title), int(en * 1e-3),
+                bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
+            )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
+        yield
+        
+        # fname = '%s-%dkeV-%sm-%sm.pickle' % (
+        #         os.path.join(subdir, scan_name, 'FM-XXpr'), int(en * 1e-3),
+        #         bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R())
+        # pos = bl.Cr2Monitor.center[1] 
+        # dx = np.inf
+        # stop = False
+        # while not stop:
+        #     with open(fname, 'rb') as f:
+        #         data = pickle.load(f)
+            
+        #         k, b = get_line_kb(data, show=False)
+        #         fdist = -np.sign(k) * np.sqrt((1. / k) ** 2 + (b / k) ** 2)
+        #         dx_ = get_integral_breadth(data, axis='x')
+
+        #         if dx_ > dx:
+        #             bl.Cr2Monitor.center[1] = pos
+        #             stop = True
+        #         else:
+        #             pos = bl.Cr2Monitor.center[1]
+        #             dx = dx_
+        #             bl.Cr2Monitor.center[1] += fdist
+                
+        #         # shutil.copyfile(fname.replace('.pickle', '.png'), fname.replace('.pickle', '%f.png' % fdist))
+        #         for plot in plts:
+        #             plot.xaxis.limits = None
+        #             plot.yaxis.limits = None
+        #             plot.caxis.limits = None
+        #             os.remove(plot.saveName)
+        #             os.remove(plot.persistentName)
+        #         print(fdist)
+        #         yield
 
 
 def get_focus(plts: List, bl: NSTU_SCW):
@@ -145,7 +260,7 @@ def get_focus(plts: List, bl: NSTU_SCW):
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()
-    scan = get_focus
+    scan = r1r2_scan
     show = False
     repeats = 10
 

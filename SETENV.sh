@@ -1,6 +1,6 @@
 #!/bin/zsh
 
 conda activate xrt
-export PYTHONPATH="$PWD:$PWD/../xrt" 
+export PYTHONPATH=$PWD 
 export BASE_DIR=$PWD
 

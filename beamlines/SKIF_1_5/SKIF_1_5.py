@@ -214,22 +214,19 @@ class SKIF15(raycing.BeamLine):
 
         print('#' * (42 + len(self.name)))
 
+    def set_energy_wiggler(self, en, d_en_abs):
+        """
+        Sets the photon energy limits for the X-ray source
+        """
+        self.SuperCWiggler.eMin = en - d_en_abs
+        self.SuperCWiggler.eMax = en + d_en_abs
 
-    def align_energy(self, en, d_en, mono=False):
-        # changing energy for the beamline / source
-        self.alignE = en
-        if not mono:
-            self.SuperCWiggler.eMin = en * (1. - d_en)
-            self.SuperCWiggler.eMax = en * (1. + d_en)
-        else:
-            self.SuperCWiggler.eMin = en - 1.
-            self.SuperCWiggler.eMax = en + 1.
-
-        # Diffraction angle for the DCM
+    def align_energy_c1(self, en):
+        """
+        Sets MonochromatorCr1 into the correct position.
+        """
         theta0 = np.arcsin(rm.ch / (2 * self.MonochromatorCr1.material[0].d * en))
 
-        # Setting up DCM orientations / positions
-        # Crystal 1
         self.MonochromatorCr1.pitch = np.pi / 2 + theta0 + self.MonochromatorCr1.alpha
         self.MonochromatorCr1.center = [
             0.,
@@ -237,21 +234,37 @@ class SKIF15(raycing.BeamLine):
             0.
         ]
 
-        # Crystal 2
-        self.MonochromatorCr2.pitch = np.pi / 2 - theta0 + self.MonochromatorCr2.alpha
-        self.MonochromatorCr2.center = [
-            0.,
-            monochromator_distance + monochromator_z_offset / np.tan(2. * theta0),
-            monochromator_z_offset
-        ]
-
-        # between-crystals monitor
         self.Cr1Monitor.center = [
             0.,
             monochromator_distance + .5 * monochromator_z_offset / np.tan(2. * theta0),
             .5 * monochromator_z_offset
         ]
 
+    def align_energy_c2(self, en):
+        """
+        Sets MonochromatorCr2 into the correct position.
+        """
+        theta0 = np.arcsin(rm.ch / (2 * self.MonochromatorCr2.material[0].d * en))
+
+        self.MonochromatorCr2.pitch = np.pi / 2 - theta0 + self.MonochromatorCr2.alpha
+        self.MonochromatorCr2.positionRoll = np.pi
+        
+        self.MonochromatorCr2.center = [
+            0.,
+            monochromator_distance + monochromator_z_offset / np.tan(2. * theta0),
+            monochromator_z_offset
+        ]
+        
+    def align_energy(self, en, d_en, mono=False):
+        # changing energy for the beamline / source
+        self.alignE = en
+        if mono:
+            self.set_energy_wiggler(en, 1.)
+        else:
+             self.set_energy_wiggler(en, en * d_en)      
+        
+        self.align_energy_c1(en)
+        self.align_energy_c2(en)
         self.print_positions()
 
     @staticmethod

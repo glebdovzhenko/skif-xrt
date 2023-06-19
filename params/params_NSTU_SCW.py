@@ -18,4 +18,5 @@ monochromator_x_lim = [-100., 100.]  # crystal surface area: min, max x in local
 monochromator_y_lim = [-10., 10.]  # crystal surface area: min, max y in local coordinates
 
 crl_distance = 55000.  # from source
+exit_slit_distance = 60000.  # from source
 

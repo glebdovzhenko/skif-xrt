@@ -63,8 +63,8 @@ def onept(plts: List, bl: SKIF15):
     
     r = 3.5e3
     en = 30.e3
-    bl.MonochromatorCr1.R = r
-    bl.MonochromatorCr2.R = r
+    bl.MonochromatorCr1.Rx = -300.
+    bl.MonochromatorCr2.Rx = -300
 
     bl.align_energy(en, bl.get_de_over_e(r, en))
     bl.set_plot_limits(plts)
@@ -608,46 +608,18 @@ def calc_abs(plts: List, bl: SKIF15):
 
 def bump_size_scan(plts: List, bl: SKIF15):
     subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'skif15')
-    scan_name = 'bump_size_1'
+    scan_name = 'bump_size_flat'
     
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
     
     en = 30.e3
-    bl.MonochromatorCr1.R = np.inf
-    bl.MonochromatorCr2.R = np.inf
+    bl.MonochromatorCr1.R = np.inf  # 20e3  # np.inf
+    bl.MonochromatorCr2.R = np.inf  # 20e3  # np.inf
 
-    bl.align_energy(en, 200. / 30.e3)
+    bl.align_energy(en, 700. / 30.e3)
 
-    for plot in plts:
-        plot.xaxis.limits = None
-        plot.yaxis.limits = None
-        plot.caxis.limits = None
-    bl.set_plot_limits(plts)
-    
-    # wd = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'bump')
-    # for fpath in filter(lambda x: x[-4:] == '.npy', os.listdir(wd)):
-    #     params = np.load(os.path.join(wd, fpath))
-    #     bl.MonochromatorCr1.bump_pars = {
-    #         'Cx': params[0],
-    #         'Cy': params[1],
-    #         'Sx': params[2],
-    #         'Sy': params[3], 
-    #         'Axy': params[4], 
-    #     }
-
-    #     for plot in plts:
-    #         # plot.xaxis.limits = None
-    #         # plot.yaxis.limits = None
-    #         # plot.caxis.limits = None
-
-    #         plot.saveName = '%s-%dkeV-%s.png' % (
-    #             os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), fpath.replace('.npy', '')
-    #         )
-    #         plot.persistentName = plot.saveName.replace('.png', '.pickle')
-    #     yield
-
-    for amp in [1e-3]:
+    for amp in [0.]:  # np.logspace(np.log10(0.0007), np.log10(0.003), 25):
         bl.MonochromatorCr1.bump_pars = {
             'Cx': 0.,
             'Cy': 0.,
@@ -660,12 +632,109 @@ def bump_size_scan(plts: List, bl: SKIF15):
                 os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), amp
             )
             plot.persistentName = plot.saveName.replace('.png', '.pickle')
+            
+            plot.xaxis.limits = None
+            plot.yaxis.limits = None
+            plot.caxis.limits = None
         yield
+
+
+def bump_r2_scan(plts: List, bl: SKIF15):
+    subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'skif15')
+    scan_name = 'bump_r2_scan'
+    
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+    
+    en = 30.e3
+    bl.MonochromatorCr1.R = 20e3  # np.inf
+    bl.MonochromatorCr2.R = 20e3  # np.inf
+
+    bl.align_energy(en, 700. / 30.e3)
+    bl.align_energy_c2(en - 44.33)
+
+    bl.MonochromatorCr1.bump_pars = {
+        'Cx': 0.,
+        'Cy': 0.,
+        'Sx': 23.,
+        'Sy': 5.,
+        'Axy': 3e-3,
+    }
+
+    for dr in [6.5e3]:
+        bl.MonochromatorCr2.R = 20e3 + dr
+        
+        for plot in plts:
+            plot.saveName = '%s-%dkeV-%s.png' % (
+                os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), bl.MonochromatorCr2.pretty_R()
+            )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+            
+            plot.xaxis.limits = None
+            plot.yaxis.limits = None
+            plot.caxis.limits = None
+        yield
+
+
+def bump_tth_scan(plts: List, bl: SKIF15):
+    subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'skif15')
+    scan_name = 'bump_tth_scan2'
+    
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+    
+    en = 30.e3
+    bl.MonochromatorCr1.R = 20e3  # np.inf
+    bl.MonochromatorCr2.R = 5e3  # np.inf
+
+    bl.align_energy(en, 700. / 30.e3)
+    bl.MonochromatorCr1.bump_pars = {
+        'Cx': 0.,
+        'Cy': 0.,
+        'Sx': 23.,
+        'Sy': 5.,
+        'Axy': 3e-3,
+    }
+
+    for d_en in np.linspace(-200, 0, 20):
+        bl.align_energy_c2(en + d_en)
+
+        for plot in plts:
+            plot.saveName = '%s-%dkeV-%f.png' % (
+                os.path.join(subdir, scan_name, plot.title), int(en * 1e-3), d_en
+            )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+            
+            plot.xaxis.limits = None
+            plot.yaxis.limits = None
+            plot.caxis.limits = None
+        yield
+
+
+def bumb_tth_r2_map(plts: List, bl: SKIF15):
+    subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'skif15')
+    scan_name = 'bump_tth_scan2'
+    
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+    
+    en = 30.e3
+    bl.MonochromatorCr1.R = 20e3  # np.inf
+    bl.MonochromatorCr2.R = 5e3  # np.inf
+
+    bl.align_energy(en, 700. / 30.e3)
+    bl.MonochromatorCr1.bump_pars = {
+        'Cx': 0.,
+        'Cy': 0.,
+        'Sx': 23.,
+        'Sy': 5.,
+        'Axy': 3e-3,
+    }
 
 
 if __name__ == '__main__':
     beamline = SKIF15()
-    scan = bump_size_scan
+    scan = bump_r2_scan
     show = True
     repeats = 10
 

@@ -96,4 +96,4 @@ if __name__ == '__main__':
             ax.scatter(x1, y1, dg(np.array([x1, y1]), *popt)) 
             plt.show()
     
-    dataset.to_csv(save_path)
+    # dataset.to_csv(save_path)

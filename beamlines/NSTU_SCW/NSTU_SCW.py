@@ -1,5 +1,6 @@
 import numpy as np
 from copy import deepcopy
+import os
 
 import matplotlib
 
@@ -16,8 +17,8 @@ import xrt.runner as xrtrun
 
 from components import CrystalSiPrecalc, BentLaueParaboloid
 from params.sources import ring_kwargs, wiggler_nstu_scw_kwargs
-from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
-    monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim, crl_distance
+from params.params_nstu_scw import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
+    monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim, exit_slit_distance
 
 
 # ################################################# SETUP PARAMETERS ###################################################
@@ -26,7 +27,7 @@ from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_
 """ Monochromator """
 monochromator_alignment_energy = 30.e3
 monochromator_c1_alpha = np.radians(35.3)
-monochromator_c1_thickness = 2.
+monochromator_c1_thickness = .5
 monochromator_c2_alpha = np.radians(35.3)
 monochromator_c2_thickness = .5
 
@@ -34,9 +35,10 @@ monochromator_c2_thickness = .5
 # #################################################### MATERIALS #######################################################
 
 
-cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness)
+cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness,
+                           database=os.path.join(os.getenv('BASE_DIR'), 'components', 'Si111ref_sag.csv'))
 cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness,
-                           database='/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/components/Si111ref_sag.csv')
+                           database=os.path.join(os.getenv('BASE_DIR'), 'components', 'Si111ref_sag.csv'))
 
 
 # #################################################### BEAMLINE ########################################################
@@ -78,7 +80,7 @@ class NSTU_SCW(raycing.BeamLine):
             yaw=0.,
             alpha=monochromator_c1_alpha,
             material=(cr_si_1,),
-            r_for_refl='y',
+            r_for_refl='x',
             targetOpenCL='CPU',
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
@@ -113,7 +115,7 @@ class NSTU_SCW(raycing.BeamLine):
         self.Cr2Monitor = rscreens.Screen(
             bl=self,
             name=r"Crystal 2 Monitor",
-            center=[0, crl_distance, monochromator_z_offset],
+            center=[0, exit_slit_distance, monochromator_z_offset],
         )
 
     def print_positions(self):
