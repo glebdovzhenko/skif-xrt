@@ -1,4 +1,3 @@
-from ast import Num
 from xrt.backends.raycing.oes_base import OE
 from xrt.backends import raycing
 import numpy as np
@@ -37,7 +36,7 @@ class BentLaueParaboloidWithBump(BentLaueParaboloid):
             'Cy': 0.,
             'Sx': 1.,
             'Sy': 1., 
-            'Axy': 3., 
+            'Axy': 0.,  # by default there is no bump since amplitude == 0 
         }
 
     def local_z(self, x, y):
