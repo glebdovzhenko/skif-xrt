@@ -20,6 +20,7 @@ import pickle
 import matplotlib as mpl
 mpl.use('agg')
 
+
 data_dir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'tmp')
 
 crl_mat = Material('Be', rho=1.848, kind='lens')
@@ -31,6 +32,7 @@ en = 30000.  # eV
 focal_dist = 14000.  # mm
 focal_dist_calc = crl_y_g * crl_y_t / (crl_L * np.real(1. - crl_mat.get_refractive_index(en)))
 focal_dist = focal_dist_calc
+
 
 class CrocTestBL(BeamLine):
     def __init__(self, azimuth=0, height=0, alignE='auto'):
@@ -220,7 +222,7 @@ def empty_scan(bl: CrocTestBL, plots: List):
         source_flux = f.intensity
         source_size = get_integral_breadth(f, 'y')
     
-    source_projection = source_size + focus * 1e-4
+    source_projection = source_size + 2. * focus * 1e-4
     print('Focus  | size: %.03f | flux %.01f | distance %.01f' % (focus_size, focus_flux, focus))
     print('Source | size: %.03f | flux %.01f' % (source_size, source_flux))
     print('Projected source size: %.03f' % source_projection)
