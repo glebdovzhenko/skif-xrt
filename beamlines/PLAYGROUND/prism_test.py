@@ -100,7 +100,6 @@ class CrocTestBL(BeamLine):
         ]
 
 
-
 def run_process(bl: CrocTestBL):
     outDict = dict()
 
