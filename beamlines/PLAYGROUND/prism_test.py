@@ -5,8 +5,8 @@ from xrt.backends.raycing.materials import Material
 from components import PrismaticLens
 from xrt.backends.raycing.screens import Screen
 from xrt.plotter import XYCAxis, XYCPlot
-from xrt.backends.raycing import get_x, get_z, get_xprime, get_zprime
-from utils.xrtutils import get_integral_breadth, bell_fit
+from xrt.backends.raycing import get_x, get_z
+from utils.xrtutils import get_integral_breadth 
 
 
 import xrt.backends.raycing.run as rrun
@@ -23,15 +23,19 @@ mpl.use('agg')
 
 data_dir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'tmp')
 
+# crl_mat = Material('C', rho=2.15, kind='lens') 
+# crl_mat = Material('Al', rho=2.7, kind='lens')
 crl_mat = Material('Be', rho=1.848, kind='lens')
-crl_y_t = 1.2  # 0.6588  # mm
-crl_y_g = 1.2  # 0.6588  # mm
-crl_L = 270.  # 82.242  # mm
-en = 30000.  # eV
+mul = 1
+crl_y_t = 1.228 * np.sqrt(mul)  # mm
+crl_y_g = 1.228 * np.sqrt(mul)  # mm
+crl_L = 270. * mul     # mm
+en = 30000.      # eV
 
 focal_dist = 14000.  # mm
-focal_dist_calc = crl_y_g * crl_y_t / (crl_L * np.real(1. - crl_mat.get_refractive_index(en)))
-focal_dist = focal_dist_calc
+# crl_y_g = focal_dist * crl_L * np.real(1. - crl_mat.get_refractive_index(en)) / crl_y_t
+# focal_dist_calc = crl_y_g * crl_y_t / (crl_L * np.real(1. - crl_mat.get_refractive_index(en)))
+# focal_dist = focal_dist_calc
 
 
 class CrocTestBL(BeamLine):
@@ -55,15 +59,15 @@ class CrocTestBL(BeamLine):
             dy=0., 
             dz=.027, 
             dxprime=1e-3, 
-            dzprime=1e-4
+            dzprime=1e-4,
         )
         
         self.LensMat = crl_mat
-        print('2F-2F geometry, F = %.01f' % focal_dist)
-        print(*[': '.join((str(a), '%.03f' % b)) for a, b in PrismaticLens.calc_optimal_params(self.LensMat , focal_dist, en).items()])
+        
+        print('Lens params: y_t: %.03f, y_g: %.03f, L: %.03f' % (crl_y_t, crl_y_g, crl_L))
 
         self.LensStack = PrismaticLens.make_stack(
-            L=crl_L, N=int(crl_L), d=crl_y_t, g_last=0.0, g_first=crl_y_g,
+            L=crl_L, N=200, d=crl_y_t, g_last=0.0, g_first=crl_y_g,  # int(crl_L)
             bl=self, 
             center=[0., 2. * focal_dist, 0],
             material=self.LensMat,
@@ -152,7 +156,7 @@ plots = [
 ]
 
 
-def empty_scan(bl: CrocTestBL, plots: List):
+def onept(bl: CrocTestBL, plots: List):
     def slice_parabola(a, b, c, m):
         m += 1.
         x0 = -b / (2. * c)
@@ -161,9 +165,9 @@ def empty_scan(bl: CrocTestBL, plots: List):
         x1 = (-b - d) / (2. * c)
         x2 = (-b + d) / (2. * c)
         return x0, x1, x2
-
+    
+    # updating beamline params
     ymin, ymax = 2.1 * focal_dist, 6. * focal_dist
-
     for _ in range(4):
         if os.path.exists(data_dir):
             shutil.rmtree(data_dir)
@@ -210,28 +214,33 @@ def empty_scan(bl: CrocTestBL, plots: List):
         ax.plot(pos, pp(pos))
         ax.plot([focus, focus], [y_size.min(), y_size.max()], '--')
         ax.text(focus, y_size.max(), 'F=%.01f mm' % focus)
+        ax.set_xlabel('Y position [mm]')
+        ax.set_ylabel('Beam integral breadth [mm]')
         fig.savefig(os.path.join(data_dir, '..', 'fdist%d.png' % _))
+    else:
+        # calculating gain
+        focus_size = coef[0] - coef[1]**2 / (4. * coef[2])
+        with open(f_name, 'rb') as f:
+            f = pickle.load(f)
+            focus_flux = f.intensity
+        with open(os.path.join(data_dir, 'BeamAtSource.pickle'), 'rb') as f:
+            f = pickle.load(f)
+            source_flux = f.intensity
+            source_size = get_integral_breadth(f, 'y')
         
-    # calculating gain
-    focus_size = coef[0] - coef[1]**2 / (4. * coef[2])
-    with open(f_name, 'rb') as f:
-        f = pickle.load(f)
-        focus_flux = f.intensity
-    with open(os.path.join(data_dir, 'BeamAtSource.pickle'), 'rb') as f:
-        f = pickle.load(f)
-        source_flux = f.intensity
-        source_size = get_integral_breadth(f, 'y')
-    
-    source_projection = source_size + 2. * focus * 1e-4
-    print('Focus  | size: %.03f | flux %.01f | distance %.01f' % (focus_size, focus_flux, focus))
-    print('Source | size: %.03f | flux %.01f' % (source_size, source_flux))
-    print('Projected source size: %.03f' % source_projection)
-    print('Gain %.01f' % ((focus_flux * source_projection) / (source_flux * focus_size)))
-
+        source_projection = source_size + 2. * focus * 1e-4
+        gain = (focus_flux * source_projection) / (source_flux * focus_size)
+        print('Focus  | size: %.03f | flux %.01f | distance %.01f' % (focus_size, focus_flux, focus))
+        print('Source | size: %.03f | flux %.01f' % (source_size, source_flux))
+        print('Projected source size: %.03f' % source_projection)
+        print('Gain %.01f' % gain)
+        ax.text(focus, y_size.max(), 'F=%.01f mm Gain = %.01f' % (focus, gain))
+        fig.savefig(os.path.join(data_dir, '..', 'fdist%d.png' % _))
+ 
 
 if __name__ == '__main__':
     beamline = CrocTestBL()
-    scan = empty_scan
+    scan = onept
     show = False
     repeats = 1
 
