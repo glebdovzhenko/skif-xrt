@@ -10,9 +10,11 @@ import xrt.plotter as xrtplot
 import xrt.backends.raycing as raycing
 
 from utils.xrtutils import get_minmax, get_line_kb, get_integral_breadth
+from components import PrismaticLens
 
 from NSTU_SCW import NSTU_SCW
-from params.params_nstu_scw import croc_crl_L, sic_filter_N, diamond_filter_N
+from params.params_nstu_scw import croc_crl_L, sic_filter_N, diamond_filter_N, front_end_opening, croc_crl_y_t, \
+croc_crl_distance, croc_crl_L, monochromator_x_lim, monochromator_y_lim
 
 
 plots = []
@@ -36,43 +38,19 @@ for beam, t1 in zip(('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local
                                      xaxis=xrtplot.XYCAxis(**xkw), yaxis=xrtplot.XYCAxis(**ykw),
                                      aspect='auto'))
 
-# # Adding crl plots
-# plots.extend([xrtplot.XYCPlot(
-#         beam='BeamLensLocal2a_{0:02d}'.format(ii),
-#         title='LensAbs_{0:02d}-XZ'.format(ii),
-#         xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x),
-#         yaxis=xrtplot.XYCAxis(label=r'$y$', unit='mm', data=raycing.get_y),
-#         aspect='auto',
-#         fluxKind='power') for ii in range(int(croc_crl_L))])
-# # Adding filter plots
-# plots.extend([xrtplot.XYCPlot(
-#         beam='BeamFilterCLocal2a_{0:02d}'.format(ii),
-#         title='FilterCAbs_{0:02d}-XZ'.format(ii),
-#         xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x),
-#         yaxis=xrtplot.XYCAxis(label=r'$y$', unit='mm', data=raycing.get_y),
-#         aspect='auto',
-#         fluxKind='power') for ii in range(diamond_filter_N)])
-# plots.extend([xrtplot.XYCPlot(
-#         beam='BeamFilterSiCLocal2a_{0:02d}'.format(ii),
-#         title='FilterSiCAbs_{0:02d}-XZ'.format(ii),
-#         xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x),
-#         yaxis=xrtplot.XYCAxis(label=r'$y$', unit='mm', data=raycing.get_y),
-#         aspect='auto',
-#         fluxKind='power') for ii in range(sic_filter_N)])
-
 
 def onept(plts: List, bl: NSTU_SCW):
     subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'nstu-scw')
-    scan_name = 'lens_abs_90'
+    scan_name = 'spot_size'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
-    en = 90.e3
-    # r1, r2 = -2.04, -2.04  # 30 keV
+    en = 30.e3
+    r1, r2 = -2.04, -2.04  # 30 keV
     # r1, r2 = -1.22, -1.22  # 50 keV
     # r1, r2 = -.87, -.87  # 70 keV
-    r1, r2 = -.675, -.675  # 90 keV
+    # r1, r2 = -.675, -.675  # 90 keV
     bl.MonochromatorCr1.Rx = r1 * 1e3
     bl.MonochromatorCr1.Ry = -r1 * 6e3
 
@@ -80,91 +58,41 @@ def onept(plts: List, bl: NSTU_SCW):
     bl.MonochromatorCr2.Ry = -r2 * 6.e3
 
     bl.align_energy(en, 5e-2, invert_croc=False)
-    bl.SuperCWiggler.eMin = 100.
-    bl.SuperCWiggler.eMax = 1.e6
-    
+    # bl.SuperCWiggler.eMin = 100.
+    # bl.SuperCWiggler.eMax = 1.e6
+
+    del bl.CrocLensStack[:]
+    g_f = 1.228  # 30 keV
+    # g_f = .435  # 50 keV
+    # g_f = .224  # 70 keV
+    # g_f = .138  # 90 keV
+    bl.CrocLensStack = PrismaticLens.make_stack(
+        L=croc_crl_L, N=int(croc_crl_L), d=croc_crl_y_t, g_last=0., g_first=g_f,
+        bl=bl, 
+        center=[0., croc_crl_distance, 0],
+        material=bl.LensMaterial,
+        limPhysX=monochromator_x_lim, 
+        limPhysY=monochromator_y_lim, 
+    )
+
+    bl.CrlMask.opening = [-100, 100, -100, 100]
+
     for plot in plts:
         if plot.title == 'FM-XZ':
             plot.xaxis.limits = [-.5, .5]
             plot.yaxis.limits = [-.5, .5]
-        # plot.caxis.limits = None
-        plot.saveName = os.path.join(subdir, scan_name, plot.title + '.png')
-        plot.persistentName = plot.saveName.replace('.png', '.pickle')
+            plot.caxis.limits = [bl.SuperCWiggler.eMin, bl.SuperCWiggler.eMax]
+            plot.saveName = os.path.join(subdir, scan_name, '%s-%dkeV.png' % (plot.title, int(en * 1e-3)))
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
 
     yield
 
 
-def r1r2_scan(plts: List, bl: NSTU_SCW):
-    subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'nstu-scw')
-    scan_name = 'r1r2_scan'
-
-    if not os.path.exists(os.path.join(subdir, scan_name)):
-        os.mkdir(os.path.join(subdir, scan_name))
-    
-    en = 90e3
-
-    for r in np.linspace(-.668, -.689, 20):
-        bl.MonochromatorCr1.Rx = r * 1e3
-        bl.MonochromatorCr1.Ry = -r * 6e3
-
-        bl.MonochromatorCr2.Rx = r * 1.e3
-        bl.MonochromatorCr2.Ry = -r * 6.e3
-
-        bl.align_energy(en, 2e-2)
-    
-        for plot in plts:
-            plot.xaxis.limits = None
-            plot.yaxis.limits = None
-            plot.caxis.limits = None
-            plot.saveName = '%s-%dkeV-%sm-%sm.png' % (
-                os.path.join(subdir, scan_name, plot.title), int(en * 1e-3),
-                bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
-            )
-            plot.persistentName = plot.saveName.replace('.png', '.pickle')
-
-        yield
-
-
-def e_scan(plts: List, bl: NSTU_SCW):
-    subdir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'nstu-scw')
-    scan_name = 'mask_lens_e_scan_gr'
-
-    if not os.path.exists(os.path.join(subdir, scan_name)):
-        os.mkdir(os.path.join(subdir, scan_name))     
-
-    for en, d_en, r in zip([30., 50., 70., 90.], [2e-3, 4e-3, 7e-3, 2e-2], [-2.04, -1.22, -.87, -.675]):
-        bl.MonochromatorCr1.Rx = r * 1e3
-        bl.MonochromatorCr1.Ry = -r * 6e3
-        bl.MonochromatorCr2.Rx = r * 1.e3
-        bl.MonochromatorCr2.Ry = -r * 6.e3
-        
-        bl.align_energy(en * 1e3, d_en, invert_croc=True)
-        # bl.SuperCWiggler.eMin = 100.
-        # bl.SuperCWiggler.eMax = 1.e6
-        
-        for plot in plts:
-            plot.xaxis.limits = None
-            plot.yaxis.limits = None
-            plot.caxis.limits = None
-
-            if plot.title == 'FM-XZ':
-                plot.xaxis.limits = [-.5, .5]
-                plot.yaxis.limits = [-.5, .5]
-
-            plot.saveName = '%s-%dkeV-%sm-%sm.png' % (
-                os.path.join(subdir, scan_name, plot.title), int(en),
-                bl.MonochromatorCr1.pretty_R(), bl.MonochromatorCr2.pretty_R()
-            )
-            plot.persistentName = plot.saveName.replace('.png', '.pickle')
-
-        yield
-
-
 if __name__ == '__main__':
     beamline = NSTU_SCW()
-    scan = e_scan
+    scan = onept
     show = False
-    repeats = 1
+    repeats = 20
 
     if show:
         beamline.glow(

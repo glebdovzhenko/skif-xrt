@@ -27,7 +27,7 @@ undulator_1_1_kwargs = {
 }
 
 wiggler_nstu_scw_kwargs = {
-        'K': 13.8939,  # deflection parameter at 3.1 T, at 4.5 T K = 20.2
-        'period': 48.,  # period length [mm]
-        'n': 40,  # number of periods
+    'K': 13.8939,  # deflection parameter at 3.1 T, at 4.5 T K = 20.2
+    'period': 48.,  # period length [mm]
+    'n': 40,  # number of periods
 }

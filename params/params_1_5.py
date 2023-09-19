@@ -30,3 +30,4 @@ focusing_distance = 51000.  # from source
 
 exit_slit_distance = 115000.  # from source
 exit_slit_opening = [-107.5, 107.5, -10., 10.]
+

@@ -26,10 +26,9 @@ data_dir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'tmp')
 # crl_mat = Material('C', rho=2.15, kind='lens') 
 # crl_mat = Material('Al', rho=2.7, kind='lens')
 crl_mat = Material('Be', rho=1.848, kind='lens')
-mul = 1
-crl_y_t = 1.228 * np.sqrt(mul)  # mm
-crl_y_g = 1.228 * np.sqrt(mul)  # mm
-crl_L = 270. * mul     # mm
+crl_y_t = 1.228  # mm
+crl_y_g = 1.228  # mm
+crl_L = 270.     # mm
 en = 30000.      # eV
 
 focal_dist = 14000.  # mm

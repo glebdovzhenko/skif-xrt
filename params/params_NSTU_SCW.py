@@ -24,18 +24,18 @@ monochromator_y_lim = [-10., 10.]  # crystal surface area: min, max y in local c
 crl_mask_distance = 27500.  # from source
 
 croc_crl_distance = 28000.  # from source
-# # Be	
-# croc_crl_y_t = 0.66
-# croc_crl_L = 107
+# Be	
+croc_crl_y_t = 1.228
+croc_crl_L = 270
 # # Al	
 # croc_crl_y_t = 0.29
 # croc_crl_L = 54
 # # Dia	
 # croc_crl_y_t = 0.58
 # croc_crl_L = 50
-# Gr	
-croc_crl_y_t = 0.58
-croc_crl_L = 81
+# # Gr	
+# croc_crl_y_t = 0.58
+# croc_crl_L = 81
 
 exit_slit_distance = 56000.  # from source
 

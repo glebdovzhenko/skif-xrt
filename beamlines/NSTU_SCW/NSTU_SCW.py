@@ -10,7 +10,7 @@ import xrt.backends.raycing.run as rrun
 import xrt.backends.raycing as raycing
 import xrt.backends.raycing.oes as roe
 
-from components import CrystalSiPrecalc, BentLaueParaboloid, CrocLens
+from components import CrystalSiPrecalc, BentLaueParaboloid, PrismaticLens
 from params.sources import ring_kwargs, wiggler_nstu_scw_kwargs, wiggler_1_5_kwargs
 from params.params_nstu_scw import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
     filter_distance, diamond_filter_th, diamond_filter_N, sic_filter_th, sic_filter_N, \
@@ -42,7 +42,7 @@ mDiamond = rm.Material('C', rho=3.5, kind='lens')
 mGraphite = rm.Material('C', rho=2.15, kind='lens')
 mDiamondF = rm.Material('C', rho=3.5)
 mSiC = rm.Material(('Si', 'C'), quantities=(1, 1), rho=3.16)
-lens_material = mGraphite
+lens_material = mBeryllium
 
 
 # #################################################### BEAMLINE ########################################################
@@ -109,16 +109,16 @@ class NSTU_SCW(raycing.BeamLine):
             center=[0, crl_mask_distance, 0],
             opening=front_end_opening
         )
-
-        self.CrocLensStack = CrocLens.make_stack(
-            L=croc_crl_L, N=int(croc_crl_L), d=croc_crl_y_t, g_left=0., g_right=croc_crl_y_t,
+        
+        self.LensMaterial = lens_material
+        self.CrocLensStack = PrismaticLens.make_stack(
+            L=croc_crl_L, N=int(croc_crl_L), d=croc_crl_y_t, g_last=0.0, g_first=croc_crl_y_t,
             bl=self, 
             center=[0., croc_crl_distance, 0],
-            material=lens_material,
+            material=self.LensMaterial,
             limPhysX=monochromator_x_lim, 
             limPhysY=monochromator_y_lim, 
         )
-
 
         self.MonochromatorCr1 = BentLaueParaboloid(
             bl=self,
@@ -192,25 +192,20 @@ class NSTU_SCW(raycing.BeamLine):
         
         # re-making the CRL
         del self.CrocLensStack[:]
-        if invert_croc:
-            g_l, g_r = CrocLens.calc_y_g(lens_material, croc_crl_distance / 2., en, croc_crl_y_t, croc_crl_L), 0
-        else:
-            g_l, g_r = 0, CrocLens.calc_y_g(lens_material, croc_crl_distance / 2., en, croc_crl_y_t, croc_crl_L)
-        
-        
-        self.CrocLensStack = CrocLens.make_stack(
-            L=croc_crl_L, N=int(croc_crl_L), d=croc_crl_y_t, g_left=g_l, g_right=g_r,
+        g_f, g_l = PrismaticLens.calc_y_g(self.LensMaterial, croc_crl_distance / 2., en, croc_crl_y_t, croc_crl_L), 0.
+        self.CrocLensStack = PrismaticLens.make_stack(
+            L=croc_crl_L, N=int(croc_crl_L), d=croc_crl_y_t, g_last=g_l, g_first=g_f,
             bl=self, 
             center=[0., croc_crl_distance, 0],
-            material=lens_material,
+            material=self.LensMaterial,
             limPhysX=monochromator_x_lim, 
             limPhysY=monochromator_y_lim, 
         )
         
         # setting up pre-CRL mask
-        apt = CrocLens.calc_optimal_params(lens_material, croc_crl_distance / 2., en)['Aperture']
+        apt = PrismaticLens.calc_optimal_params(self.LensMaterial, croc_crl_distance / 2., en)['Aperture']
         self.CrlMask.opening = [-100., 100., -apt / 2., apt / 2.]
-        print('Croc Lens: g_r = %.01f, g_l = %.01f, y_t = %.01f, L = %.01f' % (g_r, g_l, croc_crl_y_t, croc_crl_L))
+        print('Croc Lens: g_r = %.01f, g_l = %.01f, y_t = %.01f, L = %.01f' % (g_f, g_l, croc_crl_y_t, croc_crl_L))
         print('Mask: %.01f' % apt)
         # Diffraction angle for the DCM
         theta0 = np.arcsin(rm.ch / (2 * self.MonochromatorCr1.material[0].d * en))
@@ -303,7 +298,8 @@ def run_process(bl: NSTU_SCW):
         llocal2a.absorb_intensity(beamIn)
         outDict['BeamLensLocal2a'+strl] = llocal2a
         beamIn = lglobal
-
+    
+    # monochromator
     beam_mono_c1_global, beam_mono_c1_local = bl.MonochromatorCr1.reflect(
         beam=beamIn
     )
