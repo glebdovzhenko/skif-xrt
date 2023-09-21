@@ -166,6 +166,15 @@ class NSTU_SCW(raycing.BeamLine):
             name=r"Crystal 2 Monitor",
             center=[0, exit_slit_distance, monochromator_z_offset],
         )
+        self.FScreenStack = []
+        self.reset_screen_stack()
+
+    def reset_screen_stack(self, y_min=exit_slit_distance-5e3, y_max=exit_slit_distance+5e3, stack_size=20):
+        del self.FScreenStack[:]
+        self.FScreenStack = [
+            rscreens.Screen(bl=self, name=r"FSS %.03f" % y_pos, center=[0, y_pos, monochromator_z_offset]) 
+            for y_pos in np.linspace(y_min, y_max, stack_size)
+        ]
 
     def print_positions(self):
         print('#' * 20, self.name, '#' * 20)
@@ -324,6 +333,9 @@ def run_process(bl: NSTU_SCW):
     outDict['BeamMonitor2Local'] = beam_mon2
 
     bl.prepare_flow()
+        
+    for iscreen, screen in enumerate(bl.FScreenStack):
+        outDict['BeamFSSLocal_{0:02d}'.format(iscreen)] = screen.expose(beam=beam_mono_c2_global)
 
     return outDict
 
