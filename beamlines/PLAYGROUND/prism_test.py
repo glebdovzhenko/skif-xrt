@@ -6,7 +6,8 @@ from components import PrismaticLens
 from xrt.backends.raycing.screens import Screen
 from xrt.plotter import XYCAxis, XYCPlot
 from xrt.backends.raycing import get_x, get_z
-from utils.xrtutils import get_integral_breadth 
+from utils.xrtutils import get_integral_breadth
+from utils.focus_locator import FocusLocator
 
 
 import xrt.backends.raycing.run as rrun
@@ -36,7 +37,14 @@ focal_dist = 14000.  # mm
 # focal_dist_calc = crl_y_g * crl_y_t / (crl_L * np.real(1. - crl_mat.get_refractive_index(en)))
 # focal_dist = focal_dist_calc
 
+FL = FocusLocator(
+    beam_name='BeamFocused',
+    data_dir=os.path.join(os.getenv('BASE_DIR'), 'datasets', 'tmp'),
+    axes=['z']
+)
 
+
+@FL.beamline
 class CrocTestBL(BeamLine):
     def __init__(self, azimuth=0, height=0, alignE='auto'):
         super().__init__(azimuth, height, alignE)
@@ -94,17 +102,18 @@ class CrocTestBL(BeamLine):
             name=r"Focus",
             center=[0, 4. * focal_dist, 0],
         )
-        self.FScreenStack = []
-        self.reset_screen_stack()
+    #     self.FScreenStack = []
+    #     self.reset_screen_stack()
 
-    def reset_screen_stack(self, y_min=2.1*focal_dist, y_max=6*focal_dist, stack_size=20):
-        del self.FScreenStack[:]
-        self.FScreenStack = [
-            Screen(bl=self, name=r"FSS %.03f" % y_pos, center=[0, y_pos, 0]) 
-            for y_pos in np.linspace(y_min, y_max, stack_size)
-        ]
+    # def reset_screen_stack(self, y_min=2.1*focal_dist, y_max=6*focal_dist, stack_size=20):
+    #     del self.FScreenStack[:]
+    #     self.FScreenStack = [
+    #         Screen(bl=self, name=r"FSS %.03f" % y_pos, center=[0, y_pos, 0]) 
+    #         for y_pos in np.linspace(y_min, y_max, stack_size)
+    #     ]
 
 
+@FL.run_process
 def run_process(bl: CrocTestBL):
     outDict = dict()
 
@@ -127,9 +136,10 @@ def run_process(bl: CrocTestBL):
 
     outDict['BeamM3Local'] = bl.PostLensScreen.expose(beam=beamIn)
     outDict['BeamM4Local'] = bl.FocusingScreen.expose(beam=beamIn)
+    outDict['BeamFocused'] = beamIn
     
-    for iscreen, screen in enumerate(bl.FScreenStack):
-        outDict['BeamFSSLocal_{0:02d}'.format(iscreen)] = screen.expose(beam=beamIn)
+    # for iscreen, screen in enumerate(bl.FScreenStack):
+    #     outDict['BeamFSSLocal_{0:02d}'.format(iscreen)] = screen.expose(beam=beamIn)
 
     bl.prepare_flow()
     return outDict
@@ -172,32 +182,31 @@ def onept(bl: CrocTestBL, plots: List):
             shutil.rmtree(data_dir)
         os.mkdir(data_dir)
 
-        bl.reset_screen_stack(y_min=ymin, y_max=ymax)
+        bl.flscreens_reset(y_min=ymin, y_max=ymax, n=20)
         for ii in range(len(plots) - 1, -1, -1):
-            if 'BeamFSSLocal' in plots[ii].title:
+            if '_FLS_' in plots[ii].title:
                 del plots[ii]
 
         plots.extend([
             XYCPlot(
-                beam='BeamFSSLocal_{0:02d}'.format(iscreen), 
-                title='BeamFSSLocal_{0:02d}'.format(iscreen), 
-                persistentName=os.path.join(data_dir, 'BeamFSSLocal_%.03f.pickle' % screen.center[1]),
-                saveName=os.path.join(data_dir, 'BeamFSSLocal_%.03f.png' % screen.center[1]),
+                beam=FL.beam_fmt % iscreen, 
+                title=FL.plot_fmt % screen.center[1], 
+                persistentName=os.path.join(data_dir, FL.plot_fmt % screen.center[1] + '.pickle'),
+                saveName=os.path.join(data_dir, FL.plot_fmt % screen.center[1] + '.png'),
                 aspect='auto',
                 xaxis=XYCAxis(label='$x$', unit='mm', data=get_x), 
                 yaxis=XYCAxis(label='$z$', unit='mm', data=get_z, limits=[-.5, .5])) 
-            for iscreen, screen in enumerate(bl.FScreenStack)
+            for iscreen, screen in enumerate(bl._FLScreens)
         ])
         
         yield
         
         # calculating focus position and size
         pos, y_size = [], []
-        for f_name in (os.path.join(data_dir, 'BeamFSSLocal_%.03f.pickle' % screen.center[1]) 
-                       for screen in bl.FScreenStack):
+        for f_name in (os.path.join(data_dir, FL.plot_fmt % screen.center[1] + '.pickle') for screen in bl._FLScreens):
             with open(f_name, 'rb') as f:
                 y_size.append(get_integral_breadth(pickle.load(f), 'y'))
-                pos.append(float(os.path.basename(f_name).replace('.pickle', '').replace('BeamFSSLocal_', '')))
+                pos.append(float(os.path.basename(f_name).replace('.pickle', '').replace('_FLS_', '')))
         else:
             pos, y_size = np.array(pos), np.array(y_size)
             ii = np.argsort(pos)
@@ -235,11 +244,14 @@ def onept(bl: CrocTestBL, plots: List):
         print('Gain %.01f' % gain)
         ax.text(focus, y_size.max(), 'F=%.01f mm Gain = %.01f' % (focus, gain))
         fig.savefig(os.path.join(data_dir, '..', 'fdist%d.png' % _))
- 
+
+@FL.gnrtr(50e3, 70e3, 20)
+def onept2(bl: CrocTestBL, plots: List):
+    yield
 
 if __name__ == '__main__':
     beamline = CrocTestBL()
-    scan = onept
+    scan = onept2
     show = False
     repeats = 1
 

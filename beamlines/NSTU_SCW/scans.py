@@ -127,11 +127,11 @@ def onept(plts: List, bl: NSTU_SCW):
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
-    en = 30.e3
-    r1, r2 = -2.04, -2.04  # 30 keV
+    en = 90.e3
+    # r1, r2 = -2.04, -2.04  # 30 keV
     # r1, r2 = -1.22, -1.22  # 50 keV
     # r1, r2 = -.87, -.87  # 70 keV
-    # r1, r2 = -.675, -.675  # 90 keV
+    r1, r2 = -.675, -.675  # 90 keV
     bl.MonochromatorCr1.Rx = r1 * 1e3
     bl.MonochromatorCr1.Ry = -r1 * 6e3
 
@@ -143,10 +143,10 @@ def onept(plts: List, bl: NSTU_SCW):
     # bl.SuperCWiggler.eMax = 1.e6
 
     del bl.CrocLensStack[:]
-    g_f = 1.076  # 1.228  # 30 keV
+    # g_f = 1.076  # 1.228  # 30 keV
     # g_f = 0.39 #.435  # 50 keV
     # g_f = .191  # .224  # 70 keV
-    # g_f = .101  # .138  # 90 keV
+    g_f = .101  # .138  # 90 keV
     bl.CrocLensStack = PrismaticLens.make_stack(
         L=croc_crl_L, N=int(croc_crl_L), d=croc_crl_y_t, g_last=0., g_first=g_f,
         bl=bl, 
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     beamline = NSTU_SCW()
     scan = onept
     show = False
-    repeats = 40
+    repeats = 38
 
     if show:
         beamline.glow(
