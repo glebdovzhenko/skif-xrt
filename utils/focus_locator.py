@@ -1,25 +1,25 @@
+import os
+import pickle
+import shutil
+import matplotlib as mpl
+import numpy as np
+
 from xrt.backends.raycing import BeamLine
+from xrt.backends.raycing import get_x, get_z
 from xrt.backends.raycing.screens import Screen
 from xrt.plotter import XYCAxis, XYCPlot
-from xrt.backends.raycing import get_x, get_z
 
 from utils.xrtutils import get_integral_breadth
 
-import numpy as np
-import os
-import shutil
-import pickle
-import matplotlib as mpl
-
 
 class FocusLocator:
-    def __init__(self, beam_name: str, data_dir: str, x0: float=0., z0: float=0.,
-                 ymin: float=5e4, ymax: float=1e5, nscreens: int=20, niterations: int=4,
-                 cutoff=.1, axes=['z']):
+    def __init__(self, beam_name: str, data_dir: str,
+                 x0: float = 0., z0: float = 0., ymin: float = 5e4, ymax: float = 1e5,
+                 nscreens: int = 20, niterations: int = 4, cutoff=.1, axes=['z']):
         self.screen_fmt = '_FLS_%.03f'
         self.beam_fmt = '_FLSLocal_%03d'
         self.plot_fmt = self.screen_fmt
-        
+
         self.x0 = x0
         self.z0 = z0
 
@@ -35,13 +35,13 @@ class FocusLocator:
         self._subdir = os.path.join(self.data_dir, '_tmp')
 
         self.screen_fit = get_integral_breadth
-    
+
     def _init_decorator(self, fn):
         def fn_(self_, *args, **kwargs):
             fn(self_, *args, **kwargs)
             self_._FLScreens = []
         return fn_
-    
+
     def _reset_data_dir(self):
         if not os.path.exists(self.data_dir):
             os.mkdir(self.data_dir)
@@ -49,7 +49,7 @@ class FocusLocator:
         if os.path.exists(self._subdir):
             shutil.rmtree(self._subdir)
         os.mkdir(self._subdir)
-        
+
     def _reset_plots(self, bl, plts):
         for ii in range(len(plts) - 1, -1, -1):
             if self.plot_fmt.split('%')[0] in plts[ii].title:
@@ -57,16 +57,19 @@ class FocusLocator:
 
         plts.extend([
             XYCPlot(
-                beam=self.beam_fmt % iscreen, 
-                title=self.plot_fmt % screen.center[1], 
-                persistentName=os.path.join(self._subdir, self.plot_fmt % screen.center[1] + '.pickle'),
-                saveName=os.path.join(self._subdir, self.plot_fmt % screen.center[1] + '.png'),
+                beam=self.beam_fmt % iscreen,
+                title=self.plot_fmt % screen.center[1],
+                persistentName=os.path.join(self._subdir, self.plot_fmt %
+                                            screen.center[1] + '.pickle'),
+                saveName=os.path.join(self._subdir, self.plot_fmt %
+                                      screen.center[1] + '.png'),
                 aspect='auto',
-                xaxis=XYCAxis(label='$x$', unit='mm', data=get_x), 
-                yaxis=XYCAxis(label='$z$', unit='mm', data=get_z, limits=[-.5, .5])) 
+                xaxis=XYCAxis(label='$x$', unit='mm', data=get_x),
+                yaxis=XYCAxis(label='$z$', unit='mm', data=get_z,
+                              limits=[-.5, .5]))
             for iscreen, screen in enumerate(bl._FLScreens)
         ])
-    
+
     @staticmethod
     def slice_parabola(a, b, c, m):
         m += 1.
@@ -79,17 +82,29 @@ class FocusLocator:
 
     def parabolic_fit(self, bl_, cutoff=.1):
         pos, x_size, z_size = [], [], []
-        for f_name in (os.path.join(self._subdir, self.plot_fmt % screen.center[1] + '.pickle') for screen in bl_._FLScreens):
+        flux = None
+        for f_name in (os.path.join(self._subdir, self.plot_fmt %
+                                    screen.center[1] + '.pickle')
+                       for screen in bl_._FLScreens):
             with open(f_name, 'rb') as f:
                 f = pickle.load(f)
                 x_size.append(self.screen_fit(f, 'x'))
                 z_size.append(self.screen_fit(f, 'y'))
-                pos.append(float(os.path.basename(f_name).replace('.pickle', '').replace('_FLS_', '')))
+                pos.append(float(
+                    os.path.basename(f_name).replace('.pickle', '').
+                    replace('_FLS_', '')))
+
+                if flux is None:
+                    if hasattr(f, 'flux'):
+                        flux = f.flux
+                    elif hasattr(f, 'intensity'):
+                        flux = f.intensity
         else:
-            pos, x_size, z_size = np.array(pos), np.array(x_size), np.array(z_size)
+            pos, x_size, z_size = np.array(pos), np.array(x_size), \
+                np.array(z_size)
             ii = np.argsort(pos)
             pos, x_size, z_size = pos[ii], x_size[ii], z_size[ii]
-        
+
         if 'z' in self.axes:
             pp_z = np.polynomial.polynomial.Polynomial.fit(pos, z_size, 2)
             coef_z = pp_z.convert().coef
@@ -107,6 +122,7 @@ class FocusLocator:
         y_min, y_max = np.min([ymin_x, ymin_z]), np.max([ymax_x, ymax_z])
 
         fig, (ax1, ax2) = mpl.pyplot.subplots(2, 1)
+        fig.suptitle(r'$\Phi$ = %f' % flux)
         ax1.plot(pos, z_size)
         if focus_z is not None:
             ax1.plot(pos, pp_z(pos))
@@ -122,20 +138,20 @@ class FocusLocator:
         ax2.set_xlabel('Y position [mm]')
         ax2.set_ylabel('$\Delta X$ [mm]')
         mpl.pyplot.tight_layout()
-        fig.savefig(os.path.join(self.data_dir, 'fdist-%.03fm-%.03fm.png' % (np.min(pos * 1e-3), np.max(pos * 1e-3))))
+        fig.savefig(os.path.join(self.data_dir, 'fdist-%.03fm-%.03fm.png' %
+                                 (np.min(pos * 1e-3), np.max(pos * 1e-3))))
 
         return ymin_z, ymax_z
-
 
     def beamline(self, klass):
         def flscreens_reset(self_, y_min, y_max, n):
             del self_._FLScreens[:]
             self_._FLScreens = [
                 Screen(
-                    bl=self_, name=self.screen_fmt % yy, 
+                    bl=self_, name=self.screen_fmt % yy,
                     center=[self.x0, yy, self.z0]
                 ) for yy in np.linspace(y_min, y_max, n)]
-        
+
         assert issubclass(klass, BeamLine)
 
         klass.__init__ = self._init_decorator(klass.__init__)
@@ -147,11 +163,13 @@ class FocusLocator:
         def fn_(bl_):
             outDict_ = fn(bl_)
             for iscreen, screen in enumerate(bl_._FLScreens):
-                outDict_[self.beam_fmt % iscreen] = screen.expose(beam=outDict_[self.beam_name])
+                outDict_[self.beam_fmt % iscreen] = \
+                    screen.expose(beam=outDict_[self.beam_name])
             return outDict_
         return fn_
-    
-    def gnrtr(self, y_min=None, y_max=None, nscreens=None, niterations=None, cutoff=None):
+
+    def gnrtr(self, y_min=None, y_max=None, nscreens=None, niterations=None,
+              cutoff=None):
         if y_min is not None:
             self.ymin = y_min
         if y_max is not None:
@@ -168,12 +186,18 @@ class FocusLocator:
                 gn = fn(bl_, plts_, *args, **kwargs)
                 for res in gn:
                     for ii in range(self.niterations):
-                        bl_.flscreens_reset(self.ymin, self.ymax, self.nscreens)
+                        bl_.flscreens_reset(
+                            self.ymin,
+                            self.ymax,
+                            self.nscreens
+                        )
                         self._reset_data_dir()
                         self._reset_plots(bl_, plts_)
                         yield res
-                        self.ymin, self.ymax = self.parabolic_fit(bl_, self.cutoff)
+                        self.ymin, self.ymax = self.parabolic_fit(
+                            bl_,
+                            self.cutoff
+                        )
             return fn_
 
         return inner
-    

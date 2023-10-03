@@ -24,7 +24,7 @@ mpl.use('agg')
 
 data_dir = os.path.join(os.getenv('BASE_DIR'), 'datasets', 'tmp')
 
-# crl_mat = Material('C', rho=2.15, kind='lens') 
+# crl_mat = Material('C', rho=2.15, kind='lens')
 # crl_mat = Material('Al', rho=2.7, kind='lens')
 crl_mat = Material('Be', rho=1.848, kind='lens')
 crl_y_t = 1.228  # mm
@@ -32,9 +32,16 @@ crl_y_g = 1.228  # mm
 crl_L = 270.     # mm
 en = 30000.      # eV
 
+mul = 1.5
+crl_y_g *= mul
+crl_y_t *= mul
+crl_L *= mul * mul
+
 focal_dist = 14000.  # mm
-# crl_y_g = focal_dist * crl_L * np.real(1. - crl_mat.get_refractive_index(en)) / crl_y_t
-# focal_dist_calc = crl_y_g * crl_y_t / (crl_L * np.real(1. - crl_mat.get_refractive_index(en)))
+# crl_y_g = focal_dist * crl_L * \
+#     np.real(1. - crl_mat.get_refractive_index(en)) / crl_y_t
+# focal_dist_calc = crl_y_g * crl_y_t / \
+#     (crl_L * np.real(1. - crl_mat.get_refractive_index(en)))
 # focal_dist = focal_dist_calc
 
 FL = FocusLocator(
@@ -57,31 +64,33 @@ class CrocTestBL(BeamLine):
             center=[0, 0, 0],
             distE='lines',
             energies=[en],
-            distx='normal', 
-            disty='flat', 
-            distz='normal', 
-            distxprime='flat', 
+            distx='normal',
+            disty='flat',
+            distz='normal',
+            distxprime='flat',
             distzprime='flat',
-            dx=.455, 
-            dy=0., 
-            dz=.027, 
-            dxprime=1e-3, 
+            dx=.455,
+            dy=0.,
+            dz=.027,
+            dxprime=1e-3,
             dzprime=1e-4,
         )
-        
+
         self.LensMat = crl_mat
-        
-        print('Lens params: y_t: %.03f, y_g: %.03f, L: %.03f' % (crl_y_t, crl_y_g, crl_L))
+
+        print('Lens params: y_t: %.03f, y_g: %.03f, L: %.03f' %
+              (crl_y_t, crl_y_g, crl_L))
 
         self.LensStack = PrismaticLens.make_stack(
-            L=crl_L, N=200, d=crl_y_t, g_last=0.0, g_first=crl_y_g,  # int(crl_L)
-            bl=self, 
+            # int(crl_L)
+            L=crl_L, N=int(crl_L), d=crl_y_t, g_last=0.0, g_first=crl_y_g,
+            bl=self,
             center=[0., 2. * focal_dist, 0],
             material=self.LensMat,
-            limPhysX=[-100., 100.], 
-            limPhysY=[-20., 20.], 
+            limPhysX=[-100., 100.],
+            limPhysY=[-20., 20.],
         )
-        
+
         self.SourceScreen = Screen(
             bl=self,
             name=r"Source",
@@ -102,15 +111,6 @@ class CrocTestBL(BeamLine):
             name=r"Focus",
             center=[0, 4. * focal_dist, 0],
         )
-    #     self.FScreenStack = []
-    #     self.reset_screen_stack()
-
-    # def reset_screen_stack(self, y_min=2.1*focal_dist, y_max=6*focal_dist, stack_size=20):
-    #     del self.FScreenStack[:]
-    #     self.FScreenStack = [
-    #         Screen(bl=self, name=r"FSS %.03f" % y_pos, center=[0, y_pos, 0]) 
-    #         for y_pos in np.linspace(y_min, y_max, stack_size)
-    #     ]
 
 
 @FL.run_process
@@ -118,17 +118,19 @@ def run_process(bl: CrocTestBL):
     outDict = dict()
 
     outDict['BeamSourceGlobal'] = bl.GS.shine()
-    outDict['BeamM1Local'] = bl.SourceScreen.expose(beam=outDict['BeamSourceGlobal'])
-    outDict['BeamM2Local'] = bl.PreLensScreen.expose(beam=outDict['BeamSourceGlobal'])
-    
-    beamIn = outDict['BeamSourceGlobal'] 
+    outDict['BeamM1Local'] = bl.SourceScreen.expose(
+        beam=outDict['BeamSourceGlobal'])
+    outDict['BeamM2Local'] = bl.PreLensScreen.expose(
+        beam=outDict['BeamSourceGlobal'])
+
+    beamIn = outDict['BeamSourceGlobal']
     for ilens, lens in enumerate(bl.LensStack):
         lglobal, llocal1, llocal2 = lens.double_refract(beamIn, needLocal=True)
         strl = '_{0:02d}'.format(ilens)
         outDict['BeamLensGlobal'+strl] = lglobal
         outDict['BeamLensLocal1'+strl] = llocal1
         outDict['BeamLensLocal2'+strl] = llocal2
-        
+
         llocal2a = Beam(copyFrom=llocal2)
         llocal2a.absorb_intensity(beamIn)
         outDict['BeamLensLocal2a'+strl] = llocal2a
@@ -137,9 +139,6 @@ def run_process(bl: CrocTestBL):
     outDict['BeamM3Local'] = bl.PostLensScreen.expose(beam=beamIn)
     outDict['BeamM4Local'] = bl.FocusingScreen.expose(beam=beamIn)
     outDict['BeamFocused'] = beamIn
-    
-    # for iscreen, screen in enumerate(bl.FScreenStack):
-    #     outDict['BeamFSSLocal_{0:02d}'.format(iscreen)] = screen.expose(beam=beamIn)
 
     bl.prepare_flow()
     return outDict
@@ -150,17 +149,17 @@ rrun.run_process = run_process
 
 plots = [
     XYCPlot(beam='BeamM1Local', title='source', aspect='auto',
-            xaxis=XYCAxis(label='$x$', unit='mm', data=get_x), 
+            xaxis=XYCAxis(label='$x$', unit='mm', data=get_x),
             yaxis=XYCAxis(label='$z$', unit='mm', data=get_z),
             persistentName=os.path.join(data_dir, 'BeamAtSource.pickle')),
     XYCPlot(beam='BeamM2Local', title='before_lens', aspect='auto',
-            xaxis=XYCAxis(label='$x$', unit='mm', data=get_x), 
+            xaxis=XYCAxis(label='$x$', unit='mm', data=get_x),
             yaxis=XYCAxis(label='$z$', unit='mm', data=get_z)),
     XYCPlot(beam='BeamM3Local', title='after_lens', aspect='auto',
-            xaxis=XYCAxis(label='$x$', unit='mm', data=get_x), 
+            xaxis=XYCAxis(label='$x$', unit='mm', data=get_x),
             yaxis=XYCAxis(label='$z$', unit='mm', data=get_z)),
     XYCPlot(beam='BeamM3Local', title='focal_point', aspect='auto',
-            xaxis=XYCAxis(label='$x$', unit='mm', data=get_x), 
+            xaxis=XYCAxis(label='$x$', unit='mm', data=get_x),
             yaxis=XYCAxis(label='$z$', unit='mm', data=get_z))
 ]
 
@@ -174,7 +173,7 @@ def onept(bl: CrocTestBL, plots: List):
         x1 = (-b - d) / (2. * c)
         x2 = (-b + d) / (2. * c)
         return x0, x1, x2
-    
+
     # updating beamline params
     ymin, ymax = 2.1 * focal_dist, 6. * focal_dist
     for _ in range(4):
@@ -189,24 +188,29 @@ def onept(bl: CrocTestBL, plots: List):
 
         plots.extend([
             XYCPlot(
-                beam=FL.beam_fmt % iscreen, 
-                title=FL.plot_fmt % screen.center[1], 
-                persistentName=os.path.join(data_dir, FL.plot_fmt % screen.center[1] + '.pickle'),
-                saveName=os.path.join(data_dir, FL.plot_fmt % screen.center[1] + '.png'),
+                beam=FL.beam_fmt % iscreen,
+                title=FL.plot_fmt % screen.center[1],
+                persistentName=os.path.join(
+                    data_dir, FL.plot_fmt % screen.center[1] + '.pickle'),
+                saveName=os.path.join(data_dir, FL.plot_fmt %
+                                      screen.center[1] + '.png'),
                 aspect='auto',
-                xaxis=XYCAxis(label='$x$', unit='mm', data=get_x), 
-                yaxis=XYCAxis(label='$z$', unit='mm', data=get_z, limits=[-.5, .5])) 
+                xaxis=XYCAxis(label='$x$', unit='mm', data=get_x),
+                yaxis=XYCAxis(label='$z$', unit='mm', data=get_z, limits=[-.5, .5]))
             for iscreen, screen in enumerate(bl._FLScreens)
         ])
-        
+
         yield
-        
+
         # calculating focus position and size
         pos, y_size = [], []
-        for f_name in (os.path.join(data_dir, FL.plot_fmt % screen.center[1] + '.pickle') for screen in bl._FLScreens):
+        f_names = (os.path.join(data_dir, FL.plot_fmt %
+                   screen.center[1] + '.pickle') for screen in bl._FLScreens)
+        for f_name in f_names:
             with open(f_name, 'rb') as f:
                 y_size.append(get_integral_breadth(pickle.load(f), 'y'))
-                pos.append(float(os.path.basename(f_name).replace('.pickle', '').replace('_FLS_', '')))
+                pos.append(float(os.path.basename(f_name).replace(
+                    '.pickle', '').replace('_FLS_', '')))
         else:
             pos, y_size = np.array(pos), np.array(y_size)
             ii = np.argsort(pos)
@@ -235,19 +239,22 @@ def onept(bl: CrocTestBL, plots: List):
             f = pickle.load(f)
             source_flux = f.intensity
             source_size = get_integral_breadth(f, 'y')
-        
+
         source_projection = source_size + 2. * focus * 1e-4
         gain = (focus_flux * source_projection) / (source_flux * focus_size)
-        print('Focus  | size: %.03f | flux %.01f | distance %.01f' % (focus_size, focus_flux, focus))
+        print('Focus  | size: %.03f | flux %.01f | distance %.01f' %
+              (focus_size, focus_flux, focus))
         print('Source | size: %.03f | flux %.01f' % (source_size, source_flux))
         print('Projected source size: %.03f' % source_projection)
         print('Gain %.01f' % gain)
         ax.text(focus, y_size.max(), 'F=%.01f mm Gain = %.01f' % (focus, gain))
         fig.savefig(os.path.join(data_dir, '..', 'fdist%d.png' % _))
 
+
 @FL.gnrtr(50e3, 70e3, 20)
 def onept2(bl: CrocTestBL, plots: List):
     yield
+
 
 if __name__ == '__main__':
     beamline = CrocTestBL()
