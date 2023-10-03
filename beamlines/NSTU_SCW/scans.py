@@ -94,7 +94,7 @@ def onept(bl: NSTU_SCW, plts: List):
 
     bl.align_source(en, d_en)
     bl.align_crl(croc_crl_L, int(croc_crl_L), g_f, g_f, 0.)
-    bl.align_crl_mask(100., .2)
+    bl.align_crl_mask(100., 100.)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
 
     for plot in plts:
@@ -107,10 +107,11 @@ def onept(bl: NSTU_SCW, plts: List):
         if 'FM-XZ' in plot.title:
             plot.xaxis.limits = [-.5, .5]
             plot.yaxis.limits = [-.2, .2]
-    
+
     metadata = check_repo(bl._metadata)
     with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
-        ff.write('\n'.join('%s,%s' % (k, str(val)) for k, val in metadata.items()))
+        ff.write('\n'.join('%s,%s' % (k, str(val))
+                 for k, val in metadata.items()))
 
     yield
 
@@ -143,19 +144,21 @@ def scan_lens_scale(bl: NSTU_SCW, plts: List):
         raise ValueError('En is not in [30, 50, 70, 90] keV')
 
     bl.align_source(en, d_en)
-    bl.align_crl_mask(100., .2)
+    bl.align_crl(croc_crl_L, int(croc_crl_L), g_f, g_f, 0.)
+    bl.align_crl_mask(100., 100.)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
-    
+
     metadata = check_repo(bl._metadata)
     with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
-        ff.write('\n'.join('%s,%s' % (k, str(val)) for k, val in metadata.items()))
+        ff.write('\n'.join('%s,%s' % (k, str(val))
+                 for k, val in metadata.items()))
 
-    for scale in [.5, .75, 1., 1.25, 1.5, 1.75, 2.]:
+    for scale in [.05, .1, .2, .3, .4]: # [.5, .75, 1., 1.25, 1.5, 1.75, 2.]:
         bl.align_crl(
-            croc_crl_L * scale, 
-            int(croc_crl_L * scale), 
-            croc_crl_y_t * np.sqrt(scale), 
-            g_f * np.sqrt(scale), 
+            croc_crl_L * scale,
+            int(croc_crl_L * scale),
+            croc_crl_y_t * np.sqrt(scale),
+            g_f * np.sqrt(scale),
             0.
         )
 
@@ -164,20 +167,20 @@ def scan_lens_scale(bl: NSTU_SCW, plts: List):
                 plot.saveName = os.path.join(
                     subdir,
                     scan_name,
-                    '%s-crl_l-.png' % (plot.title)
+                    '%s-crl_l-%.03f-crl_d-%.03f.png' % (
+                        plot.title, croc_crl_L * scale, croc_crl_y_t * np.sqrt(scale))
                 )
                 plot.persistentName = plot.saveName.replace('.png', '.pickle')
 
                 plot.xaxis.limits = [-.5, .5]
                 plot.yaxis.limits = [-.2, .2]
-    
-        yield
 
+        yield
 
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()
-    scan = onept
+    scan = scan_lens_scale
     show = False
     repeats = 10
 
