@@ -106,8 +106,10 @@ if __name__ == '__main__':
     import git
 
     r = git.Repo(os.getenv('BASE_DIR'))
-    assert not r.is_dirty()
+    # assert not r.is_dirty()
     assert r.head.ref == r.heads.rtr
+
+    print(r.head.commit.name_rev.replace(' rtr', ''))
     # beamline = NSTU_SCW()
     # scan = onept
     # show = False
