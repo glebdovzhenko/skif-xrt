@@ -4,6 +4,8 @@ import shutil
 from typing import List
 import matplotlib
 import numpy as np
+import git
+import csv
 
 import xrt.backends.raycing as raycing
 import xrt.plotter as xrtplot
@@ -87,8 +89,6 @@ def onept(bl: NSTU_SCW, plts: List):
     bl.align_crl_mask(100., .2)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
 
-    print(bl._metadata)
-
     for plot in plts:
         if 'FM' in plot.title:
             plot.saveName = os.path.join(
@@ -99,36 +99,40 @@ def onept(bl: NSTU_SCW, plts: List):
             if 'XZ' in plot.title:
                 plot.xaxis.limits = [-.5, .5]
                 plot.yaxis.limits = [-.2, .2]
+
+    r = git.Repo(os.getenv('BASE_DIR'))
+    assert not r.is_dirty()
+    assert r.head.ref == r.heads.rtr
+    commit_name = r.head.commit.name_rev.replace(' rtr', '')
+    metadata = bl._metadata.copy()
+    metadata['commit'] = commit_name
+
+    with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
+        ff.write('\n'.join(('%s,%s' % (k, str(val)) for k, val in metadata.items())))
+
     yield
 
 
 if __name__ == '__main__':
-    import git
+    beamline = NSTU_SCW()
+    scan = onept
+    show = False
+    repeats = 1
 
-    r = git.Repo(os.getenv('BASE_DIR'))
-    # assert not r.is_dirty()
-    assert r.head.ref == r.heads.rtr
-
-    print(r.head.commit.name_rev.replace(' rtr', ''))
-    # beamline = NSTU_SCW()
-    # scan = onept
-    # show = False
-    # repeats = 1
-
-    # if show:
-    #     beamline.glow(
-    #         scale=[1e3, 1e3, 1e3],
-    #         centerAt=r'Si[111] Crystal 1',
-    #         generator=scan,
-    #         generatorArgs=[beamline, plots],
-    #         startFrom=1
-    #     )
-    # else:
-    #     xrtrun.run_ray_tracing(
-    #         beamLine=beamline,
-    #         plots=plots,
-    #         repeats=repeats,
-    #         backend=r"raycing",
-    #         generator=scan,
-    #         generatorArgs=[beamline, plots]
-    #     )
+    if show:
+        beamline.glow(
+            scale=[1e3, 1e3, 1e3],
+            centerAt=r'Si[111] Crystal 1',
+            generator=scan,
+            generatorArgs=[beamline, plots],
+            startFrom=1
+        )
+    else:
+        xrtrun.run_ray_tracing(
+            beamLine=beamline,
+            plots=plots,
+            repeats=repeats,
+            backend=r"raycing",
+            generator=scan,
+            generatorArgs=[beamline, plots]
+        )
