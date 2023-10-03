@@ -81,19 +81,19 @@ def onept(bl: NSTU_SCW, plts: List):
         d_en = 3e-2
     else:
         raise ValueError('En is not in [30, 50, 70, 90] keV')
-   
+
     bl.align_source(en, d_en)
     bl.align_crl(croc_crl_L, int(croc_crl_L), croc_crl_y_t, g_f, 0.)
     bl.align_crl_mask(100., .2)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
-    
+
     print(bl._metadata)
 
     for plot in plts:
         if 'FM' in plot.title:
             plot.saveName = os.path.join(
-                subdir, 
-                scan_name, 
+                subdir,
+                scan_name,
                 '%s.png' % (plot.title)
             )
             if 'XZ' in plot.title:
@@ -103,25 +103,31 @@ def onept(bl: NSTU_SCW, plts: List):
 
 
 if __name__ == '__main__':
-    beamline = NSTU_SCW()
-    scan = onept
-    show = False
-    repeats = 1
+    import git
 
-    if show:
-        beamline.glow(
-            scale=[1e3, 1e3, 1e3],
-            centerAt=r'Si[111] Crystal 1',
-            generator=scan,
-            generatorArgs=[beamline, plots],
-            startFrom=1
-        )
-    else:
-        xrtrun.run_ray_tracing(
-            beamLine=beamline,
-            plots=plots,
-            repeats=repeats,
-            backend=r"raycing",
-            generator=scan,
-            generatorArgs=[beamline, plots]
-        )
+    r = git.Repo(os.getenv('BASE_DIR'))
+    print(r)
+    print(r.is_dirty())
+
+    # beamline = NSTU_SCW()
+    # scan = onept
+    # show = False
+    # repeats = 1
+
+    # if show:
+    #     beamline.glow(
+    #         scale=[1e3, 1e3, 1e3],
+    #         centerAt=r'Si[111] Crystal 1',
+    #         generator=scan,
+    #         generatorArgs=[beamline, plots],
+    #         startFrom=1
+    #     )
+    # else:
+    #     xrtrun.run_ray_tracing(
+    #         beamLine=beamline,
+    #         plots=plots,
+    #         repeats=repeats,
+    #         backend=r"raycing",
+    #         generator=scan,
+    #         generatorArgs=[beamline, plots]
+    #     )
