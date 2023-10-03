@@ -1,7 +1,7 @@
 import os
 import pickle
 import shutil
-from typing import List
+from typing import Dict, List
 import matplotlib
 import numpy as np
 import git
@@ -56,6 +56,14 @@ for beam, t1 in zip(
                                      aspect='auto'))
 
 
+def check_repo(md: Dict):
+    r = git.Repo(os.getenv('BASE_DIR'))
+    assert not r.is_dirty()
+    assert r.head.ref == r.heads.rtr
+    md['commit'] = r.head.commit.name_rev.replace(' rtr', '')
+    return md
+
+
 # @FL.gnrtr(50e3, 70e3, 20)
 def onept(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
@@ -85,7 +93,7 @@ def onept(bl: NSTU_SCW, plts: List):
         raise ValueError('En is not in [30, 50, 70, 90] keV')
 
     bl.align_source(en, d_en)
-    bl.align_crl(croc_crl_L, int(croc_crl_L), croc_crl_y_t, g_f, 0.)
+    bl.align_crl(croc_crl_L, int(croc_crl_L), g_f, g_f, 0.)
     bl.align_crl_mask(100., .2)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
 
@@ -95,29 +103,83 @@ def onept(bl: NSTU_SCW, plts: List):
             scan_name,
             '%s.png' % (plot.title)
         )
-        if 'FM' in plot.title:
-            if 'XZ' in plot.title:
-                plot.xaxis.limits = [-.5, .5]
-                plot.yaxis.limits = [-.2, .2]
-
-    r = git.Repo(os.getenv('BASE_DIR'))
-    assert not r.is_dirty()
-    assert r.head.ref == r.heads.rtr
-    commit_name = r.head.commit.name_rev.replace(' rtr', '')
-    metadata = bl._metadata.copy()
-    metadata['commit'] = commit_name
-
+        plot.persistentName = plot.saveName.replace('.png', '.pickle')
+        if 'FM-XZ' in plot.title:
+            plot.xaxis.limits = [-.5, .5]
+            plot.yaxis.limits = [-.2, .2]
+    
+    metadata = check_repo(bl._metadata)
     with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
-        ff.write('\n'.join(('%s,%s' % (k, str(val)) for k, val in metadata.items())))
+        ff.write('\n'.join('%s,%s' % (k, str(val)) for k, val in metadata.items()))
 
     yield
+
+
+def scan_lens_scale(bl: NSTU_SCW, plts: List):
+    subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
+    scan_name = 'scan_lens_scale'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    en = 30.e3
+    if np.isclose(en, 30e3):
+        r1, r2 = -2.04e3, -2.04e3  # 30 keV
+        g_f = 1.076                # 30 keV
+        d_en = 5e-3
+    elif np.isclose(en, 50e3):
+        r1, r2 = -1.22e3, -1.22e3  # 50 keV
+        g_f = 0.390                # 50 keV
+        d_en = 5e-3
+    elif np.isclose(en, 70e3):
+        r1, r2 = -.870e3, -.870e3  # 70 keV
+        g_f = .191                 # 70 keV
+        d_en = 1e-2
+    elif np.isclose(en, 90e3):
+        r1, r2 = -.675e3, -.675e3  # 90 keV
+        g_f = .101                 # 90 keV
+        d_en = 3e-2
+    else:
+        raise ValueError('En is not in [30, 50, 70, 90] keV')
+
+    bl.align_source(en, d_en)
+    bl.align_crl_mask(100., .2)
+    bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
+    
+    metadata = check_repo(bl._metadata)
+    with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
+        ff.write('\n'.join('%s,%s' % (k, str(val)) for k, val in metadata.items()))
+
+    for scale in [.5, .75, 1., 1.25, 1.5, 1.75, 2.]:
+        bl.align_crl(
+            croc_crl_L * scale, 
+            int(croc_crl_L * scale), 
+            croc_crl_y_t * np.sqrt(scale), 
+            g_f * np.sqrt(scale), 
+            0.
+        )
+
+        for plot in plts:
+            if 'FM-XZ' in plot.title:
+                plot.saveName = os.path.join(
+                    subdir,
+                    scan_name,
+                    '%s-crl_l-.png' % (plot.title)
+                )
+                plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
+                plot.xaxis.limits = [-.5, .5]
+                plot.yaxis.limits = [-.2, .2]
+    
+        yield
+
 
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()
     scan = onept
     show = False
-    repeats = 1
+    repeats = 10
 
     if show:
         beamline.glow(
