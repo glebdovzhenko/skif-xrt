@@ -90,12 +90,12 @@ def onept(bl: NSTU_SCW, plts: List):
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
 
     for plot in plts:
+        plot.saveName = os.path.join(
+            subdir,
+            scan_name,
+            '%s.png' % (plot.title)
+        )
         if 'FM' in plot.title:
-            plot.saveName = os.path.join(
-                subdir,
-                scan_name,
-                '%s.png' % (plot.title)
-            )
             if 'XZ' in plot.title:
                 plot.xaxis.limits = [-.5, .5]
                 plot.yaxis.limits = [-.2, .2]

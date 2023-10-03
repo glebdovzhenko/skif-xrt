@@ -1,7 +1,6 @@
 .idea
 .run
-datasets/nstu-scw
-datasets/skif15
+datasets/**
 *.npy
 *.pickle
 *.pyc
