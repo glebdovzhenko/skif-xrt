@@ -106,9 +106,8 @@ if __name__ == '__main__':
     import git
 
     r = git.Repo(os.getenv('BASE_DIR'))
-    print(r)
-    print(r.is_dirty())
-
+    assert not r.is_dirty()
+    assert r.head.ref == r.heads.rtr
     # beamline = NSTU_SCW()
     # scan = onept
     # show = False
