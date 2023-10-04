@@ -118,12 +118,12 @@ def onept(bl: NSTU_SCW, plts: List):
 
 def scan_mask_opening(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
-    scan_name = 'scan_mask_opening_50'
+    scan_name = 'scan_mask_opening_70'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
-    en = 50.e3
+    en = 70.e3
     if np.isclose(en, 30e3):
         r1, r2 = -2.04e3, -2.04e3  # 30 keV
         g_f = 1.076                # 30 keV
@@ -238,7 +238,7 @@ if __name__ == '__main__':
     beamline = NSTU_SCW()
     scan = scan_mask_opening
     show = False
-    repeats = 10
+    repeats = 11
 
     if show:
         beamline.glow(
