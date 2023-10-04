@@ -1,12 +1,14 @@
 import re
 import os
 import numpy as np
+import pandas as pd
 
 
 def datafiles(dd):
     f_name_re0 = re.compile(r'.+.pickle$')
     f_name_re1 = re.compile(r'^(?P<name>[^-]+)-(?P<axes>[^-]+)-')
-    f_name_re2 = re.compile(r'^(?P<value>[\d.-]+|inf|-inf)(?P<units>mm|m|keV|deg|ddeg|arcsec|dmcm)-?')
+    f_name_re2 = re.compile(
+        r'^(?P<value>[\d.-]+|inf|-inf)(?P<units>mm|m|keV|deg|ddeg|arcsec|dmcm)-?')
 
     for f_name in os.listdir(dd):
         m0 = f_name_re0.match(f_name)
@@ -55,8 +57,50 @@ def datafiles(dd):
         yield result
 
 
-if __name__ == '__main__':
-    dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/beamlines/SKIF_1_5/img/t_scan'
+def datafiles2(dd: str):
+    assert os.path.exists(dd)
+    assert os.path.exists(os.path.join(dd, 'md.csv'))
 
-    for data in datafiles(dd):
+    # reading metadata common for all files
+    md_base = pd.read_csv(os.path.join(dd, 'md.csv'), header=None, index_col=0)
+    md_base = md_base.squeeze().to_dict()
+    print(md_base)
+
+    r0 = re.compile(r'^(?P<name>[^-]+)-(?P<axes>[^-]+)')
+    r1 = re.compile(r'-(?P<key>{})-(?P<value>-?[\d.]+|inf|-inf)(.pickle$)?'.format('|'.join(md_base.keys())))
+
+    for f_name in os.listdir(dd):
+        mtc = r0.match(f_name)
+        if mtc is None:
+            continue
+
+        result = md_base.copy()
+        result['file'] = f_name
+
+        pos = mtc.end()
+        while True:
+            mtc = r1.match(f_name[pos:])
+            if mtc is None:
+                break
+            pos += mtc.end()
+            gd = mtc.groupdict()
+            result[gd['key']] = gd['value']
+        
+        yield result
+
+
+if __name__ == '__main__':
+    # dd = '/Users/glebdovzhenko/Dropbox/PycharmProjects/skif-xrt/beamlines/SKIF_1_5/img/t_scan'
+
+    # for data in datafiles(dd):
+    #     print(data)
+
+    dd = os.path.join(os.getenv('BASE_DIR'), 'datasets',
+                      'nstu-scw-2', 'scan_mask_opening_30')
+
+    for data in datafiles2(dd):
+        print(data)
+    dd = os.path.join(os.getenv('BASE_DIR'), 'datasets',
+                      'nstu-scw-2', 'scan_lens_scale')
+    for data in datafiles2(dd):
         print(data)
