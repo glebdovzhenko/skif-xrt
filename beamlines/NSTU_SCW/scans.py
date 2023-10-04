@@ -118,12 +118,12 @@ def onept(bl: NSTU_SCW, plts: List):
 
 def scan_mask_opening(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
-    scan_name = 'scan_mask_opening_30'
+    scan_name = 'scan_mask_opening_50'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
-    en = 30.e3
+    en = 50.e3
     if np.isclose(en, 30e3):
         r1, r2 = -2.04e3, -2.04e3  # 30 keV
         g_f = 1.076                # 30 keV
@@ -144,7 +144,7 @@ def scan_mask_opening(bl: NSTU_SCW, plts: List):
         raise ValueError('En is not in [30, 50, 70, 90] keV')
 
     bl.align_source(en, d_en)
-    bl.align_crl(croc_crl_L, int(croc_crl_L), g_f, g_f, 0.)
+    bl.align_crl(croc_crl_L, int(croc_crl_L), croc_crl_y_t, g_f, 0.)
     bl.align_crl_mask(100., 100.)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
 
