@@ -94,7 +94,7 @@ def onept(bl: NSTU_SCW, plts: List):
 
     bl.align_source(en, d_en)
     bl.align_crl(croc_crl_L, int(croc_crl_L), g_f, g_f, 0.)
-    bl.align_crl_mask(100., 100.)
+    bl.align_crl_mask(100., .5)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
 
     for plot in plts:
@@ -106,7 +106,7 @@ def onept(bl: NSTU_SCW, plts: List):
         plot.persistentName = plot.saveName.replace('.png', '.pickle')
         if 'FM-XZ' in plot.title:
             plot.xaxis.limits = [-.5, .5]
-            plot.yaxis.limits = [-.2, .2]
+            plot.yaxis.limits = [-.3, .3]
 
     metadata = check_repo(bl._metadata)
     with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
@@ -180,9 +180,9 @@ def scan_lens_scale(bl: NSTU_SCW, plts: List):
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()
-    scan = scan_lens_scale
+    scan = onept
     show = False
-    repeats = 10
+    repeats = 1
 
     if show:
         beamline.glow(
