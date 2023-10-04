@@ -92,7 +92,7 @@ class NSTU_SCW(raycing.BeamLine):
         'en': 'Beamline alignment energy, [eV]',
         'd_en': 'Source energy is in range [en * (1. - d_en), en * (1. - d_en)',
         'crl_mask_ox': 'CRL mask opening horizontal',
-        'crl_mask_oy': 'CRL mask opening vertical',
+        'crl_mask_oz': 'CRL mask opening vertical',
         'crl_l': 'PrismaticLens length',
         'crl_d': 'PrismaticLens tooth height',
         'crl_g_first': 'PrismaticLens gap on entrance',
@@ -260,7 +260,7 @@ class NSTU_SCW(raycing.BeamLine):
 
     def align_crl_mask(self, dx, dz):
         self._metadata['crl_mask_ox'] = dx
-        self._metadata['crl_mask_oy'] = dz
+        self._metadata['crl_mask_oz'] = dz
 
         self.CrlMask.opening = [-dx/2., dx/2., -dz/2., dz/2.]
 

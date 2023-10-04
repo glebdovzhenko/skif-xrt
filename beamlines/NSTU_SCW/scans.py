@@ -1,9 +1,11 @@
 import os
 import pickle
 import shutil
-from typing import List
+from typing import Dict, List
 import matplotlib
 import numpy as np
+import git
+import csv
 
 import xrt.backends.raycing as raycing
 import xrt.plotter as xrtplot
@@ -54,6 +56,14 @@ for beam, t1 in zip(
                                      aspect='auto'))
 
 
+def check_repo(md: Dict):
+    r = git.Repo(os.getenv('BASE_DIR'))
+    assert not r.is_dirty()
+    assert r.head.ref == r.heads.rtr
+    md['commit'] = r.head.commit.name_rev.replace(' rtr', '')
+    return md
+
+
 # @FL.gnrtr(50e3, 70e3, 20)
 def onept(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
@@ -81,32 +91,154 @@ def onept(bl: NSTU_SCW, plts: List):
         d_en = 3e-2
     else:
         raise ValueError('En is not in [30, 50, 70, 90] keV')
-   
+
     bl.align_source(en, d_en)
-    bl.align_crl(croc_crl_L, int(croc_crl_L), croc_crl_y_t, g_f, 0.)
-    bl.align_crl_mask(100., .2)
+    bl.align_crl(croc_crl_L, int(croc_crl_L), g_f, g_f, 0.)
+    bl.align_crl_mask(100., .5)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
-    
-    print(bl._metadata)
 
     for plot in plts:
-        if 'FM' in plot.title:
-            plot.saveName = os.path.join(
-                subdir, 
-                scan_name, 
-                '%s.png' % (plot.title)
-            )
-            if 'XZ' in plot.title:
+        plot.saveName = os.path.join(
+            subdir,
+            scan_name,
+            '%s.png' % (plot.title)
+        )
+        plot.persistentName = plot.saveName.replace('.png', '.pickle')
+        if 'FM-XZ' in plot.title:
+            plot.xaxis.limits = [-.5, .5]
+            plot.yaxis.limits = [-.3, .3]
+
+    metadata = check_repo(bl._metadata)
+    with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
+        ff.write('\n'.join('%s,%s' % (k, str(val))
+                 for k, val in metadata.items()))
+
+    yield
+
+
+def scan_mask_opening(bl: NSTU_SCW, plts: List):
+    subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
+    scan_name = 'scan_mask_opening_30'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    en = 30.e3
+    if np.isclose(en, 30e3):
+        r1, r2 = -2.04e3, -2.04e3  # 30 keV
+        g_f = 1.076                # 30 keV
+        d_en = 5e-3
+    elif np.isclose(en, 50e3):
+        r1, r2 = -1.22e3, -1.22e3  # 50 keV
+        g_f = 0.390                # 50 keV
+        d_en = 5e-3
+    elif np.isclose(en, 70e3):
+        r1, r2 = -.870e3, -.870e3  # 70 keV
+        g_f = .191                 # 70 keV
+        d_en = 1e-2
+    elif np.isclose(en, 90e3):
+        r1, r2 = -.675e3, -.675e3  # 90 keV
+        g_f = .101                 # 90 keV
+        d_en = 3e-2
+    else:
+        raise ValueError('En is not in [30, 50, 70, 90] keV')
+
+    bl.align_source(en, d_en)
+    bl.align_crl(croc_crl_L, int(croc_crl_L), g_f, g_f, 0.)
+    bl.align_crl_mask(100., 100.)
+    bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
+
+    metadata = check_repo(bl._metadata)
+    with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
+        ff.write('\n'.join('%s,%s' % (k, str(val))
+                 for k, val in metadata.items()))
+
+    for z_op in [.4, .5, .6, .7, .8, .9, 1., 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]:
+        bl.align_crl_mask(100., z_op)
+
+        for plot in plts:
+            if 'FM-XZ' in plot.title:
+                plot.saveName = os.path.join(
+                    subdir,
+                    scan_name,
+                    '%s-crl_mask_oz-%.03f.png' % (
+                        plot.title, z_op)
+                )
+                plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
+                plot.xaxis.limits = [-.5, .5]
+                plot.yaxis.limits = [-.3, .3]
+
+        yield
+
+
+def scan_lens_scale(bl: NSTU_SCW, plts: List):
+    subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
+    scan_name = 'scan_lens_scale'
+
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    en = 30.e3
+    if np.isclose(en, 30e3):
+        r1, r2 = -2.04e3, -2.04e3  # 30 keV
+        g_f = 1.076                # 30 keV
+        d_en = 5e-3
+    elif np.isclose(en, 50e3):
+        r1, r2 = -1.22e3, -1.22e3  # 50 keV
+        g_f = 0.390                # 50 keV
+        d_en = 5e-3
+    elif np.isclose(en, 70e3):
+        r1, r2 = -.870e3, -.870e3  # 70 keV
+        g_f = .191                 # 70 keV
+        d_en = 1e-2
+    elif np.isclose(en, 90e3):
+        r1, r2 = -.675e3, -.675e3  # 90 keV
+        g_f = .101                 # 90 keV
+        d_en = 3e-2
+    else:
+        raise ValueError('En is not in [30, 50, 70, 90] keV')
+
+    bl.align_source(en, d_en)
+    bl.align_crl(croc_crl_L, int(croc_crl_L), g_f, g_f, 0.)
+    bl.align_crl_mask(100., 100.)
+    bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
+
+    metadata = check_repo(bl._metadata)
+    with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
+        ff.write('\n'.join('%s,%s' % (k, str(val))
+                 for k, val in metadata.items()))
+
+    for scale in [.05, .1, .2, .3, .4]: # [.5, .75, 1., 1.25, 1.5, 1.75, 2.]:
+        bl.align_crl(
+            croc_crl_L * scale,
+            int(croc_crl_L * scale),
+            croc_crl_y_t * np.sqrt(scale),
+            g_f * np.sqrt(scale),
+            0.
+        )
+
+        for plot in plts:
+            if 'FM-XZ' in plot.title:
+                plot.saveName = os.path.join(
+                    subdir,
+                    scan_name,
+                    '%s-crl_l-%.03f-crl_d-%.03f.png' % (
+                        plot.title, croc_crl_L * scale, croc_crl_y_t * np.sqrt(scale))
+                )
+                plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
                 plot.xaxis.limits = [-.5, .5]
                 plot.yaxis.limits = [-.2, .2]
-    yield
+
+        yield
 
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()
-    scan = onept
+    scan = scan_mask_opening
     show = False
-    repeats = 1
+    repeats = 10
 
     if show:
         beamline.glow(
