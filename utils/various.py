@@ -65,21 +65,27 @@ def datafiles2(dd: str):
     md_base = pd.read_csv(os.path.join(dd, 'md.csv'), header=None, index_col=0)
     md_base = md_base.squeeze().to_dict()
     print(md_base)
-
-    r0 = re.compile(r'^(?P<name>[^-]+)-(?P<axes>[^-]+)')
-    r1 = re.compile(r'-(?P<key>{})-(?P<value>-?[\d.]+|inf|-inf)(.pickle$)?'.format('|'.join(md_base.keys())))
+    
+    r0 = re.compile(r'.*(.pickle$)')
+    r1 = re.compile(r'^(?P<name>[^-]+)-(?P<axes>[^-]+)')
+    r2 = re.compile(r'-(?P<key>{})-(?P<value>-?[\d.]+|inf|-inf)'.format('|'.join(md_base.keys())))
 
     for f_name in os.listdir(dd):
         mtc = r0.match(f_name)
         if mtc is None:
             continue
+        
+        mtc = r1.match(f_name)
+        if mtc is None:
+            continue
 
         result = md_base.copy()
         result['file'] = f_name
+        f_name = f_name.replace('.pickle', '')
 
         pos = mtc.end()
         while True:
-            mtc = r1.match(f_name[pos:])
+            mtc = r2.match(f_name[pos:])
             if mtc is None:
                 break
             pos += mtc.end()
@@ -100,7 +106,7 @@ if __name__ == '__main__':
 
     for data in datafiles2(dd):
         print(data)
-    dd = os.path.join(os.getenv('BASE_DIR'), 'datasets',
-                      'nstu-scw-2', 'scan_lens_scale')
-    for data in datafiles2(dd):
-        print(data)
+    # dd = os.path.join(os.getenv('BASE_DIR'), 'datasets',
+    #                   'nstu-scw-2', 'scan_lens_scale')
+    # for data in datafiles2(dd):
+    #     print(data)
