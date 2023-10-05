@@ -97,6 +97,8 @@ class NSTU_SCW(raycing.BeamLine):
         'crl_d': 'PrismaticLens tooth height',
         'crl_g_first': 'PrismaticLens gap on entrance',
         'crl_g_last': 'PrismaticLens gap on exit',
+        'crl_mat_name': 'PrismaticLens material name',
+        'crl_mat_rho': 'PrismaticLens material density',
         'monoC1Rx': 'DCM 1st crystal Rx',
         'monoC1Ry': 'DCM 1st crystal Ry',
         'monoC2Rx': 'DCM 2nd crystal Rx',
@@ -247,6 +249,9 @@ class NSTU_SCW(raycing.BeamLine):
         self._metadata['crl_d'] = d
         self._metadata['crl_g_first'] = g_f
         self._metadata['crl_g_last'] = g_l
+        self._metadata['crl_mat_name'] = self.LensMaterial.name
+        self._metadata['crl_mat_rho'] = self.LensMaterial.rho
+
 
         del self.CrocLensStack[:]
         self.CrocLensStack = PrismaticLens.make_stack(

@@ -118,12 +118,12 @@ def onept(bl: NSTU_SCW, plts: List):
 
 def scan_mask_opening(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
-    scan_name = 'scan_mask_opening_90'
+    scan_name = 'scan_mask_opening_x_30'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
-    en = 90.e3
+    en = 30.e3
     if np.isclose(en, 30e3):
         r1, r2 = -2.04e3, -2.04e3  # 30 keV
         g_f = 1.076                # 30 keV
@@ -153,21 +153,21 @@ def scan_mask_opening(bl: NSTU_SCW, plts: List):
         ff.write('\n'.join('%s,%s' % (k, str(val))
                  for k, val in metadata.items()))
 
-    for z_op in [.4, .5, .6, .7, .8, .9, 1., 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]:
-        bl.align_crl_mask(100., z_op)
+    for x_op in [24., 25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35., 36., 37., 38., 39., 40.]:
+        bl.align_crl_mask(x_op, 100.)
 
         for plot in plts:
             if 'FM-XZ' in plot.title:
                 plot.saveName = os.path.join(
                     subdir,
                     scan_name,
-                    '%s-crl_mask_oz-%.03f.png' % (
-                        plot.title, z_op)
+                    '%s-crl_mask_ox-%.03f.png' % (
+                        plot.title, x_op)
                 )
                 plot.persistentName = plot.saveName.replace('.png', '.pickle')
 
                 plot.xaxis.limits = [-.5, .5]
-                plot.yaxis.limits = [-.1, .1]
+                plot.yaxis.limits = [-.3, .3]
 
         yield
 
@@ -209,7 +209,7 @@ def scan_lens_scale(bl: NSTU_SCW, plts: List):
         ff.write('\n'.join('%s,%s' % (k, str(val))
                  for k, val in metadata.items()))
 
-    for scale in [.05, .1, .2, .3, .4]: # [.5, .75, 1., 1.25, 1.5, 1.75, 2.]:
+    for scale in [.05, .1, .2, .3, .4]:  # [.5, .75, 1., 1.25, 1.5, 1.75, 2.]:
         bl.align_crl(
             croc_crl_L * scale,
             int(croc_crl_L * scale),
@@ -238,7 +238,7 @@ if __name__ == '__main__':
     beamline = NSTU_SCW()
     scan = scan_mask_opening
     show = False
-    repeats = 11
+    repeats = 10
 
     if show:
         beamline.glow(
