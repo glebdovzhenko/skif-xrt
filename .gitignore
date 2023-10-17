@@ -8,4 +8,5 @@ datasets/**
 *.pgf
 *.ipynb_checkpoints
 *.json
-.DS_Store
+**/.DS_Store
+**/__pycache__

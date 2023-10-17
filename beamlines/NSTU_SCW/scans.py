@@ -6,6 +6,7 @@ import matplotlib
 import numpy as np
 import git
 import csv
+import re
 
 import xrt.backends.raycing as raycing
 import xrt.plotter as xrtplot
@@ -18,12 +19,13 @@ from params.params_nstu_scw import (
     croc_crl_distance,
     croc_crl_y_t,
     diamond_filter_N,
+    sic_filter_N,
     front_end_opening,
     monochromator_x_lim,
     monochromator_y_lim,
     sic_filter_N,
 )
-from utils.xrtutils import get_integral_breadth, get_line_kb, get_minmax
+from utils.xrtutils import get_integral_breadth, get_line_kb, get_minmax, pickle_to_table
 
 matplotlib.use('agg')
 
@@ -38,21 +40,35 @@ zpr_kwds = {r'label': r'$z^{\prime}$',
             r'unit': r'', r'data': raycing.get_zprime}
 
 
-for beam, t1 in zip(
-        ('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local',
-         'BeamMonoC2Local', 'BeamMonitor2Local'),
-        ('FE', 'C1', 'C1C2', 'C2', 'FM')):
-    if t1 not in ('C1', 'C2'):
-        params = zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds,
-                     z_kwds), (z_kwds, xpr_kwds, zpr_kwds))
-    else:
-        params = zip(('XY', 'XXpr'), (x_kwds, x_kwds), (y_kwds, xpr_kwds))
+# for beam, t1 in zip(
+#         ('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local',
+#          'BeamMonoC2Local', 'BeamMonitor2Local'),
+#         ('FE', 'C1', 'C1C2', 'C2', 'FM')):
+#     if t1 not in ('C1', 'C2'):
+#         params = zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds,
+#                      z_kwds), (z_kwds, xpr_kwds, zpr_kwds))
+#     else:
+#         params = zip(('XY', 'XXpr'), (x_kwds, x_kwds), (y_kwds, xpr_kwds))
 
-    for t2, xkw, ykw in params:
-        plots.append(xrtplot.XYCPlot(beam=beam,
+#     for t2, xkw, ykw in params:
+#         plots.append(xrtplot.XYCPlot(beam=beam,
+#                                      title='-'.join((t1, t2)),
+#                                      xaxis=xrtplot.XYCAxis(**xkw),
+#                                      yaxis=xrtplot.XYCAxis(**ykw),
+#                                      aspect='auto'))
+
+for beam in [
+    'BeamFilterCLocal2a_{0:02d}'.format(ii) for ii in range(diamond_filter_N)
+] + [
+    'BeamFilterSiCLocal2a_{0:02d}'.format(ii) for ii in range(sic_filter_N)
+]:
+    t1 = beam.replace('BeamFilter', '').replace('Local2a_', '')
+    t2 = 'XZ'
+    plots.append(xrtplot.XYCPlot(beam=beam,
                                      title='-'.join((t1, t2)),
-                                     xaxis=xrtplot.XYCAxis(**xkw),
-                                     yaxis=xrtplot.XYCAxis(**ykw),
+                                     xaxis=xrtplot.XYCAxis(**x_kwds),
+                                     yaxis=xrtplot.XYCAxis(**z_kwds),
+                                     fluxKind='power',
                                      aspect='auto'))
 
 
@@ -62,6 +78,42 @@ def check_repo(md: Dict):
     assert r.head.ref == r.heads.rtr
     md['commit'] = r.head.commit.name_rev.replace(' rtr', '')
     return md
+
+
+def absorbed_power(bl: NSTU_SCW, plts: List):
+    subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
+    scan_name = 'absorbed_power'
+    
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+    
+    bl.align_source(50050, 999. / 1001.)
+    bl.align_crl(croc_crl_L, int(croc_crl_L), croc_crl_y_t, 0., 0.)
+    bl.align_crl_mask(100., .5)
+    bl.align_mono(50e3, np.inf, np.inf, np.inf, np.inf)
+
+    for plot in plts:
+        if re.match(r'(C|SiC)[\d]+-XZ', plot.title):
+            print(plot.title)
+            plot.saveName = os.path.join(subdir, scan_name, '%s.png' % (plot.title, ))
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+
+    metadata = check_repo(bl._metadata)
+    with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
+        ff.write('\n'.join('%s,%s' % (k, str(val))
+                 for k, val in metadata.items()))
+    yield
+
+    for plot in plts:
+        if plot.persistentName is not None:
+            with open(plot.persistentName, 'rb') as f:
+                f = pickle.load(f)
+                np.savetxt(
+                    plot.persistentName.replace('.pickle', '.txt'), 
+                    pickle_to_table(f), 
+                    delimiter=' ',
+                    header="""\"x\' (mrad)\"	\"y\' (mrad)\"	\"Filtered Power (kW/mrad<sup>2</sup>)\""""
+                )
 
 
 # @FL.gnrtr(50e3, 70e3, 20)
@@ -236,9 +288,9 @@ def scan_lens_scale(bl: NSTU_SCW, plts: List):
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()
-    scan = scan_mask_opening
+    scan = absorbed_power
     show = False
-    repeats = 10
+    repeats = 1
 
     if show:
         beamline.glow(

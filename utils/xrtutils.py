@@ -24,8 +24,10 @@ def reflectivity_box_fit(xd, yd):
 
         result[cc] = 1.
 
-        result[rw] = np.exp(-((x[rw] - args[0] - .5 * np.abs(args[1])) / gs) ** 2 / 2.)
-        result[lw] = np.exp(-((x[lw] - args[0] + .5 * np.abs(args[1])) / gs) ** 2 / 2.)
+        result[rw] = np.exp(-((x[rw] - args[0] - .5 *
+                            np.abs(args[1])) / gs) ** 2 / 2.)
+        result[lw] = np.exp(-((x[lw] - args[0] + .5 *
+                            np.abs(args[1])) / gs) ** 2 / 2.)
 
         result *= args[3]
         result *= args[4] * (x - args[0]) + 1.
@@ -135,7 +137,8 @@ def get_line_kb(data: xrtplot.SaveResults, show=False):
     def f(x):
         return np.sum(data.total2D * (yvals_ - xvals_ * np.tan(x[0]) - x[1]) ** 2)
 
-    min_res = minimize(f, np.array([.1, .1]), bounds=[(-np.pi/2, np.pi/2), (-1., 1.)])
+    min_res = minimize(f, np.array([.1, .1]), bounds=[
+                       (-np.pi/2, np.pi/2), (-1., 1.)])
 
     if show:
         _, ax = plt.subplots()
@@ -146,14 +149,14 @@ def get_line_kb(data: xrtplot.SaveResults, show=False):
 
         plt.xlim(data.xbinEdges.min(), data.xbinEdges.max())
         plt.ylim(data.ybinEdges.min(), data.ybinEdges.max())
-        ax.text(.5 * (data.xbinEdges.min() + data.xbinEdges.max()), data.ybinEdges.max(), 
+        ax.text(.5 * (data.xbinEdges.min() + data.xbinEdges.max()), data.ybinEdges.max(),
                 'k=%e, \nb=%e' % (np.tan(min_res.x[0]), min_res.x[1]))
         plt.show()
 
     return np.tan(min_res.x[0]), min_res.x[1]
 
 
-def get_minmax(data: xrtplot.SaveResults, axis: str ='x', fadeout: float=1e-3):
+def get_minmax(data: xrtplot.SaveResults, axis: str = 'x', fadeout: float = 1e-3):
     if axis not in ('x', 'y', 'e'):
         raise ValueError()
 
@@ -172,7 +175,21 @@ def get_minmax(data: xrtplot.SaveResults, axis: str ='x', fadeout: float=1e-3):
     t1d_xs = .5 * (be[1:] + be[:-1])
     t1d_dx = np.mean(be[1:] - be[:-1])
     t1d_xs = t1d_xs[t1d > fadeout * np.max(t1d)]
-    
+
     return np.min(t1d_xs) - t1d_dx, np.max(t1d_xs) + t1d_dx
 
 
+def pickle_to_table(data: xrtplot.SaveResults):
+    if data.fluxKind == 'power':
+        total2D = data.total2D / data.nRaysAll  # each pixel is in W
+        density2D = total2D / ((np.mean(data.xbinEdges[1:] - data.xbinEdges[:-1]) * (
+            np.mean(data.ybinEdges[1:] - data.ybinEdges[:-1]))))
+        x_crd = .5 * (data.xbinEdges[1:] + data.xbinEdges[:-1])
+        y_crd = .5 * (data.ybinEdges[1:] + data.ybinEdges[:-1])
+        
+        result, k = np.zeros(shape=(density2D.size, 3)), 0
+        for ii in range(x_crd.size):
+            for jj in range(y_crd.size):
+                result[k] = x_crd[ii], y_crd[jj], density2D[jj, ii]
+                k += 1
+        return result
