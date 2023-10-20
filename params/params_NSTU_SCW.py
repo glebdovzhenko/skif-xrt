@@ -15,6 +15,8 @@ diamond_filter_th = .5  # mm
 diamond_filter_N = 15
 sic_filter_th = .5
 sic_filter_N = 7
+filter_size_z = 10.  # mm
+filter_size_x = 50.  # mm
 
 monochromator_distance = 33500  # from source
 monochromator_z_offset = 25  # fixed beam offset in z direction

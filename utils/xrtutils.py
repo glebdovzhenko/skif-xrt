@@ -190,6 +190,6 @@ def pickle_to_table(data: xrtplot.SaveResults):
         result, k = np.zeros(shape=(density2D.size, 3)), 0
         for ii in range(x_crd.size):
             for jj in range(y_crd.size):
-                result[k] = y_crd[jj], x_crd[ii], density2D[jj, ii]
+                result[k] = x_crd[ii], y_crd[jj], density2D[jj, ii]
                 k += 1
         return result

@@ -29,6 +29,8 @@ from params.params_nstu_scw import (
     monochromator_z_offset,
     sic_filter_N,
     sic_filter_th,
+    filter_size_x,
+    filter_size_z
 )
 from params.sources import ring_kwargs, wiggler_1_5_kwargs, wiggler_nstu_scw_kwargs
 from utils.focus_locator import FocusLocator
@@ -146,7 +148,9 @@ class NSTU_SCW(raycing.BeamLine):
                             1.1 * diamond_filter_th, 0],
                     pitch=np.pi/2.,
                     material=mDiamondF,
-                    t=diamond_filter_th
+                    t=diamond_filter_th,
+                    limPhysX=[-filter_size_x / 2, filter_size_x / 2],
+                    limPhysY=[-filter_size_z / 2, filter_size_z / 2]
                 )
             )
 
@@ -159,7 +163,9 @@ class NSTU_SCW(raycing.BeamLine):
                             diamond_filter_th + ii * 1.1 * sic_filter_th, 0],
                     pitch=np.pi/2.,
                     material=mSiC,
-                    t=sic_filter_th
+                    t=sic_filter_th,
+                    limPhysX=[-filter_size_x / 2, filter_size_x / 2],
+                    limPhysY=[-filter_size_z / 2, filter_size_z / 2]
                 )
             )
 

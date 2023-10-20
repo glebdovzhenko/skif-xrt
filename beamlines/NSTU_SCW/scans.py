@@ -23,6 +23,8 @@ from params.params_nstu_scw import (
     front_end_opening,
     monochromator_x_lim,
     monochromator_y_lim,
+    filter_size_x,
+    filter_size_z,
     sic_filter_N,
 )
 from utils.xrtutils import get_integral_breadth, get_line_kb, get_minmax, pickle_to_table
@@ -65,11 +67,13 @@ for beam in [
     t1 = beam.replace('BeamFilter', '').replace('Local2a_', '')
     t2 = 'XZ'
     plots.append(xrtplot.XYCPlot(beam=beam,
-                                     title='-'.join((t1, t2)),
-                                     xaxis=xrtplot.XYCAxis(**x_kwds),
-                                     yaxis=xrtplot.XYCAxis(**z_kwds),
-                                     fluxKind='power',
-                                     aspect='auto'))
+                                 title='-'.join((t1, t2)),
+                                 xaxis=xrtplot.XYCAxis(
+                                     limits=[-filter_size_x/2, filter_size_x/2], **x_kwds),
+                                 yaxis=xrtplot.XYCAxis(
+                                     limits=[-filter_size_z/2, filter_size_z/2], **y_kwds),
+                                 fluxKind='power',
+                                 aspect='auto'))
 
 
 def check_repo(md: Dict):
@@ -83,10 +87,10 @@ def check_repo(md: Dict):
 def absorbed_power(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
     scan_name = 'absorbed_power'
-    
+
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
-    
+
     bl.align_source(50050, 999. / 1001.)
     bl.align_crl(croc_crl_L, int(croc_crl_L), croc_crl_y_t, 0., 0.)
     bl.align_crl_mask(100., .5)
@@ -95,7 +99,8 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
     for plot in plts:
         if re.match(r'(C|SiC)[\d]+-XZ', plot.title):
             print(plot.title)
-            plot.saveName = os.path.join(subdir, scan_name, '%s.png' % (plot.title, ))
+            plot.saveName = os.path.join(
+                subdir, scan_name, '%s.png' % (plot.title, ))
             plot.persistentName = plot.saveName.replace('.png', '.pickle')
 
     metadata = check_repo(bl._metadata)
@@ -109,10 +114,10 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
             with open(plot.persistentName, 'rb') as f:
                 f = pickle.load(f)
                 np.savetxt(
-                    plot.persistentName.replace('.pickle', '.txt'), 
-                    pickle_to_table(f), 
+                    plot.persistentName.replace('.pickle', '.txt'),
+                    pickle_to_table(f),
                     delimiter=' ',
-                    header="""\"x\' (mrad)\"	\"y\' (mrad)\"	\"Filtered Power (kW/mrad<sup>2</sup>)\""""
+                    header="""\"x (mm)\"	\"y (mm)\"	\"Filtered Power (W/mm<sup>2</sup>)\""""
                 )
 
 
@@ -290,7 +295,7 @@ if __name__ == '__main__':
     beamline = NSTU_SCW()
     scan = absorbed_power
     show = False
-    repeats = 1
+    repeats = 10
 
     if show:
         beamline.glow(
