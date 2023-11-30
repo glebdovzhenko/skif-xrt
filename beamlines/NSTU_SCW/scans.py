@@ -129,7 +129,7 @@ def onept(bl: NSTU_SCW, plts: List):
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
-    en = 30.e3
+    en = 70.e3
     if np.isclose(en, 30e3):
         r1, r2 = -2.04e3, -2.04e3  # 30 keV
         g_f = 1.25                 # 30 keV
@@ -140,7 +140,7 @@ def onept(bl: NSTU_SCW, plts: List):
         d_en = 5e-3
     elif np.isclose(en, 70e3):
         r1, r2 = -.870e3, -.870e3  # 70 keV
-        g_f = .191                 # 70 keV PrismaticLens.calc_y_g(bl.LensMaterial, 14000, en, croc_crl_y_t, croc_crl_L)
+        g_f = .21                   # 70 keV PrismaticLens.calc_y_g(bl.LensMaterial, 14000, en, croc_crl_y_t, croc_crl_L)
         d_en = 1e-2
     elif np.isclose(en, 90e3):
         r1, r2 = -.675e3, -.675e3  # 90 keV
