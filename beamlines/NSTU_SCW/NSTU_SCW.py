@@ -68,9 +68,10 @@ mBeryllium = rm.Material('Be', rho=1.848, kind='lens')
 mAl = rm.Material('Al', rho=2.7, kind='lens')
 mDiamond = rm.Material('C', rho=3.5, kind='lens')
 mGraphite = rm.Material('C', rho=2.15, kind='lens')
+mGlassyCarbon = rm.Material('C', rho=1.50, kind='lens')
 mDiamondF = rm.Material('C', rho=3.5)
 mSiC = rm.Material(('Si', 'C'), quantities=(1, 1), rho=3.16)
-lens_material = mBeryllium
+lens_material = mGlassyCarbon
 
 
 # ################################ BEAMLINE ###################################

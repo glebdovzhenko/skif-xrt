@@ -27,8 +27,8 @@ crl_mask_distance = 27500.  # from source
 
 croc_crl_distance = 28000.  # from source
 # Be	
-croc_crl_y_t = 1.228
-croc_crl_L = 270
+# croc_crl_y_t = 1.228
+# croc_crl_L = 270
 # # Al	
 # croc_crl_y_t = 0.29
 # croc_crl_L = 54
@@ -38,6 +38,9 @@ croc_crl_L = 270
 # # Gr	
 # croc_crl_y_t = 0.58
 # croc_crl_L = 81
+# glassy carbon	
+croc_crl_y_t = 0.58
+croc_crl_L = 115.7
 
 exit_slit_distance = 56000.  # from source
 
