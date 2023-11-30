@@ -39,8 +39,8 @@ croc_crl_distance = 28000.  # from source
 # croc_crl_y_t = 0.58
 # croc_crl_L = 81
 # glassy carbon	
-croc_crl_y_t = 0.6
-croc_crl_L = 115.
+croc_crl_y_t = 0.85
+croc_crl_L = 230.
 
 exit_slit_distance = 56000.  # from source
 
