@@ -121,7 +121,7 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
                 )
 
 
-@FL.gnrtr(45e3, 67e3, 30)
+@FL.gnrtr(45e3, 100e3, 30)
 def onept(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
     scan_name = 'onept'
@@ -129,14 +129,14 @@ def onept(bl: NSTU_SCW, plts: List):
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
-    en = 30.e3
+    en = 50.e3
     if np.isclose(en, 30e3):
         r1, r2 = -2.04e3, -2.04e3  # 30 keV
         g_f = 0.73                # 30 keV
         d_en = 5e-3
     elif np.isclose(en, 50e3):
         r1, r2 = -1.22e3, -1.22e3  # 50 keV
-        g_f = 0.390                # 50 keV
+        g_f = 0.2                # 50 keV
         d_en = 5e-3
     elif np.isclose(en, 70e3):
         r1, r2 = -.870e3, -.870e3  # 70 keV
