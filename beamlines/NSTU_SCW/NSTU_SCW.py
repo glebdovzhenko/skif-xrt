@@ -86,7 +86,7 @@ FL = FocusLocator(
 )
 
 
-@FL.beamline
+# @FL.beamline
 class NSTU_SCW(raycing.BeamLine):
     # metadata keys for organizing modelling results
     # these are variables that are potentially varied or scanned,
@@ -314,7 +314,7 @@ class NSTU_SCW(raycing.BeamLine):
 # ############################# BEAM TOPOLOGY #################################
 
 
-@FL.run_process
+# @FL.run_process
 def run_process(bl: NSTU_SCW):
 
     beam_source = bl.sources[0].shine()

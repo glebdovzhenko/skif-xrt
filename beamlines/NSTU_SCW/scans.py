@@ -121,7 +121,7 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
                 )
 
 
-@FL.gnrtr(45e3, 67e3, 30)
+# @FL.gnrtr(45e3, 67e3, 30)
 def onept(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
     scan_name = 'onept'
@@ -295,7 +295,7 @@ if __name__ == '__main__':
     beamline = NSTU_SCW()
     scan = onept
     show = False
-    repeats = 2
+    repeats = 10
 
     if show:
         beamline.glow(
