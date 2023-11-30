@@ -42,38 +42,38 @@ zpr_kwds = {r'label': r'$z^{\prime}$',
             r'unit': r'', r'data': raycing.get_zprime}
 
 
-# for beam, t1 in zip(
-#         ('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local',
-#          'BeamMonoC2Local', 'BeamMonitor2Local'),
-#         ('FE', 'C1', 'C1C2', 'C2', 'FM')):
-#     if t1 not in ('C1', 'C2'):
-#         params = zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds,
-#                      z_kwds), (z_kwds, xpr_kwds, zpr_kwds))
-#     else:
-#         params = zip(('XY', 'XXpr'), (x_kwds, x_kwds), (y_kwds, xpr_kwds))
+for beam, t1 in zip(
+        ('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local',
+         'BeamMonoC2Local', 'BeamMonitor2Local'),
+        ('FE', 'C1', 'C1C2', 'C2', 'FM')):
+    if t1 not in ('C1', 'C2'):
+        params = zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds,
+                     z_kwds), (z_kwds, xpr_kwds, zpr_kwds))
+    else:
+        params = zip(('XY', 'XXpr'), (x_kwds, x_kwds), (y_kwds, xpr_kwds))
 
-#     for t2, xkw, ykw in params:
-#         plots.append(xrtplot.XYCPlot(beam=beam,
-#                                      title='-'.join((t1, t2)),
-#                                      xaxis=xrtplot.XYCAxis(**xkw),
-#                                      yaxis=xrtplot.XYCAxis(**ykw),
-#                                      aspect='auto'))
+    for t2, xkw, ykw in params:
+        plots.append(xrtplot.XYCPlot(beam=beam,
+                                     title='-'.join((t1, t2)),
+                                     xaxis=xrtplot.XYCAxis(**xkw),
+                                     yaxis=xrtplot.XYCAxis(**ykw),
+                                     aspect='auto'))
 
-for beam in [
-    'BeamFilterCLocal2a_{0:02d}'.format(ii) for ii in range(diamond_filter_N)
-] + [
-    'BeamFilterSiCLocal2a_{0:02d}'.format(ii) for ii in range(sic_filter_N)
-]:
-    t1 = beam.replace('BeamFilter', '').replace('Local2a_', '')
-    t2 = 'XZ'
-    plots.append(xrtplot.XYCPlot(beam=beam,
-                                 title='-'.join((t1, t2)),
-                                 xaxis=xrtplot.XYCAxis(
-                                     limits=[-filter_size_x/2, filter_size_x/2], **x_kwds),
-                                 yaxis=xrtplot.XYCAxis(
-                                     limits=[-filter_size_z/2, filter_size_z/2], **y_kwds),
-                                 fluxKind='power',
-                                 aspect='auto'))
+# for beam in [
+#     'BeamFilterCLocal2a_{0:02d}'.format(ii) for ii in range(diamond_filter_N)
+# ] + [
+#     'BeamFilterSiCLocal2a_{0:02d}'.format(ii) for ii in range(sic_filter_N)
+# ]:
+#     t1 = beam.replace('BeamFilter', '').replace('Local2a_', '')
+#     t2 = 'XZ'
+#     plots.append(xrtplot.XYCPlot(beam=beam,
+#                                  title='-'.join((t1, t2)),
+#                                  xaxis=xrtplot.XYCAxis(
+#                                      limits=[-filter_size_x/2, filter_size_x/2], **x_kwds),
+#                                  yaxis=xrtplot.XYCAxis(
+#                                      limits=[-filter_size_z/2, filter_size_z/2], **y_kwds),
+#                                  fluxKind='power',
+#                                  aspect='auto'))
 
 
 def check_repo(md: Dict):
@@ -121,7 +121,7 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
                 )
 
 
-# @FL.gnrtr(50e3, 70e3, 20)
+@FL.gnrtr(45e3, 67e3, 30)
 def onept(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
     scan_name = 'onept'
@@ -132,7 +132,7 @@ def onept(bl: NSTU_SCW, plts: List):
     en = 30.e3
     if np.isclose(en, 30e3):
         r1, r2 = -2.04e3, -2.04e3  # 30 keV
-        g_f = 1.076                # 30 keV
+        g_f = 0.73                # 30 keV
         d_en = 5e-3
     elif np.isclose(en, 50e3):
         r1, r2 = -1.22e3, -1.22e3  # 50 keV
@@ -293,9 +293,9 @@ def scan_lens_scale(bl: NSTU_SCW, plts: List):
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()
-    scan = absorbed_power
+    scan = onept
     show = False
-    repeats = 10
+    repeats = 2
 
     if show:
         beamline.glow(

@@ -86,7 +86,7 @@ FL = FocusLocator(
 )
 
 
-# @FL.beamline
+@FL.beamline
 class NSTU_SCW(raycing.BeamLine):
     # metadata keys for organizing modelling results
     # these are variables that are potentially varied or scanned,
@@ -314,7 +314,7 @@ class NSTU_SCW(raycing.BeamLine):
 # ############################# BEAM TOPOLOGY #################################
 
 
-# @FL.run_process
+@FL.run_process
 def run_process(bl: NSTU_SCW):
 
     beam_source = bl.sources[0].shine()
@@ -373,29 +373,29 @@ def run_process(bl: NSTU_SCW):
         outDict['BeamLensLocal2a'+strl] = llocal2a
         beamIn = lglobal
 
-    # # monochromator
-    # beam_mono_c1_global, beam_mono_c1_local = bl.MonochromatorCr1.reflect(
-    #     beam=beamIn
-    # )
+    # monochromator
+    beam_mono_c1_global, beam_mono_c1_local = bl.MonochromatorCr1.reflect(
+        beam=beamIn
+    )
 
-    # beam_mon1 = bl.Cr1Monitor.expose(
-    #     beam=beam_mono_c1_global
-    # )
+    beam_mon1 = bl.Cr1Monitor.expose(
+        beam=beam_mono_c1_global
+    )
 
-    # beam_mono_c2_global, beam_mono_c2_local = bl.MonochromatorCr2.reflect(
-    #     beam=beam_mono_c1_global
-    # )
+    beam_mono_c2_global, beam_mono_c2_local = bl.MonochromatorCr2.reflect(
+        beam=beam_mono_c1_global
+    )
 
-    # beam_mon2 = bl.Cr2Monitor.expose(
-    #     beam=beam_mono_c2_global
-    # )
+    beam_mon2 = bl.Cr2Monitor.expose(
+        beam=beam_mono_c2_global
+    )
 
-    # outDict['BeamMonoC1Local'] = beam_mono_c1_local
-    # outDict['BeamMonoC1Global'] = beam_mono_c1_global
-    # outDict['BeamMonitor1Local'] = beam_mon1
-    # outDict['BeamMonoC2Local'] = beam_mono_c2_local
-    # outDict['BeamMonoC2Global'] = beam_mono_c2_global
-    # outDict['BeamMonitor2Local'] = beam_mon2
+    outDict['BeamMonoC1Local'] = beam_mono_c1_local
+    outDict['BeamMonoC1Global'] = beam_mono_c1_global
+    outDict['BeamMonitor1Local'] = beam_mon1
+    outDict['BeamMonoC2Local'] = beam_mono_c2_local
+    outDict['BeamMonoC2Global'] = beam_mono_c2_global
+    outDict['BeamMonitor2Local'] = beam_mon2
 
     bl.prepare_flow()
 
