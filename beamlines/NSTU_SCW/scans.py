@@ -18,6 +18,7 @@ from params.params_nstu_scw import (
     croc_crl_L,
     croc_crl_distance,
     croc_crl_y_t,
+    croc_crl_N,
     diamond_filter_N,
     sic_filter_N,
     front_end_opening,
@@ -42,23 +43,22 @@ zpr_kwds = {r'label': r'$z^{\prime}$',
             r'unit': r'', r'data': raycing.get_zprime}
 
 
-for beam, t1 in zip(
-        ('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local',
-         'BeamMonoC2Local', 'BeamMonitor2Local'),
-        ('FE', 'C1', 'C1C2', 'C2', 'FM')):
-    if t1 not in ('C1', 'C2'):
-        params = zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds,
-                     z_kwds), (z_kwds, xpr_kwds, zpr_kwds))
-    else:
-        params = zip(('XY', 'XXpr'), (x_kwds, x_kwds), (y_kwds, xpr_kwds))
+# for beam, t1 in zip(
+#         ('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local',
+#          'BeamMonoC2Local', 'BeamMonitor2Local'),
+#         ('FE', 'C1', 'C1C2', 'C2', 'FM')):
+#     if t1 not in ('C1', 'C2'):
+#         params = zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds,
+#                      z_kwds), (z_kwds, xpr_kwds, zpr_kwds))
+#     else:
+#         params = zip(('XY', 'XXpr'), (x_kwds, x_kwds), (y_kwds, xpr_kwds))
 
-    for t2, xkw, ykw in params:
-        plots.append(xrtplot.XYCPlot(beam=beam,
-                                     title='-'.join((t1, t2)),
-                                     xaxis=xrtplot.XYCAxis(**xkw),
-                                     yaxis=xrtplot.XYCAxis(**ykw),
-                                     aspect='auto'))
-
+#     for t2, xkw, ykw in params:
+#         plots.append(xrtplot.XYCPlot(beam=beam,
+#                                      title='-'.join((t1, t2)),
+#                                      xaxis=xrtplot.XYCAxis(**xkw),
+#                                      yaxis=xrtplot.XYCAxis(**ykw),
+#                                      aspect='auto'))
 # for beam in [
 #     'BeamFilterCLocal2a_{0:02d}'.format(ii) for ii in range(diamond_filter_N)
 # ] + [
@@ -74,6 +74,20 @@ for beam, t1 in zip(
 #                                      limits=[-filter_size_z/2, filter_size_z/2], **y_kwds),
 #                                  fluxKind='power',
 #                                  aspect='auto'))
+for beam in [
+    'BeamLensLocal2a_{0:02d}'.format(ii) for ii in range(croc_crl_N)
+]:
+    t1 = beam.replace('BeamLensLocal2a_', 'CRL')
+    t2 = 'XZ'
+    plots.append(xrtplot.XYCPlot(beam=beam,
+                                 title='-'.join((t1, t2)),
+                                 xaxis=xrtplot.XYCAxis(
+                                     limits=[-3 * filter_size_x / 4, 3 * filter_size_x / 4], **x_kwds),
+                                 yaxis=xrtplot.XYCAxis(
+                                     limits=[-filter_size_z/2, filter_size_z/2], **y_kwds),
+                                 fluxKind='power',
+                                 aspect='auto'
+    ))
 
 
 def check_repo(md: Dict):
@@ -86,18 +100,18 @@ def check_repo(md: Dict):
 
 def absorbed_power(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
-    scan_name = 'absorbed_power'
+    scan_name = 'absorbed_power_lens'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
     bl.align_source(50050, 999. / 1001.)
-    bl.align_crl(croc_crl_L, int(croc_crl_L), croc_crl_y_t, 0., 0.)
-    bl.align_crl_mask(100., .5)
+    bl.align_crl(croc_crl_L, croc_crl_N, croc_crl_y_t, .12, 0.)
+    bl.align_crl_mask(100., 100.)
     bl.align_mono(50e3, np.inf, np.inf, np.inf, np.inf)
 
     for plot in plts:
-        if re.match(r'(C|SiC)[\d]+-XZ', plot.title):
+        if re.match(r'(C|SiC|CRL)[\d]+-XZ', plot.title):
             print(plot.title)
             plot.saveName = os.path.join(
                 subdir, scan_name, '%s.png' % (plot.title, ))
@@ -108,17 +122,39 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
         ff.write('\n'.join('%s,%s' % (k, str(val))
                  for k, val in metadata.items()))
     yield
-
+    
+    # FILTERS
+    # for plot in plts:
+    #     if plot.persistentName is not None:
+    #         with open(plot.persistentName, 'rb') as f:
+    #             f = pickle.load(f)
+    #             np.savetxt(
+    #                 plot.persistentName.replace('.pickle', '.txt'),
+    #                 pickle_to_table(f),
+    #                 delimiter=' ',
+    #                 header="""\"x (mm)\"	\"y (mm)\"	\"Filtered Power (W/mm<sup>2</sup>)\""""
+    #             )
+    # LENS
+    tooth_ids, tooth_ps = [], []
     for plot in plts:
         if plot.persistentName is not None:
             with open(plot.persistentName, 'rb') as f:
                 f = pickle.load(f)
-                np.savetxt(
-                    plot.persistentName.replace('.pickle', '.txt'),
-                    pickle_to_table(f),
-                    delimiter=' ',
-                    header="""\"x (mm)\"	\"y (mm)\"	\"Filtered Power (W/mm<sup>2</sup>)\""""
-                )
+                tooth_ids.append(int(
+                    os.path.basename(plot.persistentName)
+                    .replace('CRL', '').replace('-XZ.pickle', '')
+                ))
+                tooth_ps.append(f.power)
+    tooth_ps = np.array([tooth_ids, tooth_ps]).T
+    tooth_ps = tooth_ps[tooth_ps[:, 0].argsort()]
+    tooth_ps[:, 0] = 2. * tooth_ps[:, 0]
+    np.savetxt(
+        os.path.join(subdir, scan_name, 'lens_power.txt'),
+        tooth_ps,
+        delimiter = ' ',
+        header = """\"Y (mm)\" \"Power (W)\"""",
+    )
+    print('TOTAL CRL ABSORBED POWER %.03f W' % np.sum(tooth_ps[:, 1]))
 
 
 # @FL.gnrtr(45e3, 67e3, 30)
@@ -150,7 +186,7 @@ def onept(bl: NSTU_SCW, plts: List):
         raise ValueError('En is not in [30, 50, 70, 90] keV')
 
     bl.align_source(en, d_en)
-    bl.align_crl(croc_crl_L, 30, croc_crl_y_t, g_f, 0.)
+    bl.align_crl(croc_crl_L, croc_crl_N, croc_crl_y_t, g_f, 0.)
     bl.align_crl_mask(100., .5)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
 
@@ -293,9 +329,9 @@ def scan_lens_scale(bl: NSTU_SCW, plts: List):
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()
-    scan = onept
+    scan = absorbed_power
     show = False
-    repeats = 30
+    repeats = 1
 
     if show:
         beamline.glow(
