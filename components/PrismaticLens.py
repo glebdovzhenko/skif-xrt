@@ -227,3 +227,10 @@ class PrismaticLens(roe.Plate):
     def calc_y_g(mat, fdist, en, y_t, L):
         delta = np.real(1. - mat.get_refractive_index(en))
         return fdist * delta * L / y_t
+
+    @staticmethod
+    def calc_sigma_abs(mat, fdist, en):
+        abs_len = 10. / mat.get_absorption_coefficient(en)  # mm
+        delta = np.real(1. - mat.get_refractive_index(en))
+        return np.sqrt(fdist * delta * abs_len)
+

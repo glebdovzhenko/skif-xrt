@@ -12,7 +12,7 @@ import xrt.backends.raycing as raycing
 import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
 
-from NSTU_SCW import FL, NSTU_SCW
+from NSTU_SCW import FL, NSTU_SCW, mGlassyCarbon
 from components import PrismaticLens
 from params.params_nstu_scw import (
     croc_crl_L,
@@ -100,14 +100,14 @@ def check_repo(md: Dict):
 
 def absorbed_power(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
-    scan_name = 'absorbed_power_lens'
+    scan_name = 'absorbed_power_lens_w_slits'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
     bl.align_source(50050, 999. / 1001.)
     bl.align_crl(croc_crl_L, croc_crl_N, croc_crl_y_t, .12, 0.)
-    bl.align_crl_mask(100., 100.)
+    bl.align_crl_mask(100., 6. * PrismaticLens.calc_sigma_abs(mGlassyCarbon, 14000, 90e3))
     bl.align_mono(50e3, np.inf, np.inf, np.inf, np.inf)
 
     for plot in plts:
@@ -343,7 +343,7 @@ if __name__ == '__main__':
     beamline = NSTU_SCW()
     scan = absorbed_power
     show = False
-    repeats = 1
+    repeats = 10
 
     if show:
         beamline.glow(
