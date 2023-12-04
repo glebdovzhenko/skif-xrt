@@ -87,7 +87,7 @@ for beam in [
                                      limits=[-filter_size_z/2, filter_size_z/2], **y_kwds),
                                  fluxKind='power',
                                  aspect='auto'
-    ))
+                                 ))
 
 
 def check_repo(md: Dict):
@@ -122,7 +122,7 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
         ff.write('\n'.join('%s,%s' % (k, str(val))
                  for k, val in metadata.items()))
     yield
-    
+
     # FILTERS
     # for plot in plts:
     #     if plot.persistentName is not None:
@@ -132,10 +132,10 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
     #                 plot.persistentName.replace('.pickle', '.txt'),
     #                 pickle_to_table(f),
     #                 delimiter=' ',
-    #                 header="""\"x (mm)\"	\"y (mm)\"	\"Filtered Power (W/mm<sup>2</sup>)\""""
+    #                 header="""\"x (mm)\"	\"y (mm)\"	\"Absorbed Power Density (W/mm<sup>2</sup>)\""""
     #             )
     # LENS
-    tooth_ids, tooth_ps = [], []
+    tooth_ids, tooth_ps, tooth_ps_density = [], [], []
     for plot in plts:
         if plot.persistentName is not None:
             with open(plot.persistentName, 'rb') as f:
@@ -145,15 +145,27 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
                     .replace('CRL', '').replace('-XZ.pickle', '')
                 ))
                 tooth_ps.append(f.power)
-    tooth_ps = np.array([tooth_ids, tooth_ps]).T
+                tooth_ps_density.append(
+                    (np.max(f.total2D) / f.nRaysAll) / ((np.mean(f.xbinEdges[1:] - f.xbinEdges[:-1]) * (
+                        np.mean(f.ybinEdges[1:] - f.ybinEdges[:-1]))))
+                )
+    tooth_ps = np.array([tooth_ids, tooth_ps, tooth_ps_density]).T
     tooth_ps = tooth_ps[tooth_ps[:, 0].argsort()]
     tooth_ps[:, 0] = 2. * tooth_ps[:, 0]
+
     np.savetxt(
         os.path.join(subdir, scan_name, 'lens_power.txt'),
-        tooth_ps,
-        delimiter = ' ',
-        header = """\"Y (mm)\" \"Power (W)\"""",
+        tooth_ps[:,[0, 1]],
+        delimiter=' ',
+        header="""\"Y (mm)\" \"Total Power (W)\" """,
     )
+    np.savetxt(
+        os.path.join(subdir, scan_name, 'lens_power_density.txt'),
+        tooth_ps[:,[0, 2]],
+        delimiter=' ',
+        header="""\"Y (mm)\" \"Max Power Density (W/mm<sup>2</sup>)\"""",
+    )
+
     print('TOTAL CRL ABSORBED POWER %.03f W' % np.sum(tooth_ps[:, 1]))
 
 
@@ -176,7 +188,7 @@ def onept(bl: NSTU_SCW, plts: List):
         d_en = 5e-3
     elif np.isclose(en, 70e3):
         r1, r2 = -.870e3, -.870e3  # 70 keV
-        g_f = .21                   # 70 keV         
+        g_f = .21                   # 70 keV
         d_en = 1e-2
     elif np.isclose(en, 90e3):
         r1, r2 = -.675e3, -.675e3  # 90 keV
