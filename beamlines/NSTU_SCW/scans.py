@@ -42,23 +42,24 @@ xpr_kwds = {r'label': r'$x^{\prime}$',
 zpr_kwds = {r'label': r'$z^{\prime}$',
             r'unit': r'', r'data': raycing.get_zprime}
 
+# optical elements
+for beam, t1 in zip(
+        ('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local',
+         'BeamMonoC2Local', 'BeamMonitor2Local'),
+        ('FE', 'C1', 'C1C2', 'C2', 'FM')):
+    if t1 not in ('C1', 'C2'):
+        params = zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds,
+                     z_kwds), (z_kwds, xpr_kwds, zpr_kwds))
+    else:
+        params = zip(('XY', 'XXpr'), (x_kwds, x_kwds), (y_kwds, xpr_kwds))
 
-# for beam, t1 in zip(
-#         ('BeamAperture1Local', 'BeamMonoC1Local', 'BeamMonitor1Local',
-#          'BeamMonoC2Local', 'BeamMonitor2Local'),
-#         ('FE', 'C1', 'C1C2', 'C2', 'FM')):
-#     if t1 not in ('C1', 'C2'):
-#         params = zip(('XZ', 'XXpr', 'ZZpr'), (x_kwds, x_kwds,
-#                      z_kwds), (z_kwds, xpr_kwds, zpr_kwds))
-#     else:
-#         params = zip(('XY', 'XXpr'), (x_kwds, x_kwds), (y_kwds, xpr_kwds))
-
-#     for t2, xkw, ykw in params:
-#         plots.append(xrtplot.XYCPlot(beam=beam,
-#                                      title='-'.join((t1, t2)),
-#                                      xaxis=xrtplot.XYCAxis(**xkw),
-#                                      yaxis=xrtplot.XYCAxis(**ykw),
-#                                      aspect='auto'))
+    for t2, xkw, ykw in params:
+        plots.append(xrtplot.XYCPlot(beam=beam,
+                                     title='-'.join((t1, t2)),
+                                     xaxis=xrtplot.XYCAxis(**xkw),
+                                     yaxis=xrtplot.XYCAxis(**ykw),
+                                     aspect='auto'))
+# # filter absorption plots
 # for beam in [
 #     'BeamFilterCLocal2a_{0:02d}'.format(ii) for ii in range(diamond_filter_N)
 # ] + [
@@ -74,20 +75,21 @@ zpr_kwds = {r'label': r'$z^{\prime}$',
 #                                      limits=[-filter_size_z/2, filter_size_z/2], **y_kwds),
 #                                  fluxKind='power',
 #                                  aspect='auto'))
-for beam in [
-    'BeamLensLocal2a_{0:02d}'.format(ii) for ii in range(croc_crl_N)
-]:
-    t1 = beam.replace('BeamLensLocal2a_', 'CRL')
-    t2 = 'XZ'
-    plots.append(xrtplot.XYCPlot(beam=beam,
-                                 title='-'.join((t1, t2)),
-                                 xaxis=xrtplot.XYCAxis(
-                                     limits=[-3 * filter_size_x / 4, 3 * filter_size_x / 4], **x_kwds),
-                                 yaxis=xrtplot.XYCAxis(
-                                     limits=[-filter_size_z/2, filter_size_z/2], **y_kwds),
-                                 fluxKind='power',
-                                 aspect='auto'
-                                 ))
+# # CRL absorption plots
+# for beam in [
+#     'BeamLensLocal2a_{0:02d}'.format(ii) for ii in range(croc_crl_N)
+# ]:
+#     t1 = beam.replace('BeamLensLocal2a_', 'CRL')
+#     t2 = 'XZ'
+#     plots.append(xrtplot.XYCPlot(beam=beam,
+#                                  title='-'.join((t1, t2)),
+#                                  xaxis=xrtplot.XYCAxis(
+#                                      limits=[-3 * filter_size_x / 4, 3 * filter_size_x / 4], **x_kwds),
+#                                  yaxis=xrtplot.XYCAxis(
+#                                      limits=[-filter_size_z/2, filter_size_z/2], **y_kwds),
+#                                  fluxKind='power',
+#                                  aspect='auto'
+#                                  ))
 
 
 def check_repo(md: Dict):
@@ -177,25 +179,25 @@ def onept(bl: NSTU_SCW, plts: List):
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
-    en = 90.e3
+    en = 70.e3
     if np.isclose(en, 30e3):
-        r1, r2 = -2.04e3, -2.04e3  # 30 keV
-        g_f = 1.25                 # 30 keV
+        r1, r2 = -2.04e3, -2.04e3   # 30 keV
+        g_f = 1.25                  # 30 keV
         d_en = 5e-3
         six_sigma = 2.1
     elif np.isclose(en, 50e3):
-        r1, r2 = -1.22e3, -1.22e3  # 50 keV
-        g_f = 0.45                # 50 keV
+        r1, r2 = -1.22e3, -1.22e3   # 50 keV
+        g_f = 0.45                  # 50 keV
         d_en = 5e-3
         six_sigma = 1.5
     elif np.isclose(en, 70e3):
-        r1, r2 = -.870e3, -.870e3  # 70 keV
+        r1, r2 = -.870e3, -.870e3   # 70 keV
         g_f = .21                   # 70 keV
         d_en = 1e-2
         six_sigma = 1.1
     elif np.isclose(en, 90e3):
-        r1, r2 = -.675e3, -.675e3  # 90 keV
-        g_f = 0.12                 # 90 keV
+        r1, r2 = -.675e3, -.675e3   # 90 keV
+        g_f = 0.12                  # 90 keV
         d_en = 3e-2
         six_sigma = 0.9
     else:
