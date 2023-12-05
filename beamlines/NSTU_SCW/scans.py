@@ -174,7 +174,7 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
 # @FL.gnrtr(45e3, 67e3, 30)
 def onept(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
-    scan_name = 'exit_w_slits'
+    scan_name = 'exit_w_o_slits'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
@@ -205,7 +205,7 @@ def onept(bl: NSTU_SCW, plts: List):
 
     bl.align_source(en, d_en)
     bl.align_crl(croc_crl_L, croc_crl_N, croc_crl_y_t, g_f, 0.)
-    bl.align_crl_mask(100., six_sigma)
+    bl.align_crl_mask(100., 100.)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
 
     for plot in plts:
