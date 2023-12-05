@@ -179,7 +179,7 @@ def onept(bl: NSTU_SCW, plts: List):
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
-    en = 50.e3
+    en = 30.e3
     if np.isclose(en, 30e3):
         r1, r2 = -2.04e3, -2.04e3   # 30 keV
         g_f = 1.25                  # 30 keV
