@@ -179,7 +179,7 @@ def onept(bl: NSTU_SCW, plts: List):
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
-    en = 90.e3
+    en = 50.e3
     if np.isclose(en, 30e3):
         r1, r2 = -2.04e3, -2.04e3   # 30 keV
         g_f = 1.25                  # 30 keV
@@ -217,7 +217,7 @@ def onept(bl: NSTU_SCW, plts: List):
         plot.persistentName = plot.saveName.replace('.png', '.pickle')
         if 'FM-XZ' in plot.title:
             plot.xaxis.limits = [-.2, .2]
-            plot.yaxis.limits = [-.1, .1]
+            plot.yaxis.limits = [-.2, .2]
 
     metadata = check_repo(bl._metadata)
     with open(os.path.join(subdir, scan_name, 'md.csv'), 'w') as ff:
