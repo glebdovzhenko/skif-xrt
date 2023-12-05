@@ -172,7 +172,7 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
 # @FL.gnrtr(45e3, 67e3, 30)
 def onept(bl: NSTU_SCW, plts: List):
     subdir = os.path.join(os.getenv('BASE_DIR', ''), 'datasets', 'nstu-scw-2')
-    scan_name = 'onept'
+    scan_name = 'exit_w_slits'
 
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
@@ -182,24 +182,28 @@ def onept(bl: NSTU_SCW, plts: List):
         r1, r2 = -2.04e3, -2.04e3  # 30 keV
         g_f = 1.25                 # 30 keV
         d_en = 5e-3
+        six_sigma = 2.1
     elif np.isclose(en, 50e3):
         r1, r2 = -1.22e3, -1.22e3  # 50 keV
         g_f = 0.45                # 50 keV
         d_en = 5e-3
+        six_sigma = 1.5
     elif np.isclose(en, 70e3):
         r1, r2 = -.870e3, -.870e3  # 70 keV
         g_f = .21                   # 70 keV
         d_en = 1e-2
+        six_sigma = 1.1
     elif np.isclose(en, 90e3):
         r1, r2 = -.675e3, -.675e3  # 90 keV
         g_f = 0.12                 # 90 keV
         d_en = 3e-2
+        six_sigma = 0.9
     else:
         raise ValueError('En is not in [30, 50, 70, 90] keV')
 
     bl.align_source(en, d_en)
     bl.align_crl(croc_crl_L, croc_crl_N, croc_crl_y_t, g_f, 0.)
-    bl.align_crl_mask(100., .5)
+    bl.align_crl_mask(100., six_sigma)
     bl.align_mono(en, r1, -6. * r1, r2, -6 * r2)
 
     for plot in plts:
@@ -341,7 +345,7 @@ def scan_lens_scale(bl: NSTU_SCW, plts: List):
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()
-    scan = absorbed_power
+    scan = onept 
     show = False
     repeats = 10
 
