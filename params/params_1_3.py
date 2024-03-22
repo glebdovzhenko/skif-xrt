@@ -9,4 +9,3 @@ sample_2_distance = 122000
 
 croc_1_distance = 37000
 croc_2_distance = 52000
-
