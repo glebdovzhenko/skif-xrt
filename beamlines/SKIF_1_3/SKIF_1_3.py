@@ -3,14 +3,22 @@ import numpy as np
 import xrt.backends.raycing.sources as rsources
 import xrt.backends.raycing.screens as rscreens
 import xrt.backends.raycing.apertures as rapts
+import xrt.backends.raycing.oes as roe
 import xrt.backends.raycing.materials as rm
 import xrt.backends.raycing.run as rrun
 import xrt.backends.raycing as raycing
 from components import PrismaticLens
 
 from params.sources import ring_kwargs, wiggler_1_3_kwargs
-from params.params_1_3 import front_end_distance, front_end_h_angle, front_end_v_angle
 from params.params_1_3 import (
+    front_end_distance,
+    front_end_h_angle,
+    front_end_v_angle,
+    filter_distance,
+    be_filter_thickness,
+    gr_filter_thickness,
+    filter_size_x,
+    filter_size_z,
     croc_1_distance,
     # croc_2_distance,
     # sample_1_distance,
@@ -28,10 +36,14 @@ sample_pos = sample_2_distance
 # ############################### MATERIALS ###################################
 
 
+# lenses
 mBeryllium = rm.Material("Be", rho=1.848, kind="lens")
 mAl = rm.Material("Al", rho=2.7, kind="lens")
 mGlassyCarbon = rm.Material("C", rho=1.50, kind="lens")
 lens_material = mGlassyCarbon
+# filters
+mBeryllium = rm.Material("Be", rho=1.848)
+mGraphite = rm.Material("C", rho=2.15)
 
 
 # ############################### BEAMLINE ####################################
@@ -45,10 +57,10 @@ class SKIF13(raycing.BeamLine):
             name=r"Superconducting Wiggler",
             bl=self,
             center=[0, 0, 0],
-            # eMin=100,
-            # eMax=100e3,
-            eMin=35e3 - 1.0,
-            eMax=35e3 + 1.0,
+            eMin=100,
+            eMax=100e3,
+            # eMin=35e3 - 1.0,
+            # eMax=35e3 + 1.0,
             xPrimeMax=front_end_h_angle * 0.505e3,
             zPrimeMax=front_end_v_angle * 0.505e3,
             uniformRayDensity=True,
@@ -78,6 +90,32 @@ class SKIF13(raycing.BeamLine):
             bl=self,
             name=r"FE Monitor",
             center=[0, front_end_distance + 100, 0],
+        )
+
+        self.FilterStack = []
+        self.FilterStack.append(
+            roe.Plate(
+                name="Be Filter",
+                bl=self,
+                center=[0, filter_distance, 0],
+                pitch=np.pi / 2.0,
+                material=mBeryllium,
+                t=be_filter_thickness,
+                limPhysX=[-filter_size_x / 2, filter_size_x / 2],
+                limPhysY=[-filter_size_z / 2, filter_size_z / 2],
+            )
+        )
+        self.FilterStack.append(
+            roe.Plate(
+                name="Gr Filter",
+                bl=self,
+                center=[0, filter_distance + 2.0 * be_filter_thickness, 0],
+                pitch=np.pi / 2.0,
+                material=mGraphite,
+                t=gr_filter_thickness,
+                limPhysX=[-filter_size_x / 2, filter_size_x / 2],
+                limPhysY=[-filter_size_z / 2, filter_size_z / 2],
+            )
         )
 
         self.LensEntranceMonitor = rscreens.Screen(
@@ -152,13 +190,24 @@ def run_process(bl: SKIF13):
     # Exposing Front-End Monitor
     outDict["FEMonitorLocal"] = bl.FrontEndMonitor.expose(beam=outDict["SourceGlobal"])
 
+    # SiC filters
+    beamIn = outDict["SourceGlobal"]
+    for ifl, fl in enumerate(bl.FilterStack):
+        lglobal, llocal1, llocal2 = fl.double_refract(beam=beamIn)
+        strl = "_{0:02d}".format(ifl)
+        outDict["FilterGlobal" + strl] = lglobal
+        outDict["FilterLocal1" + strl] = llocal1
+        outDict["FilterLocal2" + strl] = llocal2
+
+        llocal2a = raycing.sources.Beam(copyFrom=llocal2)
+        llocal2a.absorb_intensity(beamIn)
+        outDict["FilterLocal2a" + strl] = llocal2a
+        beamIn = lglobal
+
     # Exposing CRL Entrance Monitor
-    outDict["LensEntranceMonitorLocal"] = bl.LensEntranceMonitor.expose(
-        beam=outDict["SourceGlobal"]
-    )
+    outDict["LensEntranceMonitorLocal"] = bl.LensEntranceMonitor.expose(beam=beamIn)
 
     # CRL
-    beamIn = outDict["SourceGlobal"]
     for ilens, lens in enumerate(bl.CrocLensStack):
         lglobal, llocal1, llocal2 = lens.double_refract(beamIn, needLocal=True)
         strl = "_{0:02d}".format(ilens)
@@ -180,8 +229,8 @@ def run_process(bl: SKIF13):
     # Exposing CRL Exit Monitor
     outDict["SampleMonitorLocal"] = bl.SampleMonitor.expose(beam=beamIn)
 
+    # Preparing for XrtQook
     bl.prepare_flow()
-
     return outDict
 
 
