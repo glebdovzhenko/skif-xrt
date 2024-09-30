@@ -10,3 +10,5 @@ datasets/**
 *.json
 **/.DS_Store
 **/__pycache__
+.evrc
+.direnv

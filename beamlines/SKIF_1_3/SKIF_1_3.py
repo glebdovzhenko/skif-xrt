@@ -132,7 +132,7 @@ class SKIF13(raycing.BeamLine):
         )
         self.CrocLensStack = PrismaticLens.make_stack(
             L=self.lens_pars["L"],
-            N=int(self.lens_pars["L"]),
+            N=100,  # int(self.lens_pars["L"]),
             d=self.lens_pars["y_t"],
             g_last=0.0,
             g_first=self.lens_pars["y_t"],
@@ -162,8 +162,10 @@ class SKIF13(raycing.BeamLine):
             opening=[
                 -sample_pos * np.tan(front_end_h_angle / 2.0),
                 sample_pos * np.tan(front_end_h_angle / 2.0),
-                -sample_pos * np.tan(front_end_v_angle / 2.0),
-                sample_pos * np.tan(front_end_v_angle / 2.0),
+                -0.5,
+                0.5,
+                # -4.0 * sample_pos * np.tan(front_end_v_angle / 2.0),
+                # 4.0 * sample_pos * np.tan(front_end_v_angle / 2.0),
             ],
         )
 

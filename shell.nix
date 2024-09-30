@@ -22,6 +22,7 @@ in mkShell {
   propagatedBuildInputs = [
     (python3.withPackages (ps: with ps; [
       matplotlib
+      pyqtwebengine
       pyqt5
       setuptools
       numpy
@@ -29,8 +30,12 @@ in mkShell {
       pandas
       pyopencl
       pyopengl
+      pyopengl-accelerate 
       colorama
       xrt
+      # my deps
+      gitpython
+      uncertainties
     ]))
 
   ];
@@ -39,7 +44,5 @@ in mkShell {
   QT_QPA_PLATFORM_PLUGIN_PATH="${qt5.qtbase.bin}/lib/qt-${qt5.qtbase.version}/plugins";
   PYTHONPATH=builtins.getEnv "PWD"; 
   BASE_DIR=builtins.getEnv "PWD";
-
-  #QT_QPA_PLATFORM="wayland";
 }
 

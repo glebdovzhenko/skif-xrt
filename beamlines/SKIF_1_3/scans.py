@@ -1,4 +1,6 @@
 from typing import List
+import numpy as np
+import os
 import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
 
@@ -47,10 +49,7 @@ plots = [
 ]
 
 
-# ################################### SCANS ###################################
-
-
-def none_scan(plts: List[xrtplot.XYCPlot], bl: SKIF13):
+def setup_plots(plts: List[xrtplot.XYCPlot], bl: SKIF13):
     # setting up axes limits
     for plt in plts:
         if plt.beam in ("WgMonitorLocal", "FEMonitorLocal"):
@@ -109,7 +108,49 @@ def none_scan(plts: List[xrtplot.XYCPlot], bl: SKIF13):
                 (plt.title, "[%.01f m]" % (bl.SampleMonitor.center[1] * 1e-3))
             )
 
+
+# ################################### SCANS ###################################
+
+
+def none_scan(plts: List[xrtplot.XYCPlot], bl: SKIF13):
+    setup_plots(plts, bl)
     yield
+
+
+def en_scan(plts: List[xrtplot.XYCPlot], bl: SKIF13):
+    subdir = os.path.join(os.getenv("BASE_DIR", ""), "datasets", "skif13")
+    scan_name = "1mm_gr_lens"
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+    setup_plots(plts, bl)
+    for plt in plts:
+        if plt.beam == "SampleMonitorLocal":
+            plt.xaxis.limits = (
+                1.4 * bl.SampleSlit.opening[0],
+                1.4 * bl.SampleSlit.opening[1],
+            )
+            plt.yaxis.limits = (
+                1.4 * bl.SampleSlit.opening[2],
+                1.4 * bl.SampleSlit.opening[3],
+            )
+    ens = np.concatenate(
+        (
+            np.array([31.0, 32.0, 33.0, 34.0, 36.0, 37.0, 38.0, 39.0]),
+            np.arange(10.0, 70.0, 5.0),
+        )
+    )
+    for en in ens * 1e3:
+        bl.SuperCWiggler.eMin = en - 1.0
+        bl.SuperCWiggler.eMax = en + 1.0
+        for plt in plts:
+            plt.saveName = " ".join((plt.title, "[%.01f keV]" % (en * 1e-3)))
+            plt.saveName = os.path.join(subdir, scan_name, plt.saveName + ".png")
+            plt.persistentName = plt.saveName.replace(".png", ".pickle")
+            plt.caxis.limits = None
+            # if plt.beam == "SampleMonitorLocal":
+            #     plt.yaxis.limits = None
+        yield
 
 
 # ################################### MAIN ####################################
