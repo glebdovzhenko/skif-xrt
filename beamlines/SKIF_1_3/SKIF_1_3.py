@@ -2,47 +2,51 @@ import numpy as np
 
 import xrt.backends.raycing.sources as rsources
 import xrt.backends.raycing.screens as rscreens
-import xrt.backends.raycing.oes as roes
 import xrt.backends.raycing.apertures as rapts
+import xrt.backends.raycing.oes as roe
 import xrt.backends.raycing.materials as rm
 import xrt.backends.raycing.run as rrun
 import xrt.backends.raycing as raycing
-import xrt.plotter as xrtplot
-import xrt.runner as xrtrun
+from components import PrismaticLens
 
 from params.sources import ring_kwargs, wiggler_1_3_kwargs
-from params.params_1_3 import front_end_distance, front_end_h_angle, front_end_v_angle, filter_distance
+from params.params_1_3 import (
+    front_end_distance,
+    front_end_h_angle,
+    front_end_v_angle,
+    filter_distance,
+    be_filter_thickness,
+    gr_filter_thickness,
+    filter_size_x,
+    filter_size_z,
+    croc_1_distance,
+    # croc_2_distance,
+    # sample_1_distance,
+    sample_2_distance,
+)
 
 
-# ################################################## SIM PARAMETERS ####################################################
+# ############################ SETUP PARAMETERS ###############################
 
 
-show = True
-repeats = 10
+crl_pos = croc_1_distance
+sample_pos = sample_2_distance
 
 
-# ################################################# SETUP PARAMETERS ###################################################
+# ############################### MATERIALS ###################################
 
 
-""" Front End Aperture """
-front_end_opening = [
-    -front_end_distance * np.tan(front_end_h_angle / 2.),
-    front_end_distance * np.tan(front_end_h_angle / 2.),
-    -front_end_distance * np.tan(front_end_v_angle / 2.),
-    front_end_distance * np.tan(front_end_v_angle / 2.)
-]
-
-""" Filter """
-filter_thickness = 0.1
+# lenses
+mBeryllium = rm.Material("Be", rho=1.848, kind="lens")
+mAl = rm.Material("Al", rho=2.7, kind="lens")
+mGlassyCarbon = rm.Material("C", rho=1.50, kind="lens")
+lens_material = mGlassyCarbon
+# filters
+mBeryllium = rm.Material("Be", rho=1.848)
+mGraphite = rm.Material("C", rho=2.15)
 
 
-# #################################################### MATERIALS #######################################################
-
-
-filterDiamond = rm.Material('C', rho=3.52, kind='plate')
-
-
-# #################################################### BEAMLINE ########################################################
+# ############################### BEAMLINE ####################################
 
 
 class SKIF13(raycing.BeamLine):
@@ -54,151 +58,182 @@ class SKIF13(raycing.BeamLine):
             bl=self,
             center=[0, 0, 0],
             eMin=100,
-            eMax=200000,
+            eMax=100e3,
+            # eMin=35e3 - 1.0,
+            # eMax=35e3 + 1.0,
+            xPrimeMax=front_end_h_angle * 0.505e3,
+            zPrimeMax=front_end_v_angle * 0.505e3,
+            uniformRayDensity=True,
             **ring_kwargs,
             **wiggler_1_3_kwargs
+        )
+
+        self.WigglerMonitor = rscreens.Screen(
+            bl=self,
+            name=r"SCWg Monitor",
+            center=[0, front_end_distance - 100, 0],
         )
 
         self.FrontEnd = rapts.RectangularAperture(
             bl=self,
             name=r"Front End Slit",
             center=[0, front_end_distance, 0],
-            opening=front_end_opening
+            opening=[
+                -front_end_distance * np.tan(front_end_h_angle / 2.0),
+                front_end_distance * np.tan(front_end_h_angle / 2.0),
+                -front_end_distance * np.tan(front_end_v_angle / 2.0),
+                front_end_distance * np.tan(front_end_v_angle / 2.0),
+            ],
         )
 
         self.FrontEndMonitor = rscreens.Screen(
             bl=self,
-            name='Front End Monitor',
-            center=[0, front_end_distance + 1, 0]
+            name=r"FE Monitor",
+            center=[0, front_end_distance + 100, 0],
         )
 
-        self.Filter = roes.Plate(
+        self.FilterStack = []
+        self.FilterStack.append(
+            roe.Plate(
+                name="Be Filter",
+                bl=self,
+                center=[0, filter_distance, 0],
+                pitch=np.pi / 2.0,
+                material=mBeryllium,
+                t=be_filter_thickness,
+                limPhysX=[-filter_size_x / 2, filter_size_x / 2],
+                limPhysY=[-filter_size_z / 2, filter_size_z / 2],
+            )
+        )
+        self.FilterStack.append(
+            roe.Plate(
+                name="Gr Filter",
+                bl=self,
+                center=[0, filter_distance + 2.0 * be_filter_thickness, 0],
+                pitch=np.pi / 2.0,
+                material=mGraphite,
+                t=gr_filter_thickness,
+                limPhysX=[-filter_size_x / 2, filter_size_x / 2],
+                limPhysY=[-filter_size_z / 2, filter_size_z / 2],
+            )
+        )
+
+        self.LensEntranceMonitor = rscreens.Screen(
             bl=self,
-            name='Diamond Window',
-            center=[0, filter_distance, 0],
-            pitch=.5 * np.pi,
-            material=filterDiamond,
-            t=filter_thickness
+            name=r"Lens Entrance Monitor",
+            center=[0, crl_pos - 100, 0],
         )
 
-        self.FilterMonitor = rscreens.Screen(
+        self.LensMaterial = lens_material
+        self.lens_pars = PrismaticLens.calc_optimal_params(
+            mat=lens_material,
+            fdist=1.0 / (1.0 / crl_pos + 1.0 / (sample_pos - crl_pos)),
+            en=35e3,
+        )
+        self.CrocLensStack = PrismaticLens.make_stack(
+            L=self.lens_pars["L"],
+            N=100,  # int(self.lens_pars["L"]),
+            d=self.lens_pars["y_t"],
+            g_last=0.0,
+            g_first=self.lens_pars["y_t"],
             bl=self,
-            name='Front End Monitor',
-            center=[0, filter_distance + 100, 0]
+            center=[0.0, crl_pos, 0],
+            material=self.LensMaterial,
+            limPhysX=[
+                -crl_pos * np.tan(front_end_h_angle / 2.0),
+                crl_pos * np.tan(front_end_h_angle / 2.0),
+            ],
+            limPhysY=[
+                -crl_pos * np.tan(front_end_v_angle / 2.0),
+                crl_pos * np.tan(front_end_v_angle / 2.0),
+            ],
+        )
+
+        self.LensExitMonitor = rscreens.Screen(
+            bl=self,
+            name=r"Lens Exit Monitor",
+            center=[0, crl_pos + self.lens_pars["L"] + 100, 0],
+        )
+
+        self.SampleSlit = rapts.RectangularAperture(
+            bl=self,
+            name=r"Sample Slit",
+            center=[0, sample_pos - 1, 0],
+            opening=[
+                -sample_pos * np.tan(front_end_h_angle / 2.0),
+                sample_pos * np.tan(front_end_h_angle / 2.0),
+                -0.5,
+                0.5,
+                # -4.0 * sample_pos * np.tan(front_end_v_angle / 2.0),
+                # 4.0 * sample_pos * np.tan(front_end_v_angle / 2.0),
+            ],
+        )
+
+        self.SampleMonitor = rscreens.Screen(
+            bl=self,
+            name=r"Sample Monitor",
+            center=[0, sample_pos, 0],
         )
 
 
-# ################################################# BEAM TOPOLOGY ######################################################
+# ############################ BEAM TOPOLOGY ##################################
 
 
 def run_process(bl: SKIF13):
-    beam_source = bl.sources[0].shine()
+    # Generating source beams
+    outDict = {"SourceGlobal": bl.sources[0].shine()}
 
-    _ = bl.FrontEnd.propagate(
-        beam=beam_source
-    )
-    beam_monitor1 = bl.FrontEndMonitor.expose(
-        beam=beam_source
-    )
-    beam_filter1_global, beam_filter1_local1, beam_filter1_local2 = bl.Filter.double_refract(
-        beam=beam_source
-    )
-    beam_filter1_local2a = rsources.Beam(
-        copyFrom=beam_filter1_local2
-    )
-    beam_filter1_local2a.absorb_intensity(
-        inBeam=beam_source
-    )
-    beam_monitor2 = bl.FilterMonitor.expose(
-        beam=beam_filter1_global
-    )
+    # Exposing Wiggler Monitor
+    outDict["WgMonitorLocal"] = bl.WigglerMonitor.expose(beam=outDict["SourceGlobal"])
 
-    if show:
-        bl.prepare_flow()
+    # Propagating through front-end
+    outDict["Ap1Local"] = bl.FrontEnd.propagate(beam=outDict["SourceGlobal"])
 
-    return {
-        'BeamSourceGlobal': beam_source,
-        'BeamFrontEndMonitorLocal': beam_monitor1,
-        'BeamFilter1Global': beam_filter1_global,
-        'BeamFilter1Local1': beam_filter1_local1,
-        'BeamFilter1Local2': beam_filter1_local2,
-        'BeamFilter1Local2A': beam_filter1_local2a,
-        'BeamFilterMonitorLocal': beam_monitor2,
-    }
+    # Exposing Front-End Monitor
+    outDict["FEMonitorLocal"] = bl.FrontEndMonitor.expose(beam=outDict["SourceGlobal"])
+
+    # SiC filters
+    beamIn = outDict["SourceGlobal"]
+    for ifl, fl in enumerate(bl.FilterStack):
+        lglobal, llocal1, llocal2 = fl.double_refract(beam=beamIn)
+        strl = "_{0:02d}".format(ifl)
+        outDict["FilterGlobal" + strl] = lglobal
+        outDict["FilterLocal1" + strl] = llocal1
+        outDict["FilterLocal2" + strl] = llocal2
+
+        llocal2a = raycing.sources.Beam(copyFrom=llocal2)
+        llocal2a.absorb_intensity(beamIn)
+        outDict["FilterLocal2a" + strl] = llocal2a
+        beamIn = lglobal
+
+    # Exposing CRL Entrance Monitor
+    outDict["LensEntranceMonitorLocal"] = bl.LensEntranceMonitor.expose(beam=beamIn)
+
+    # CRL
+    for ilens, lens in enumerate(bl.CrocLensStack):
+        lglobal, llocal1, llocal2 = lens.double_refract(beamIn, needLocal=True)
+        strl = "_{0:02d}".format(ilens)
+        outDict["LensGlobal" + strl] = lglobal
+        outDict["LensLocal1" + strl] = llocal1
+        outDict["LensLocal2" + strl] = llocal2
+
+        llocal2a = raycing.sources.Beam(copyFrom=llocal2)
+        llocal2a.absorb_intensity(beamIn)
+        outDict["LensLocal2a" + strl] = llocal2a
+        beamIn = lglobal
+
+    # Exposing CRL Exit Monitor
+    outDict["LensExitMonitorLocal"] = bl.LensExitMonitor.expose(beam=beamIn)
+
+    # Propagating through sample slit
+    outDict["SampleSlitLocal"] = bl.SampleSlit.propagate(beam=beamIn)
+
+    # Exposing CRL Exit Monitor
+    outDict["SampleMonitorLocal"] = bl.SampleMonitor.expose(beam=beamIn)
+
+    # Preparing for XrtQook
+    bl.prepare_flow()
+    return outDict
 
 
 rrun.run_process = run_process
-
-
-# ##################################################### PLOTS ##########################################################
-
-
-plots = [
-    xrtplot.XYCPlot(
-        beam='BeamFrontEndMonitorLocal',
-        title='Front End Intensity',
-        xaxis=xrtplot.XYCAxis(r'$x$', 'mm', limits=(1.4 * front_end_opening[0], 1.4 * front_end_opening[1])),
-        yaxis=xrtplot.XYCAxis(r'$z$', 'mm', limits=(1.4 * front_end_opening[2], 1.4 * front_end_opening[3])),
-        ePos=1),
-    xrtplot.XYCPlot(
-        beam='BeamFrontEndMonitorLocal',
-        title='Front End Power',
-        fluxKind='power',
-        xaxis=xrtplot.XYCAxis(r'$x$', 'mm', limits=(1.4 * front_end_opening[0], 1.4 * front_end_opening[1])),
-        yaxis=xrtplot.XYCAxis(r'$z$', 'mm', limits=(1.4 * front_end_opening[2], 1.4 * front_end_opening[3])),
-        ePos=1),
-    xrtplot.XYCPlot(
-        beam='BeamFilter1Local2A',
-        title='Filter absorbed intensity',
-        xaxis=xrtplot.XYCAxis(r'$x$', 'mm'),
-        yaxis=xrtplot.XYCAxis(r'$y$', 'mm'),
-        caxis=xrtplot.XYCAxis('energy', 'keV'),
-        fluxKind='total'),
-    xrtplot.XYCPlot(
-        beam='BeamFilter1Local2A',
-        title='Filter absorbed power',
-        xaxis=xrtplot.XYCAxis(r'$x$', 'mm'),
-        yaxis=xrtplot.XYCAxis(r'$y$', 'mm'),
-        caxis=xrtplot.XYCAxis('energy', 'keV'),
-        fluxKind='power',
-        fluxFormatStr='%.0f'),
-    xrtplot.XYCPlot(
-        beam='BeamFilterMonitorLocal',
-        title='Post-Filter Intensity',
-        xaxis=xrtplot.XYCAxis(r'$x$', 'mm', limits=(5.4 * front_end_opening[0], 5.4 * front_end_opening[1])),
-        yaxis=xrtplot.XYCAxis(r'$z$', 'mm', limits=(5.4 * front_end_opening[2], 5.4 * front_end_opening[3])),
-        ePos=1),
-]
-
-
-# ############################################### SEQUENCE GENERATOR ###################################################
-
-
-def none_scan(plts, bl: SKIF13):
-    yield
-
-
-# ###################################################### MAIN ##########################################################
-
-
-if __name__ == '__main__':
-    beamline = SKIF13()
-    scan = none_scan
-
-    if show:
-        beamline.glow(
-            scale=[1e3, 1e3, 1e3],
-            centerAt=2,
-            generator=scan,
-            generatorArgs=[plots, beamline],
-            startFrom=1
-        )
-    else:
-        xrtrun.run_ray_tracing(
-            beamLine=beamline,
-            plots=plots,
-            repeats=repeats,
-            backend=r"raycing",
-            generator=scan,
-            generatorArgs=[plots, beamline]
-        )

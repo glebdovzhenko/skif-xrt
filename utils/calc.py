@@ -6,52 +6,138 @@ from scipy.signal import argrelextrema
 from scipy.optimize import minimize
 
 
-def chukhovskii_krisch_r2(r1, theta, c1chi, c2chi, source_c1_y, c1_c2_z, source_f2_y=0.):
+def chukhovskii_krisch_r2(
+    r1, theta, c1chi, c2chi, source_c1_y, c1_c2_z, source_f2_y=0.0
+):
     """
     Calculates bending radius for the 2nd crystal from the bending radius for the 1st crystal and the beamline params
     :return:
     """
-    a = 4. * source_c1_y * np.abs(np.cos(c1chi - theta)) * (np.cos(c2chi + theta) ** 2 * (
-                source_c1_y - source_f2_y + c1_c2_z / np.tan(2. * theta)) + c1_c2_z * np.cos(
-        c2chi - theta) ** 2 / np.sin(2. * theta)) + 2. * source_c1_y * np.cos(c1chi + theta) * (
-                    2. * (source_c1_y - source_f2_y) * np.cos(c2chi + theta) ** 2 + c1_c2_z * (
-                        1. / np.tan(theta) + np.cos(2. * c2chi - theta) / np.sin(theta) - np.sin(2. * (c2chi + theta))))
-    b = 4. * source_c1_y * np.cos(c1chi - theta) ** 2 * np.cos(c2chi - theta) ** 2 - 2. * np.cos(c1chi + theta) ** 2 * (
-                2. * (source_c1_y - source_f2_y) * np.cos(c2chi + theta) ** 2 + c1_c2_z * (
-            1. / np.tan(theta) + np.cos(2. * c2chi - theta) / np.sin(theta) - np.sin(2. * (c2chi + theta))))
-    c = 4. * source_c1_y * np.cos(c1chi - theta) ** 2 * np.cos(c2chi + theta) * (
-                source_c1_y - source_f2_y + c1_c2_z / np.tan(2. * theta)) - 4. * source_c1_y * np.abs(
-        np.cos(c1chi - theta)) * np.cos(c2chi + theta) ** 2 * (
-                    source_c1_y - source_f2_y + c1_c2_z / np.tan(2. * theta)) - 4. * source_c1_y * np.cos(
-        c1chi + theta) * np.cos(c2chi + theta) ** 2 * (
-                    source_c1_y - source_f2_y + c1_c2_z / np.tan(2. * theta)) - 4. * source_c1_y * c1_c2_z * np.abs(
-        np.cos(c1chi - theta)) * np.cos(c2chi - theta) ** 2 / np.sin(2. * theta) - 4. * source_c1_y * c1_c2_z * np.cos(
-        c2chi - theta) ** 2 * np.cos(c1chi + theta) / np.sin(2. * theta) - 4. * c1_c2_z * np.cos(
-        c1chi + theta) ** 2 * np.cos(c2chi + theta) * (
-                    source_c1_y - source_f2_y + c1_c2_z / np.tan(2. * theta)) / np.sin(2. * theta) + .25 * np.abs(
-        np.cos(c2chi - theta)) * (1. / np.sin(theta)) ** 2 * (1. / np.cos(theta)) ** 2 * (
-                    -2. * c1_c2_z - 2. * c1_c2_z * np.cos(2. * (c1chi + theta)) + source_c1_y * np.sin(
-                2. * c1chi) - source_c1_y * np.sin(2. * c1chi - 4. * theta) + 2. * source_c1_y * np.sin(2. * theta)) * (
-        c1_c2_z * np.cos(2. * theta) + (source_c1_y - source_f2_y) * np.sin(2. * theta))
-    d = -4. * source_c1_y * np.cos(c1chi - theta) ** 2 * np.cos(c2chi - theta) ** 2 + 4. * np.cos(
-        c1chi + theta) ** 2 * np.cos(c2chi + theta) ** 2 * (
-                    source_c1_y - source_f2_y + c1_c2_z / np.tan(2 * theta)) + 4. * c1_c2_z * np.cos(
-        c2chi - theta) ** 2 * np.cos(c1chi + theta) ** 2 / np.sin(2. * theta)
-    e = 4. * source_c1_y * c1_c2_z * np.abs(np.cos(c1chi - theta)) * np.cos(c2chi + theta) * (
-                source_c1_y - source_f2_y + c1_c2_z / np.tan(2. * theta)) / np.sin(
-        2. * theta) + 4. * source_c1_y * c1_c2_z * np.cos(c1chi + theta) * np.cos(c2chi + theta) * (
-                    source_c1_y - source_f2_y + c1_c2_z / np.tan(2. * theta)) / np.sin(
-        2. * theta) + source_c1_y * c1_c2_z * np.abs(np.cos(c1chi - theta)) * np.abs(np.cos(c2chi - theta)) * (
-                    np.cos(theta) * np.sin(theta)) ** -2 * (
-                    c1_c2_z * np.cos(2. * theta) + (source_c1_y - source_f2_y) * np.sin(
-                2. * theta)) + source_c1_y * c1_c2_z * np.abs(np.cos(c2chi - theta)) * np.cos(c1chi + theta) * (
-                    np.cos(theta) * np.sin(theta)) ** -2 * (
-                    c1_c2_z * np.cos(2. * theta) + (source_c1_y - source_f2_y) * np.sin(2. * theta))
+    a = 4.0 * source_c1_y * np.abs(np.cos(c1chi - theta)) * (
+        np.cos(c2chi + theta) ** 2
+        * (source_c1_y - source_f2_y + c1_c2_z / np.tan(2.0 * theta))
+        + c1_c2_z * np.cos(c2chi - theta) ** 2 / np.sin(2.0 * theta)
+    ) + 2.0 * source_c1_y * np.cos(c1chi + theta) * (
+        2.0 * (source_c1_y - source_f2_y) * np.cos(c2chi + theta) ** 2
+        + c1_c2_z
+        * (
+            1.0 / np.tan(theta)
+            + np.cos(2.0 * c2chi - theta) / np.sin(theta)
+            - np.sin(2.0 * (c2chi + theta))
+        )
+    )
+    b = 4.0 * source_c1_y * np.cos(c1chi - theta) ** 2 * np.cos(
+        c2chi - theta
+    ) ** 2 - 2.0 * np.cos(c1chi + theta) ** 2 * (
+        2.0 * (source_c1_y - source_f2_y) * np.cos(c2chi + theta) ** 2
+        + c1_c2_z
+        * (
+            1.0 / np.tan(theta)
+            + np.cos(2.0 * c2chi - theta) / np.sin(theta)
+            - np.sin(2.0 * (c2chi + theta))
+        )
+    )
+    c = (
+        4.0
+        * source_c1_y
+        * np.cos(c1chi - theta) ** 2
+        * np.cos(c2chi + theta)
+        * (source_c1_y - source_f2_y + c1_c2_z / np.tan(2.0 * theta))
+        - 4.0
+        * source_c1_y
+        * np.abs(np.cos(c1chi - theta))
+        * np.cos(c2chi + theta) ** 2
+        * (source_c1_y - source_f2_y + c1_c2_z / np.tan(2.0 * theta))
+        - 4.0
+        * source_c1_y
+        * np.cos(c1chi + theta)
+        * np.cos(c2chi + theta) ** 2
+        * (source_c1_y - source_f2_y + c1_c2_z / np.tan(2.0 * theta))
+        - 4.0
+        * source_c1_y
+        * c1_c2_z
+        * np.abs(np.cos(c1chi - theta))
+        * np.cos(c2chi - theta) ** 2
+        / np.sin(2.0 * theta)
+        - 4.0
+        * source_c1_y
+        * c1_c2_z
+        * np.cos(c2chi - theta) ** 2
+        * np.cos(c1chi + theta)
+        / np.sin(2.0 * theta)
+        - 4.0
+        * c1_c2_z
+        * np.cos(c1chi + theta) ** 2
+        * np.cos(c2chi + theta)
+        * (source_c1_y - source_f2_y + c1_c2_z / np.tan(2.0 * theta))
+        / np.sin(2.0 * theta)
+        + 0.25
+        * np.abs(np.cos(c2chi - theta))
+        * (1.0 / np.sin(theta)) ** 2
+        * (1.0 / np.cos(theta)) ** 2
+        * (
+            -2.0 * c1_c2_z
+            - 2.0 * c1_c2_z * np.cos(2.0 * (c1chi + theta))
+            + source_c1_y * np.sin(2.0 * c1chi)
+            - source_c1_y * np.sin(2.0 * c1chi - 4.0 * theta)
+            + 2.0 * source_c1_y * np.sin(2.0 * theta)
+        )
+        * (
+            c1_c2_z * np.cos(2.0 * theta)
+            + (source_c1_y - source_f2_y) * np.sin(2.0 * theta)
+        )
+    )
+    d = (
+        -4.0 * source_c1_y * np.cos(c1chi - theta) ** 2 * np.cos(c2chi - theta) ** 2
+        + 4.0
+        * np.cos(c1chi + theta) ** 2
+        * np.cos(c2chi + theta) ** 2
+        * (source_c1_y - source_f2_y + c1_c2_z / np.tan(2 * theta))
+        + 4.0
+        * c1_c2_z
+        * np.cos(c2chi - theta) ** 2
+        * np.cos(c1chi + theta) ** 2
+        / np.sin(2.0 * theta)
+    )
+    e = (
+        4.0
+        * source_c1_y
+        * c1_c2_z
+        * np.abs(np.cos(c1chi - theta))
+        * np.cos(c2chi + theta)
+        * (source_c1_y - source_f2_y + c1_c2_z / np.tan(2.0 * theta))
+        / np.sin(2.0 * theta)
+        + 4.0
+        * source_c1_y
+        * c1_c2_z
+        * np.cos(c1chi + theta)
+        * np.cos(c2chi + theta)
+        * (source_c1_y - source_f2_y + c1_c2_z / np.tan(2.0 * theta))
+        / np.sin(2.0 * theta)
+        + source_c1_y
+        * c1_c2_z
+        * np.abs(np.cos(c1chi - theta))
+        * np.abs(np.cos(c2chi - theta))
+        * (np.cos(theta) * np.sin(theta)) ** -2
+        * (
+            c1_c2_z * np.cos(2.0 * theta)
+            + (source_c1_y - source_f2_y) * np.sin(2.0 * theta)
+        )
+        + source_c1_y
+        * c1_c2_z
+        * np.abs(np.cos(c2chi - theta))
+        * np.cos(c1chi + theta)
+        * (np.cos(theta) * np.sin(theta)) ** -2
+        * (
+            c1_c2_z * np.cos(2.0 * theta)
+            + (source_c1_y - source_f2_y) * np.sin(2.0 * theta)
+        )
+    )
 
-    return r1 + (c * r1 + d * r1 ** 2 + e) / (a + b * r1)
+    return r1 + (c * r1 + d * r1**2 + e) / (a + b * r1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from matplotlib import pyplot as plt
 
     # r1s = np.linspace(1000., 100000., 1000)
