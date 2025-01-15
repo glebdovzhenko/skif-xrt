@@ -36,6 +36,8 @@ in mkShell {
       # my deps
       gitpython
       uncertainties
+      jupyterlab
+      plotly
     ]))
 
   ];
