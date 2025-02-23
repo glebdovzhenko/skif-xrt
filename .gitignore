@@ -10,5 +10,7 @@ datasets/**
 *.json
 **/.DS_Store
 **/__pycache__
-.evrc
+.envrc
 .direnv
+.venv
+beamlines/PTYCHO

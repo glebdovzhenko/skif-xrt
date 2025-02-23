@@ -16,7 +16,12 @@ import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
 
 from params.sources import ring_kwargs, undulator_1_1_kwargs
-from params.params_1_1 import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle
+from params.params_1_1 import (
+    front_end_distance,
+    front_end_opening,
+    front_end_v_angle,
+    front_end_h_angle,
+)
 
 
 # ################################################## SIM PARAMETERS ####################################################
@@ -24,7 +29,7 @@ from params.params_1_1 import front_end_distance, front_end_opening, front_end_v
 
 show = True
 repeats = 1
-scan = 'energy_scan'
+scan = "energy_scan"
 
 
 # ################################################# SETUP PARAMETERS ###################################################
@@ -42,7 +47,7 @@ class SKIF11(raycing.BeamLine):
 
         self.name = r"SKIF 1-1"
 
-        self.alignE = 25.e3
+        self.alignE = 25.0e3
 
         self.SuperCUndulator = rsources.Undulator(
             name=r"Superconducting Undulator",
@@ -50,11 +55,11 @@ class SKIF11(raycing.BeamLine):
             center=[0, 0, 0],
             eMin=100,
             eMax=35000,
-            xPrimeMax=front_end_h_angle * .505e3,
-            zPrimeMax=front_end_v_angle * .505e3,
+            xPrimeMax=front_end_h_angle * 0.505e3,
+            zPrimeMax=front_end_v_angle * 0.505e3,
             nrays=10000,
-            # xPrimeMaxAutoReduce=False,
-            # zPrimeMaxAutoReduce=False,
+            xPrimeMaxAutoReduce=False,
+            zPrimeMaxAutoReduce=False,
             **ring_kwargs,
             **undulator_1_1_kwargs
         )
@@ -63,7 +68,7 @@ class SKIF11(raycing.BeamLine):
             bl=self,
             name=r"Front End Slit",
             center=[0, front_end_distance, 0],
-            opening=front_end_opening
+            opening=front_end_opening,
         )
 
 
@@ -74,16 +79,14 @@ def run_process(bl: SKIF11):
 
     beam_source = bl.sources[0].shine()
 
-    beam_ap1 = bl.FrontEnd.propagate(
-        beam=beam_source
-    )
+    beam_ap1 = bl.FrontEnd.propagate(beam=beam_source)
 
     if show:
         bl.prepare_flow()
 
     return {
-        'BeamSourceGlobal': beam_source,
-        'BeamAperture1Local': beam_ap1,
+        "BeamSourceGlobal": beam_source,
+        "BeamAperture1Local": beam_ap1,
     }
 
 
@@ -95,17 +98,19 @@ rrun.run_process = run_process
 
 plots = [
     xrtplot.XYCPlot(
-        beam='BeamAperture1Local',
-        title='FE-XZ',
-        xaxis=xrtplot.XYCAxis(label=r'$x$', unit='mm', data=raycing.get_x),
-        yaxis=xrtplot.XYCAxis(label=r'$z$', unit='mm', data=raycing.get_z),
-        aspect='auto'),
+        beam="BeamAperture1Local",
+        title="FE-XZ",
+        xaxis=xrtplot.XYCAxis(label=r"$x$", unit="mm", data=raycing.get_x),
+        yaxis=xrtplot.XYCAxis(label=r"$z$", unit="mm", data=raycing.get_z),
+        aspect="auto",
+    ),
     xrtplot.XYCPlot(
-        beam='BeamAperture1Local',
+        beam="BeamAperture1Local",
         title="FE-XprZpr",
-        xaxis=xrtplot.XYCAxis(label=r'$x^{\prime}$', unit='', data=raycing.get_xprime),
-        yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
-        aspect='auto'),
+        xaxis=xrtplot.XYCAxis(label=r"$x^{\prime}$", unit="", data=raycing.get_xprime),
+        yaxis=xrtplot.XYCAxis(label=r"$z^{\prime}$", unit="", data=raycing.get_zprime),
+        aspect="auto",
+    ),
 ]
 
 
@@ -113,12 +118,12 @@ plots = [
 
 
 def print_positions(bl: SKIF11):
-    print('#' * 20, bl.name, '#' * 20)
+    print("#" * 20, bl.name, "#" * 20)
 
     for element in (bl.SuperCUndulator, bl.FrontEnd):
-        print('#' * 5, element.name, 'at', element.center)
+        print("#" * 5, element.name, "at", element.center)
 
-    print('#' * (42 + len(bl.name)))
+    print("#" * (42 + len(bl.name)))
 
 
 def energy_scan(plts, bl: SKIF11):
@@ -129,17 +134,17 @@ def energy_scan(plts, bl: SKIF11):
 # ###################################################### MAIN ##########################################################
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     beamline = SKIF11()
     scan = vars()[scan]
 
     if show:
         beamline.glow(
             scale=[1e3, 1e3, 1e3],
-            centerAt=r'Si[111] Crystal 1',
+            centerAt=r"Si[111] Crystal 1",
             generator=scan,
             generatorArgs=[plots, beamline],
-            startFrom=1
+            startFrom=1,
         )
     else:
         xrtrun.run_ray_tracing(
@@ -148,5 +153,5 @@ if __name__ == '__main__':
             repeats=repeats,
             backend=r"raycing",
             generator=scan,
-            generatorArgs=[plots, beamline]
+            generatorArgs=[plots, beamline],
         )

@@ -85,9 +85,9 @@ for beam in [
 
 def check_repo(md: Dict):
     r = git.Repo(os.getenv("BASE_DIR"))
-    assert not r.is_dirty()
-    assert r.head.ref == r.heads.rtr
-    md["commit"] = r.head.commit.name_rev.replace(" rtr", "")
+    # assert not r.is_dirty()
+    # assert r.head.ref == r.heads.rtr
+    # md["commit"] = r.head.commit.name_rev.replace(" rtr", "")
     return md
 
 
@@ -307,7 +307,7 @@ def scan_lens_scale(bl: NSTU_SCW, plts: List):
 if __name__ == "__main__":
     beamline = NSTU_SCW()
     scan = absorbed_power
-    show = True  # False
+    show = False
     repeats = 10
 
     if show:

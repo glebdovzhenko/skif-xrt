@@ -1,6 +1,7 @@
-with import <nixpkgs> {};
+with import <nixpkgs> { };
 
 let
+  pythonPackages = python3Packages;
   xrt =
     let
       pname = "xrt";
@@ -16,35 +17,67 @@ let
       doCheck = false;
     };
 
-in mkShell {
-  nativeBuildInputs = [ qt5.qttools.dev ];
+in
+pkgs.mkShell rec {
+  name = "skif-xrt";
+  venvDir = "./.venv";
+  nativeBuildInputs = [ qt5.qttools.dev cmake ];
 
-  propagatedBuildInputs = [
-    (python3.withPackages (ps: with ps; [
-      matplotlib
-      pyqtwebengine
-      pyqt5
-      setuptools
-      numpy
-      scipy
-      pandas
-      pyopencl
-      pyopengl
-      pyopengl-accelerate 
-      colorama
-      xrt
-      # my deps
-      gitpython
-      uncertainties
-      jupyterlab
-      plotly
-    ]))
+  buildInputs = [
+    # adaptive deps
+    pythonPackages.python
+    pythonPackages.venvShellHook
+    pythonPackages.numpy
+    pythonPackages.scipy
+    pythonPackages.pandas
+    pythonPackages.ipykernel
+    pythonPackages.ipywidgets
+    pythonPackages.pyviz-comms
+    pythonPackages.bokeh
+    pythonPackages.mpi4py
+    pythonPackages.cmake
+    pythonPackages.scikit-build
+    pythonPackages.selenium
+    stdenv
+    # xrt deps
+    pythonPackages.matplotlib
+    pythonPackages.pyqtwebengine
+    pythonPackages.pyqt5
+    pythonPackages.setuptools
+    pythonPackages.pyopencl
+    pythonPackages.pyopengl
+    pythonPackages.pyopengl-accelerate
+    pythonPackages.colorama
+    xrt
+    # my deps
+    pythonPackages.gitpython
+    pythonPackages.uncertainties
+    pythonPackages.plotly
 
   ];
 
-  # Normally set by the wrapper, but we can't use it in nix-shell (?).
+  # Run this command, only after creating the virtual environment
+  postVenvCreation = ''
+    unset SOURCE_DATE_EPOCH
+    pip install --upgrade pip
+    pip install jupyterlab
+    pip install ipympl
+    pip install "adaptive[notebook]"
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager
+    jupyter labextension install @pyviz/jupyterlab_pyviz
+    python -m ipykernel install --user --name=${name}
+  '';
+
+  # Now we can execute any commands within the virtual environment.
+  # This is optional and can be left out to run pip manually.
+  postShellHook = ''
+    # allow pip to install wheels
+    unset SOURCE_DATE_EPOCH
+  '';
   QT_QPA_PLATFORM_PLUGIN_PATH="${qt5.qtbase.bin}/lib/qt-${qt5.qtbase.version}/plugins";
+
+  LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
   PYTHONPATH=builtins.getEnv "PWD"; 
   BASE_DIR=builtins.getEnv "PWD";
-}
 
+}
