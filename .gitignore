@@ -14,3 +14,4 @@ datasets/**
 .direnv
 .venv
 beamlines/PTYCHO
+notebooks/**/iframe_figures
