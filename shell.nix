@@ -2,20 +2,30 @@ with import <nixpkgs> { };
 
 let
   pythonPackages = python3Packages;
-  xrt =
-    let
+  #xrt =
+  #  let
+  #    pname = "xrt";
+  #    version = "1.6.0";
+  #    extension = "zip";
+  #  in
+  #  python3Packages.buildPythonPackage {
+  #    inherit pname version;
+  #    src = fetchPypi {
+  #      inherit pname version extension;
+  #      sha256 = "1a2e19306abd67a4b45c8b9c4e05d7fb2d8a5836b82e08749d935bf4314599dc";
+  #    };
+  #    doCheck = false;
+  xrt = pythonPackages.buildPythonPackage {
       pname = "xrt";
-      version = "1.6.0";
-      extension = "zip";
-    in
-    python3Packages.buildPythonPackage {
-      inherit pname version;
-      src = fetchPypi {
-        inherit pname version extension;
-        sha256 = "1a2e19306abd67a4b45c8b9c4e05d7fb2d8a5836b82e08749d935bf4314599dc";
+      version = "1.6.1";
+    src = fetchFromGitHub {
+        owner = "kklmn";
+        repo = "xrt";
+        rev = "43a229b98c49669378e2e2127ba00ac9217de451";
+        sha256 = "sha256-BfMfAx/sN3Uf/JxY41DzDce0yAotFeI9o//wINeOVEM=";
       };
-      doCheck = false;
-    };
+
+  };
 
 in
 pkgs.mkShell rec {
@@ -53,6 +63,7 @@ pkgs.mkShell rec {
     pythonPackages.gitpython
     pythonPackages.uncertainties
     pythonPackages.plotly
+    pythonPackages.dash
 
   ];
 
@@ -73,11 +84,12 @@ pkgs.mkShell rec {
   postShellHook = ''
     # allow pip to install wheels
     unset SOURCE_DATE_EPOCH
+    chmod -R 777 /home/glebd/.xrt
   '';
-  QT_QPA_PLATFORM_PLUGIN_PATH="${qt5.qtbase.bin}/lib/qt-${qt5.qtbase.version}/plugins";
+  QT_QPA_PLATFORM_PLUGIN_PATH = "${qt5.qtbase.bin}/lib/qt-${qt5.qtbase.version}/plugins";
 
   LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
-  PYTHONPATH=builtins.getEnv "PWD"; 
-  BASE_DIR=builtins.getEnv "PWD";
+  PYTHONPATH = builtins.getEnv "PWD";
+  BASE_DIR = builtins.getEnv "PWD";
 
 }
