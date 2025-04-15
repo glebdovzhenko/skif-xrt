@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<Project>
+	<Beams type="prop">
+		<None type="flat"></None>
+		<undulator01beamGlobal01 type="flat"></undulator01beamGlobal01>
+		<plate01beamGlobal01 type="flat"></plate01beamGlobal01>
+		<plate01beamLocal101 type="flat"></plate01beamLocal101>
+		<plate01beamLocal201 type="flat"></plate01beamLocal201>
+	</Beams>
+	<Materials type="prop">
+		<powder01 type="value">
+			<properties type="prop">
+				<chi type="param">[0, 0.5*np.pi]</chi>
+				<name type="param"></name>
+				<hkl type="param">[1, 1, 1]</hkl>
+				<a type="param">5.43071</a>
+				<b type="param">None</b>
+				<c type="param">None</c>
+				<alpha type="param">90</alpha>
+				<beta type="param">90</beta>
+				<gamma type="param">90</gamma>
+				<atoms type="param">[14, 14, 14, 14, 14, 14, 14, 14]</atoms>
+				<atomsXYZ type="param">[[0.0, 0.0, 0.0], [0.0, 0.5, 0.5], [0.5, 0.5, 0.0], [0.5, 0.0, 0.5], [0.25, 0.25, 0.25], [0.25, 0.75, 0.75], [0.75, 0.25, 0.75], [0.75, 0.75, 0.25]]</atomsXYZ>
+				<atomsFraction type="param">None</atomsFraction>
+				<tK type="param">0</tK>
+				<t type="param">None</t>
+				<factDW type="param">1.0</factDW>
+				<geom type="param">Laue reflected</geom>
+				<table type="param">Chantler total</table>
+				<nuPoisson type="param">0.0</nuPoisson>
+				<calcBorrmann type="param">None</calcBorrmann>
+				<useTT type="param">False</useTT>
+				<mosaicity type="param">0</mosaicity>
+			</properties>
+			<_object type="object">xrt.backends.raycing.materials.Powder</_object>
+		</powder01>
+	</Materials>
+	<beamLine type="value">
+		<properties type="prop">
+			<azimuth type="param">0.0</azimuth>
+			<height type="param">0.0</height>
+			<alignE type="param">auto</alignE>
+		</properties>
+		<_object type="object">xrt.backends.raycing.BeamLine</_object>
+		<undulator01 type="value">
+			<properties type="prop">
+				<bl type="param">beamLine</bl>
+				<name type="param">GenericSource</name>
+				<center type="param">(0, 0, 0)</center>
+				<pitch type="param">0</pitch>
+				<yaw type="param">0</yaw>
+				<nrays type="param">100000</nrays>
+				<eE type="param">3</eE>
+				<eI type="param">0.4</eI>
+				<eEspread type="param">0.00135</eEspread>
+				<eSigmaX type="param">None</eSigmaX>
+				<eSigmaZ type="param">None</eSigmaZ>
+				<eEpsilonX type="param">0.09586</eEpsilonX>
+				<eEpsilonZ type="param">0.009586</eEpsilonZ>
+				<betaX type="param">15.66</betaX>
+				<betaZ type="param">2.29</betaZ>
+				<xPrimeMax type="param">0.05</xPrimeMax>
+				<zPrimeMax type="param">0.05</zPrimeMax>
+				<xPrimeMaxAutoReduce type="param">True</xPrimeMaxAutoReduce>
+				<zPrimeMaxAutoReduce type="param">True</zPrimeMaxAutoReduce>
+				<distE type="param">eV</distE>
+				<targetE type="param">15000, 7</targetE>
+				<eMin type="param">14999</eMin>
+				<eMax type="param">15001</eMax>
+				<eN type="param">51</eN>
+				<K type="param">0</K>
+				<Kx type="param">0</Kx>
+				<Ky type="param">0</Ky>
+				<period type="param">15.6</period>
+				<n type="param">128</n>
+				<phaseDeg type="param">0</phaseDeg>
+				<taper type="param">None</taper>
+				<R0 type="param">None</R0>
+				<filamentBeam type="param">False</filamentBeam>
+				<uniformRayDensity type="param">False</uniformRayDensity>
+				<nx type="param">25</nx>
+				<nz type="param">25</nz>
+				<gp type="param">1e-6</gp>
+				<targetOpenCL type="param">(0, 0)</targetOpenCL>
+				<precisionOpenCL type="param">float32</precisionOpenCL>
+			</properties>
+			<_object type="object">xrt.backends.raycing.sources.Undulator</_object>
+			<shine type="prop">
+				<parameters type="prop">
+					<toGlobal type="param">True</toGlobal>
+					<withAmplitudes type="param">True</withAmplitudes>
+					<fixedEnergy type="param">False</fixedEnergy>
+					<wave type="param">None</wave>
+					<accuBeam type="param">None</accuBeam>
+				</parameters>
+				<_object type="object">xrt.backends.raycing.sources.Undulator.shine</_object>
+				<output type="prop">
+					<beamGlobal type="param">undulator01beamGlobal01</beamGlobal>
+				</output>
+			</shine>
+		</undulator01>
+		<plate01 type="value">
+			<properties type="prop">
+				<bl type="param">beamLine</bl>
+				<name type="param"></name>
+				<center type="param">[0, 20000, 0]</center>
+				<pitch type="param">np.pi</pitch>
+				<roll type="param">0</roll>
+				<yaw type="param">0</yaw>
+				<positionRoll type="param">0</positionRoll>
+				<extraPitch type="param">0</extraPitch>
+				<extraRoll type="param">0</extraRoll>
+				<extraYaw type="param">0</extraYaw>
+				<rotationSequence type="param">RzRyRx</rotationSequence>
+				<extraRotationSequence type="param">RzRyRx</extraRotationSequence>
+				<material type="param">powder01</material>
+				<alpha type="param">None</alpha>
+				<limPhysX type="param">[-1000.0, 1000.0]</limPhysX>
+				<limOptX type="param">None</limOptX>
+				<limPhysY type="param">[-1000.0, 1000.0]</limPhysY>
+				<limOptY type="param">None</limOptY>
+				<isParametric type="param">False</isParametric>
+				<shape type="param">rect</shape>
+				<gratingDensity type="param">None</gratingDensity>
+				<shouldCheckCenter type="param">False</shouldCheckCenter>
+				<wedgeAngle type="param">0</wedgeAngle>
+				<alarmLevel type="param">None</alarmLevel>
+				<t type="param">1</t>
+				<targetOpenCL type="param">(2, 0)</targetOpenCL>
+				<precisionOpenCL type="param">float32</precisionOpenCL>
+			</properties>
+			<_object type="object">xrt.backends.raycing.oes.Plate</_object>
+			<double_refract type="prop">
+				<parameters type="prop">
+					<beam type="param">undulator01beamGlobal01</beam>
+					<needLocal type="param">True</needLocal>
+					<returnLocalAbsorbed type="param">None</returnLocalAbsorbed>
+				</parameters>
+				<_object type="object">xrt.backends.raycing.oes.Plate.double_refract</_object>
+				<output type="prop">
+					<beamGlobal type="param">plate01beamGlobal01</beamGlobal>
+					<beamLocal1 type="param">plate01beamLocal101</beamLocal1>
+					<beamLocal2 type="param">plate01beamLocal201</beamLocal2>
+				</output>
+			</double_refract>
+		</plate01>
+	</beamLine>
+	<plots type="value">
+	</plots>
+	<run_ray_tracing type="prop">
+		<_object type="object">xrt.runner.run_ray_tracing</_object>
+		<plots type="param">plots</plots>
+		<repeats type="param">1</repeats>
+		<updateEvery type="param">1</updateEvery>
+		<pickleEvery type="param">None</pickleEvery>
+		<energyRange type="param">None</energyRange>
+		<backend type="param">raycing</backend>
+		<beamLine type="param">beamLine</beamLine>
+		<threads type="param">1</threads>
+		<processes type="param">1</processes>
+		<generator type="param">None</generator>
+		<generatorArgs type="param">[]</generatorArgs>
+		<generatorKWargs type="param">auto</generatorKWargs>
+		<globalNorm type="param">0</globalNorm>
+		<afterScript type="param">None</afterScript>
+		<afterScriptArgs type="param">[]</afterScriptArgs>
+		<afterScriptKWargs type="param">{}</afterScriptKWargs>
+	</run_ray_tracing>
+<description></description>
+</Project>
