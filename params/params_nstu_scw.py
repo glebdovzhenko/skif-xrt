@@ -32,20 +32,28 @@ monochromator_y_lim = [
 crl_mask_distance = 27500.0  # from source
 
 croc_crl_distance = 28000.0  # from source
-# Be
-# croc_crl_y_t = 1.228
-# croc_crl_L = 270
-# # Al
-# croc_crl_y_t = 0.29
-# croc_crl_L = 54
-# # Dia
-# croc_crl_y_t = 0.58
-# croc_crl_L = 50
-# # Gr
-# croc_crl_y_t = 0.58
-# croc_crl_L = 81
-# glassy carbon
-croc_crl_y_t = 0.6
-croc_crl_L = 115.0
-
+# not actually optimal
+optimal_croc_geometry = {
+    "Be": {"y_t": 0.7, "L": 110.0},  # Beryllium
+    "Al": {"y_t": 0.3, "L": 55.0},  # Aluminium
+    "Dia": {"y_t": 0.6, "L": 50.0},  # Diamond
+    "GC": {"y_t": 0.6, "L": 115.0},  # Glassy carbon
+}
+# geometries that have 68, 87, and 95 percent of the absorption aperture
+# covered by the physical aperture
+croc_geometry_68_percent = {
+    "Be": {"y_t": 0.5, "L": 130.0},  # Beryllium
+    "Al": {"y_t": 0.2, "L": 60.0},  # Aluminium
+    "GC": {"y_t": 0.4, "L": 120.0},  # Glassy carbon
+}
+croc_geometry_87_percent = {
+    "Be": {"y_t": 0.7, "L": 280.0},  # Beryllium
+    "Al": {"y_t": 0.3, "L": 70.0},  # Aluminium
+    "GC": {"y_t": 0.6, "L": 250.0},  # Glassy carbon
+}
+croc_geometry_95_percent = {
+    "Be": {"y_t": 0.9, "L": 470.0},  # Beryllium
+    "Al": {"y_t": 0.4, "L": 120.0},  # Aluminium
+    "GC": {"y_t": 0.8, "L": 440.0},  # Glassy carbon
+}
 exit_slit_distance = 56000.0  # from source
