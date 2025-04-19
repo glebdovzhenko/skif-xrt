@@ -36,6 +36,7 @@ crystalSi01 = rmats.CrystalSi(
 
 powder01 = rmats.Powder(
     chi=[0, 6.283185307179586],
+    name=None,
     hkl=[7, 7, 7],
     a=5.256,
     atoms=[58, 58, 58, 58, 8, 8, 8, 8, 8, 8, 8, 8],
@@ -103,11 +104,13 @@ def build_beamline():
 
     beamLine.rectangularAperture01 = rapts.RectangularAperture(
         bl=beamLine,
+        name=None,
         center=[0, 55990, 25],
         opening=[-0.068, 0.068, -0.69, 0.69])
 
     beamLine.lauePlate01 = roes.LauePlate(
         bl=beamLine,
+        name=None,
         center=[0, 55000, 25],
         pitch=1.5707963267948966,
         material=powder01,
@@ -116,10 +119,12 @@ def build_beamline():
 
     beamLine.roundBeamStop01 = rapts.RoundBeamStop(
         bl=beamLine,
+        name=None,
         center=[0, 56499, 25])
 
     beamLine.screen03 = rscreens.Screen(
         bl=beamLine,
+        name=None,
         center=[0, 56500, 25])
 
     return beamLine
@@ -264,8 +269,7 @@ def define_plots():
             unit=r"eV",
             bins=256,
             ppb=1),
-        title=r"DETECTOR",
-        persistentName=r"sagittal_f_60keV_detector.npy")
+        title=r"DETECTOR")
     plots.append(plot05)
     return plots
 
@@ -278,7 +282,7 @@ def main():
     plots = define_plots()
     xrtrun.run_ray_tracing(
         plots=plots,
-        repeats=1000,
+        repeats=10,
         backend=r"raycing",
         beamLine=beamLine)
 
