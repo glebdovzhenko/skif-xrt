@@ -62,8 +62,8 @@ def build_beamline():
         betaZ=2.29,
         xPrimeMax=1,
         zPrimeMax=0.1,
-        eMin=59500,
-        eMax=60500,
+        eMin=59850,
+        eMax=60150,
         eN=101,
         K=20.1685,
         period=48.0,
@@ -269,7 +269,8 @@ def define_plots():
             unit=r"eV",
             bins=256,
             ppb=1),
-        title=r"DETECTOR")
+        title=r"DETECTOR",
+        persistentName=r"sagittal_f_60keV_detector.npy")
     plots.append(plot05)
     return plots
 
@@ -282,7 +283,7 @@ def main():
     plots = define_plots()
     xrtrun.run_ray_tracing(
         plots=plots,
-        repeats=10,
+        repeats=10000,
         backend=r"raycing",
         beamLine=beamLine)
 

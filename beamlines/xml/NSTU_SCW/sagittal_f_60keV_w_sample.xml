@@ -92,8 +92,8 @@
 			<xPrimeMax type="param">1</xPrimeMax>
 			<zPrimeMax type="param">0.1</zPrimeMax>
 			<distE type="param">eV</distE>
-			<eMin type="param">59500</eMin>
-			<eMax type="param">60500</eMax>
+			<eMin type="param">59850</eMin>
+			<eMax type="param">60150</eMax>
 			<eN type="param">101</eN>
 			<K type="param">20.1685</K>
 			<period type="param">48.0</period>
@@ -718,7 +718,7 @@
 		<contourFmt type="param">%.1f</contourFmt>
 		<contourFactor type="param">1.0</contourFactor>
 		<saveName type="param">None</saveName>
-		<persistentName type="param">None</persistentName>
+		<persistentName type="param">sagittal_f_60keV_detector.npy</persistentName>
 		<oe type="param">None</oe>
 		<raycingParam type="param">0</raycingParam>
 		<beamState type="param">None</beamState>
@@ -729,7 +729,7 @@
 <run_ray_tracing type="prop">
 	<_object type="object">xrt.runner.run_ray_tracing</_object>
 	<plots type="param">plots</plots>
-	<repeats type="param">10</repeats>
+	<repeats type="param">10000</repeats>
 	<updateEvery type="param">1</updateEvery>
 	<pickleEvery type="param">None</pickleEvery>
 	<energyRange type="param">None</energyRange>
