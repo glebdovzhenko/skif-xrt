@@ -111,7 +111,7 @@ def build_beamline():
     beamLine.lauePlate01 = roes.LauePlate(
         bl=beamLine,
         name=None,
-        center=[0, 55000, 25],
+        center=[0, 56000, 25],
         pitch=1.5707963267948966,
         material=powder01,
         targetOpenCL=[0, 0],

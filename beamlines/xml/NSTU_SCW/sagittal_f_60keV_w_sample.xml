@@ -283,7 +283,7 @@
 		<properties type="prop">
 			<bl type="param">beamLine</bl>
 			<name type="param">None</name>
-			<center type="param">[0, 55000, 25]</center>
+			<center type="param">[0, 56000, 25]</center>
 			<pitch type="param">np.pi/2</pitch>
 			<roll type="param">0</roll>
 			<yaw type="param">0</yaw>
