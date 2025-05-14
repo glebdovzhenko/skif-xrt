@@ -12,9 +12,9 @@ front_end_opening = [
 
 filter_distance = 23000  # from source
 diamond_filter_th = 0.5  # mm
-diamond_filter_N = 15
-sic_filter_th = 0.5
-sic_filter_N = 7
+diamond_filter_N = 5
+sic_filter_th = 0.35
+sic_filter_N = 5
 filter_size_z = 10.0  # mm
 filter_size_x = 50.0  # mm
 
@@ -56,4 +56,5 @@ croc_geometry_95_percent = {
     "Al": {"y_t": 0.4, "L": 120.0},  # Aluminium
     "GC": {"y_t": 0.8, "L": 440.0},  # Glassy carbon
 }
+croc_geometry_BSU = {"Be": {"y_t": 0.850, "L": 310, "N": 178}}
 exit_slit_distance = 56000.0  # from source

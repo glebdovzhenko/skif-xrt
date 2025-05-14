@@ -19,6 +19,7 @@ from params.params_nstu_scw import (
     croc_geometry_68_percent,
     croc_geometry_87_percent,
     croc_geometry_95_percent,
+    croc_geometry_BSU,
 )
 
 # matplotlib.use("agg")
@@ -91,23 +92,11 @@ def onept(bl: NSTU_SCW, plts: List):
     70 keV, r1r2 = -870, focal = 12000, offset=955
     90 keV, r1r2 = -670, focal = 12300
     """
-    en = 30.0e3
-    croc_focal = 11500
-    r1, r2 = -2040, -2040
-    d_en = 150.0
-    geom = croc_geometry_87_percent["GC"]
 
-    bl.align_source(en, d_en)
     bl.set_effective_filters()
-    y_g = PrismaticLens.calc_y_g(
-        bl.LensMaterial, croc_focal, en, geom["y_t"], geom["L"]
-    )
-    bl.align_crl(geom["L"], 100, geom["y_t"], y_g, 0.0)
+    bl.align_30_keV_2()
+    bl.SuperCWiggler.nrays = 100000
 
-    bl.align_front_end(
-        dzprime=2.0 * min(geom["y_t"], y_g) / bl.CrocLensStack[0].center[1]
-    )
-    bl.align_mono(en, r1, -6.0 * r1, r2, -6.0 * r2, c1_en_offset=0.0, c2_en_offset=-0.0)
     for plot in plts:
         plot.xaxis.limits = None
         plot.yaxis.limits = None
@@ -146,11 +135,11 @@ def y_g_scan_plots(*args, **kwargs):
 
     result = []
     for beam, t1 in (
-        ("BeamSourceLocal", "SRC"),
-        ("BeamAperture1Local", "FE"),
+        # ("BeamSourceLocal", "SRC"),
+        # ("BeamAperture1Local", "FE"),
         ("BeamLensExitLocal", "CRL"),
         ("BeamMonoC1Local", "C1"),
-        ("BeamMonitor1Local", "C1C2"),
+        # ("BeamMonitor1Local", "C1C2"),
         ("BeamMonoC2Local", "C2"),
         ("BeamMonitor2Local", "FM"),
     ):
@@ -183,19 +172,21 @@ def y_g_scan(bl: NSTU_SCW, plts: List):
     70 keV, r1r2 = -870, focal = 12000
     90 keV, r1r2 = -670, focal = 12300
     """
-    en = 90.0e3
-    r1, r2 = -670, -670
-    d_en = 1.0
-    bl.align_source(en, d_en)
+    en = 30.0e3
+    bl.align_30_keV()
+    # r1, r2 = -670, -670
+    # d_en = 1.0
+    # bl.align_source(en, d_en)
     bl.align_front_end()
-    bl.align_mono(en, r1, -6.0 * r1, r2, -6.0 * r2, c1_en_offset=90, c2_en_offset=-90)
-    geom = croc_geometry_95_percent["GC"]
+    bl.ExitSlit.opening = [-100, 100, -100, 100]
+    # bl.align_mono(en, r1, -6.0 * r1, r2, -6.0 * r2, c1_en_offset=90, c2_en_offset=-90)
+    geom = croc_geometry_BSU["Be"]
     result = {"focal": [], "dz": []}
-    for focal in np.linspace(10000, 14000, 15):
+    for focal in np.linspace(11000, 13000, 15):
         y_g = PrismaticLens.calc_y_g(bl.LensMaterial, focal, en, geom["y_t"], geom["L"])
-        bl.align_crl(geom["L"], 50, geom["y_t"], y_g, 0.0)
+        bl.align_crl(L=geom["L"], N=geom["N"], d=geom["y_t"], g_f=y_g, g_l=0.0)
         bl.align_front_end(
-            dzprime=min(geom["y_t"], y_g) / bl.CrocLensStack[0].center[1]
+            dzprime=2.0 * min(geom["y_t"], y_g) / bl.CrocLensStack[0].center[1]
         )
         for plot in plts:
             plot.xaxis.limits = None
@@ -502,10 +493,10 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
 # ################################## RUN ######################################
 if __name__ == "__main__":
     beamline = NSTU_SCW()
-    scan = onept
-    plot_gen = onept_plots
-    show = True
-    repeats = 4
+    scan = y_g_scan
+    plot_gen = y_g_scan_plots
+    show = False
+    repeats = 5
 
     if show:
         beamline.glow(

@@ -13,6 +13,7 @@ import xrt.runner as xrtrun
 from params.params_nstu_scw import (
     croc_crl_distance,
     optimal_croc_geometry,
+    croc_geometry_BSU,
     monochromator_x_lim,
     monochromator_y_lim,
 )
@@ -21,9 +22,11 @@ from components import PrismaticLens
 
 # ################################ MATERIALS ##################################
 mGlassyCarbon = rm.Material("C", rho=1.50, kind="lens")
-lens_material = mGlassyCarbon
-crl_y_t = 1.0 * optimal_croc_geometry["GC"]["y_t"]
-crl_L = 1.0 * optimal_croc_geometry["GC"]["L"]
+mBeryllium = rm.Material("Be", rho=1.848, kind="lens")
+lens_material = mBeryllium
+crl_y_t = croc_geometry_BSU["Be"]["y_t"]
+crl_L = croc_geometry_BSU["Be"]["L"]
+crl_N = croc_geometry_BSU["Be"]["N"]
 
 
 # ############################ SETUP PARAMETERS ###############################
@@ -53,7 +56,7 @@ class CrlTest(raycing.BeamLine):
         crl_y_g = PrismaticLens.calc_y_g(lens_material, fdist, en, crl_y_t, crl_L)
         self.CrocLensStack = PrismaticLens.make_stack(
             L=crl_L,
-            N=int(crl_L),
+            N=crl_N,
             d=crl_y_t,
             g_last=0.0,
             g_first=crl_y_g,

@@ -31,7 +31,7 @@ in
 pkgs.mkShell rec {
   name = "skif-xrt";
   venvDir = "./.venv";
-  nativeBuildInputs = [ qt5.qttools.dev cmake ];
+  nativeBuildInputs = [ qt5.qttools.dev cmake blas];
 
   buildInputs = [
     # adaptive deps
@@ -52,6 +52,7 @@ pkgs.mkShell rec {
     # xrt deps
     pythonPackages.matplotlib
     pythonPackages.pyqtwebengine
+    #pythonPackages.pyqt5-webkit
     pythonPackages.pyqt5
     pythonPackages.setuptools
     pythonPackages.pyopencl
@@ -74,6 +75,10 @@ pkgs.mkShell rec {
     pip install jupyterlab
     pip install ipympl
     pip install "adaptive[notebook]"
+    pip install siphash24
+    pip install pymc
+    pip install bambi
+    pip install arviz
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
     jupyter labextension install @pyviz/jupyterlab_pyviz
     python -m ipykernel install --user --name=${name}

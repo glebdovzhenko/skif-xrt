@@ -12,7 +12,7 @@ import xrt.backends.raycing.sources as rsources
 from components import BentLaueParaboloid, PrismaticLens
 from params.params_nstu_scw import (
     croc_crl_distance,
-    optimal_croc_geometry,
+    croc_geometry_BSU,
     diamond_filter_N,
     diamond_filter_th,
     exit_slit_distance,
@@ -47,13 +47,17 @@ cr_si_1 = rm.CrystalSi(
     hkl=(1, 1, 1),
     geom="Laue reflected",
     useTT=True,
+    volumetricDiffraction=True,
     t=monochromator_c1_thickness,
+    name=None,
 )
 cr_si_2 = rm.CrystalSi(
     hkl=(1, 1, 1),
     geom="Laue reflected",
     useTT=True,
+    volumetricDiffraction=True,
     t=monochromator_c2_thickness,
+    name=None,
 )
 
 mBeryllium = rm.Material("Be", rho=1.848, kind="lens")
@@ -63,9 +67,7 @@ mGraphite = rm.Material("C", rho=2.15, kind="lens")
 mGlassyCarbon = rm.Material("C", rho=1.50, kind="lens")
 mDiamondF = rm.Material("C", rho=3.5, kind="lens")
 mSiC = rm.Material(("Si", "C"), quantities=(1, 1), rho=3.16, kind="lens")
-lens_material = mGlassyCarbon
-crl_y_t = optimal_croc_geometry["GC"]["y_t"]
-crl_L = optimal_croc_geometry["GC"]["L"]
+lens_material = mBeryllium
 
 
 # ################################ BEAMLINE ###################################
@@ -109,32 +111,15 @@ class NSTU_SCW(raycing.BeamLine):
         self.set_filter_stacks()
 
         self.LensMaterial = lens_material
-        self.LensLength = crl_L
-        self.LensHeight = crl_y_t
-        fdist = croc_crl_distance / 2.0
-        crl_y_g = PrismaticLens.calc_y_g(
-            self.LensMaterial, fdist, 30e3, self.LensHeight, self.LensLength
-        )
-        self.CrocLensStack = PrismaticLens.make_stack(
-            L=crl_L,
-            N=int(crl_L),
-            d=crl_y_t,
-            g_last=0.0,
-            g_first=crl_y_g,
-            bl=self,
-            center=[0.0, croc_crl_distance, 0],
-            material=self.LensMaterial,
-            limPhysX=monochromator_x_lim,
-            limPhysY=monochromator_y_lim,
-        )
+        self.CrocLensStack = []
 
         self.CrlMonitor = rscreens.Screen(
             bl=self,
             name=r"Lens Monitor",
-            center=[0, self.CrocLensStack[-1].center[1] + 10, 0],
+            center=[0, croc_crl_distance, 0],
         )
 
-        self.MonochromatorCr1 = BentLaueParaboloid(
+        self.MonochromatorCr1 = roe.BentLaue2D(
             bl=self,
             name=r"Si[111] Crystal 1",
             center=[0.0, monochromator_distance, 0.0],
@@ -142,8 +127,7 @@ class NSTU_SCW(raycing.BeamLine):
             roll=0.0,
             yaw=0.0,
             alpha=monochromator_c1_alpha,
-            material=(cr_si_1,),
-            r_for_refl="x",
+            material=cr_si_1,
             targetOpenCL="CPU",
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
@@ -157,7 +141,7 @@ class NSTU_SCW(raycing.BeamLine):
             center=[0, monochromator_distance, 0.5 * monochromator_z_offset],
         )
 
-        self.MonochromatorCr2 = BentLaueParaboloid(
+        self.MonochromatorCr2 = roe.BentLaue2D(
             bl=self,
             name=r"Si[111] Crystal 2",
             center=[0.0, monochromator_distance, monochromator_z_offset],
@@ -166,8 +150,7 @@ class NSTU_SCW(raycing.BeamLine):
             roll=0.0,
             yaw=0.0,
             alpha=monochromator_c2_alpha,
-            material=(cr_si_2,),
-            r_for_refl="x",
+            material=cr_si_2,
             targetOpenCL="CPU",
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
@@ -177,7 +160,7 @@ class NSTU_SCW(raycing.BeamLine):
 
         self.ExitSlit = rapts.RectangularAperture(
             bl=self,
-            name=r"Front End Slit",
+            name=r"Exit Slit",
             center=[0, exit_slit_distance, monochromator_z_offset],
             opening=front_end_opening,
         )
@@ -272,6 +255,8 @@ class NSTU_SCW(raycing.BeamLine):
             -front_end_distance * np.tan(dzprime / 2.0),
             front_end_distance * np.tan(dzprime / 2.0),
         ]
+        self.SuperCWiggler.xPrimeMax = 1e3 * dxprime / 2.0
+        self.SuperCWiggler.zPrimeMax = 1e3 * dzprime / 2.0
 
     def align_crl(self, L, N, d, g_f, g_l):
         del self.CrocLensStack[:]
@@ -287,6 +272,8 @@ class NSTU_SCW(raycing.BeamLine):
             limPhysX=monochromator_x_lim,
             limPhysY=monochromator_y_lim,
         )
+
+        self.CrlMonitor.center = [0, self.CrocLensStack[-1].center[1] + 10, 0]
 
     def align_mono(self, en, R1x, R1y, R2x, R2y, c1_en_offset=0.0, c2_en_offset=0.0):
         self.MonochromatorCr1.Rx = R1x
@@ -318,6 +305,94 @@ class NSTU_SCW(raycing.BeamLine):
             + 0.5 * monochromator_z_offset / np.tan(2.0 * theta0),
             0.5 * monochromator_z_offset,
         ]
+
+    def align_30_keV(self):
+        """
+        Assuming Rm / Rs = 6.
+        """
+        self.SuperCWiggler.xPrimeMax = 1.0
+        self.SuperCWiggler.zPrimeMax = 0.1
+        self.SuperCWiggler.eMin = 29950.0
+        self.SuperCWiggler.eMax = 30050
+        self.SuperCWiggler.eN = 101
+
+        self.MonochromatorCr1.center = [0.0, 33000.0, 0.0]
+        self.MonochromatorCr1.pitch = 2.252850
+        self.MonochromatorCr1.alpha = np.radians(35.3)
+        self.MonochromatorCr1.Rm = 2060.0 * 6
+        self.MonochromatorCr1.Rs = -2060.0
+
+        self.MonochromatorCr2.center = [0.0, 33189.355, 25.0]
+        self.MonochromatorCr2.pitch = 2.120950
+        self.MonochromatorCr2.alpha = np.radians(35.3)
+        self.MonochromatorCr2.positionRoll = np.pi
+        self.MonochromatorCr2.Rm = 2060.0 * 6
+        self.MonochromatorCr2.Rs = -2060.0
+
+        self.Cr1Monitor.center = [
+            0.0,
+            33094.678,
+            12.5,
+        ]
+
+        self.LensMaterial = mBeryllium
+        self.align_crl(
+            L=croc_geometry_BSU["Be"]["L"],
+            N=croc_geometry_BSU["Be"]["N"],
+            d=croc_geometry_BSU["Be"]["y_t"],
+            g_f=1.587,
+            g_l=0.0,
+        )
+
+        self.align_front_end(
+            dzprime=2.0
+            * croc_geometry_BSU["Be"]["y_t"]
+            / self.CrocLensStack[0].center[1]
+        )
+
+    def align_30_keV_2(self):
+        """
+        Assuming Rm / Rs = 12. f croc = 8150
+        """
+        self.SuperCWiggler.xPrimeMax = 1.0
+        self.SuperCWiggler.zPrimeMax = 0.1
+        self.SuperCWiggler.eMin = 29950.0
+        self.SuperCWiggler.eMax = 30050
+        self.SuperCWiggler.eN = 101
+
+        self.MonochromatorCr1.center = [0.0, 33000.0, 0.0]
+        self.MonochromatorCr1.pitch = 2.252815
+        self.MonochromatorCr1.alpha = np.radians(35.3)
+        self.MonochromatorCr1.Rm = 2060.0 * 12
+        self.MonochromatorCr1.Rs = -2060.0
+
+        self.MonochromatorCr2.center = [0.0, 33189.355, 25.0]
+        self.MonochromatorCr2.pitch = 2.120988
+        self.MonochromatorCr2.alpha = np.radians(35.3)
+        self.MonochromatorCr2.positionRoll = np.pi
+        self.MonochromatorCr2.Rm = 2060.0 * 12
+        self.MonochromatorCr2.Rs = -2060.0
+
+        self.Cr1Monitor.center = [
+            0.0,
+            33094.678,
+            12.5,
+        ]
+
+        self.LensMaterial = mBeryllium
+        self.align_crl(
+            L=croc_geometry_BSU["Be"]["L"],
+            N=croc_geometry_BSU["Be"]["N"],
+            d=croc_geometry_BSU["Be"]["y_t"],
+            g_f=1.587,
+            g_l=0.0,
+        )
+
+        self.align_front_end(
+            dzprime=2.0
+            * croc_geometry_BSU["Be"]["y_t"]
+            / self.CrocLensStack[0].center[1]
+        )
 
 
 # ############################# BEAM TOPOLOGY #################################
@@ -385,7 +460,7 @@ def run_process(bl: NSTU_SCW):
             outDict["BeamFilterSiCLocal2a" + strl] = llocal2a
             beamIn = lglobal
 
-    # CRL
+    # # CRL
     for ilens, lens in enumerate(bl.CrocLensStack):
         lglobal, llocal1, llocal2 = lens.double_refract(beamIn, needLocal=True)
         strl = "_{0:02d}".format(ilens)

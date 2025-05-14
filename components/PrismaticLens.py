@@ -234,7 +234,7 @@ class PrismaticLens(roe.Plate):
                     y_g_first=g_first,
                     y_g_last=g_last,
                     ii=ii,
-                    **kwargs
+                    **kwargs,
                 )
             )
         return result

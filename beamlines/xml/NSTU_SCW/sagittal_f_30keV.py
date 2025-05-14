@@ -2,7 +2,7 @@
 """
 
 __author__ = "Konstantin Klementiev", "Roman Chernikov"
-__date__ = "2025-04-22"
+__date__ = "2025-05-13"
 
 Created with xrtQook
 
@@ -13,7 +13,7 @@ Created with xrtQook
 
 import numpy as np
 import sys
-sys.path.append(r"D:\miniconda3\Lib\site-packages")
+sys.path.append(r"/nix/store/mii96qf5vy744b67qmqgdars3iqjjpvv-python3.12-xrt-1.6.1/lib/python3.12/site-packages")
 import xrt.backends.raycing.sources as rsources
 import xrt.backends.raycing.screens as rscreens
 import xrt.backends.raycing.materials as rmats
@@ -219,7 +219,8 @@ def main():
     plots = define_plots()
     xrtrun.run_ray_tracing(
         plots=plots,
-        repeats=10,
+        repeats=100,
+        pickleEvery=1,
         backend=r"raycing",
         beamLine=beamLine)
 

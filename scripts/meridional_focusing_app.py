@@ -1,3 +1,13 @@
+"""
+## Caciuffo Melone Rustichelli Boeuf
+$$
+R_s = \frac{2pq \cdot \sin \theta}{(p+q)}
+$$
+$$
+R_m = \frac{pq}{R_s \cdot \cos \theta} \sqrt{1 - R_s^2 / pq}
+$$
+"""
+
 import numpy as np
 import plotly.graph_objects as go
 from copy import deepcopy
