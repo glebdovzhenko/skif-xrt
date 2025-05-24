@@ -1,70 +1,42 @@
 with import <nixpkgs> { };
 
-let
-  pythonPackages = python3Packages;
-  #xrt =
-  #  let
-  #    pname = "xrt";
-  #    version = "1.6.0";
-  #    extension = "zip";
-  #  in
-  #  python3Packages.buildPythonPackage {
-  #    inherit pname version;
-  #    src = fetchPypi {
-  #      inherit pname version extension;
-  #      sha256 = "1a2e19306abd67a4b45c8b9c4e05d7fb2d8a5836b82e08749d935bf4314599dc";
-  #    };
-  #    doCheck = false;
-  xrt = pythonPackages.buildPythonPackage {
-      pname = "xrt";
-      version = "1.6.1";
-    src = fetchFromGitHub {
-        owner = "kklmn";
-        repo = "xrt";
-        rev = "43a229b98c49669378e2e2127ba00ac9217de451";
-        sha256 = "sha256-BfMfAx/sN3Uf/JxY41DzDce0yAotFeI9o//wINeOVEM=";
-      };
-
-  };
-
-in
 pkgs.mkShell rec {
   name = "skif-xrt";
   venvDir = "./.venv";
-  nativeBuildInputs = [ qt5.qttools.dev cmake blas];
+  nativeBuildInputs = [ qt5.qttools.dev cmake blas ];
 
   buildInputs = [
     # adaptive deps
-    pythonPackages.python
-    pythonPackages.venvShellHook
-    pythonPackages.numpy
-    pythonPackages.scipy
-    pythonPackages.pandas
-    pythonPackages.ipykernel
-    pythonPackages.ipywidgets
-    pythonPackages.pyviz-comms
-    pythonPackages.bokeh
-    pythonPackages.mpi4py
-    pythonPackages.cmake
-    pythonPackages.scikit-build
-    pythonPackages.selenium
+    python3Packages.python
+    python3Packages.venvShellHook
+    python3Packages.numpy
+    python3Packages.scipy
+    python3Packages.pandas
+    python3Packages.ipykernel
+    python3Packages.ipywidgets
+    python3Packages.pyviz-comms
+    python3Packages.bokeh
+    python3Packages.mpi4py
+    python3Packages.cmake
+    python3Packages.scikit-build
+    python3Packages.selenium
     stdenv
     # xrt deps
-    pythonPackages.matplotlib
-    pythonPackages.pyqtwebengine
-    #pythonPackages.pyqt5-webkit
-    pythonPackages.pyqt5
-    pythonPackages.setuptools
-    pythonPackages.pyopencl
-    pythonPackages.pyopengl
-    pythonPackages.pyopengl-accelerate
-    pythonPackages.colorama
-    xrt
+    python3Packages.matplotlib
+    python3Packages.pyqtwebengine
+    #python3Packages.pyqt5-webkit
+    python3Packages.pyqt5
+    python3Packages.setuptools
+    python3Packages.pyopencl
+    python3Packages.pyopengl
+    python3Packages.pyopengl-accelerate
+    python3Packages.colorama
+    (callPackage ~/nixos-config/pkgs/xrt { })
     # my deps
-    pythonPackages.gitpython
-    pythonPackages.uncertainties
-    pythonPackages.plotly
-    pythonPackages.dash
+    python3Packages.gitpython
+    python3Packages.uncertainties
+    python3Packages.plotly
+    python3Packages.dash
 
   ];
 
