@@ -1,6 +1,12 @@
 with import <nixpkgs> { };
-
-pkgs.mkShell rec {
+let 
+  glebpkgs = fetchFromGitHub{
+    owner = "glebdovzhenko";
+    repo = "nixos-config";
+    rev = "56289601413a1b2befccfd5d342a2dabaa4e7218";
+    sha256 = "sha256-UrLRWqz3KgcALtMmeFmqmxZUoh0iG8u/s3bYZwHRP60=";
+  };
+in pkgs.mkShell rec {
   name = "skif-xrt";
   venvDir = "./.venv";
   nativeBuildInputs = [ qt5.qttools.dev cmake blas ];
@@ -31,13 +37,13 @@ pkgs.mkShell rec {
     python3Packages.pyopengl
     python3Packages.pyopengl-accelerate
     python3Packages.colorama
-    (callPackage ~/nixos-config/pkgs/xrt { })
+    (callPackage "${glebpkgs}/pkgs/xrt" { })
+
     # my deps
     python3Packages.gitpython
     python3Packages.uncertainties
     python3Packages.plotly
     python3Packages.dash
-
   ];
 
   # Run this command, only after creating the virtual environment
@@ -61,7 +67,6 @@ pkgs.mkShell rec {
   postShellHook = ''
     # allow pip to install wheels
     unset SOURCE_DATE_EPOCH
-    chmod -R 777 /home/glebd/.xrt
   '';
   QT_QPA_PLATFORM_PLUGIN_PATH = "${qt5.qtbase.bin}/lib/qt-${qt5.qtbase.version}/plugins";
 
