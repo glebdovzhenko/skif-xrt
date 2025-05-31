@@ -52,8 +52,8 @@ def build_beamline():
         betaZ=2.29,
         xPrimeMax=1,
         zPrimeMax=0.1,
-        eMin=29850,
-        eMax=30150,
+        eMin=28500,
+        eMax=31500,
         eN=101,
         K=20.1685,
         period=48.0,
@@ -73,33 +73,17 @@ def build_beamline():
         name=None,
         center=[0, 33000, 0],
         pitch=2.25285,
+        roll=1.5707963267948966,
         material=crystalSi01,
         alpha=0.6161012259539983,
-        Rm=12360.0,
-        Rs=-2060,
+        Rm=-24300.0,
+        Rs=10000000000.0,
         targetOpenCL=[2, 0])
 
     beamLine.screenDCMC1 = rscreens.Screen(
         bl=beamLine,
         name=None,
-        center=[0, 33020, 0])
-
-    beamLine.dcmC2 = roes.BentLaue2D(
-        bl=beamLine,
-        name=None,
-        center=[0, 33189.355, 25],
-        pitch=2.12095,
-        positionRoll=3.141592653589793,
-        material=crystalSi01,
-        alpha=0.6161012259539983,
-        Rm=12360.0,
-        Rs=-2060,
-        targetOpenCL=[2, 0])
-
-    beamLine.screenDCMC2 = rscreens.Screen(
-        bl=beamLine,
-        name=None,
-        center=[0, 33200, 25])
+        center=[r"auto", 41000, 0])
 
     return beamLine
 
@@ -119,22 +103,13 @@ def run_process(beamLine):
     screen02beamLocal01 = beamLine.screenDCMC1.expose(
         beam=bentLaue2D01beamGlobal01)
 
-    bentLaue2D02beamGlobal01, bentLaue2D02beamLocal01 = beamLine.dcmC2.reflect(
-        beam=bentLaue2D01beamGlobal01)
-
-    screen03beamLocal01 = beamLine.screenDCMC2.expose(
-        beam=bentLaue2D02beamGlobal01)
-
     outDict = {
         'wiggler01beamGlobal01': wiggler01beamGlobal01,
         'screen04beamLocal01': screen04beamLocal01,
         'screen01beamLocal01': screen01beamLocal01,
         'bentLaue2D01beamGlobal01': bentLaue2D01beamGlobal01,
         'bentLaue2D01beamLocal01': bentLaue2D01beamLocal01,
-        'screen02beamLocal01': screen02beamLocal01,
-        'bentLaue2D02beamGlobal01': bentLaue2D02beamGlobal01,
-        'bentLaue2D02beamLocal01': bentLaue2D02beamLocal01,
-        'screen03beamLocal01': screen03beamLocal01}
+        'screen02beamLocal01': screen02beamLocal01}
     return outDict
 
 
@@ -205,26 +180,6 @@ def define_plots():
         persistentName=r"dcm_30keV_c1_xz.npy")
     plots.append(plot07)
 
-    plot10 = xrtplot.XYCPlot(
-        beam=r"screen03beamLocal01",
-        xaxis=xrtplot.XYCAxis(
-            label=r"x",
-            bins=512,
-            ppb=1),
-        yaxis=xrtplot.XYCAxis(
-            label=r"z",
-            bins=512,
-            ppb=1),
-        caxis=xrtplot.XYCAxis(
-            label=r"energy",
-            unit=r"eV",
-            bins=512,
-            ppb=1),
-        aspect=r"auto",
-        title=r"C2 XZ",
-        persistentName=r"dcm_30keV_c2_xz.npy")
-    plots.append(plot10)
-
     plot02 = xrtplot.XYCPlot(
         beam=r"screen04beamLocal01",
         xaxis=xrtplot.XYCAxis(
@@ -288,27 +243,6 @@ def define_plots():
         persistentName=r"dcm_30keV_c1_fx.npy")
     plots.append(plot08)
 
-    plot11 = xrtplot.XYCPlot(
-        beam=r"screen03beamLocal01",
-        xaxis=xrtplot.XYCAxis(
-            label=r"x",
-            bins=512,
-            ppb=1),
-        yaxis=xrtplot.XYCAxis(
-            label=r"x'",
-            unit=r"",
-            bins=512,
-            ppb=1),
-        caxis=xrtplot.XYCAxis(
-            label=r"energy",
-            unit=r"eV",
-            bins=512,
-            ppb=1),
-        aspect=r"auto",
-        title=r"C2 FX",
-        persistentName=r"dcm_30keV_c2_fx.npy")
-    plots.append(plot11)
-
     plot03 = xrtplot.XYCPlot(
         beam=r"screen04beamLocal01",
         xaxis=xrtplot.XYCAxis(
@@ -371,27 +305,6 @@ def define_plots():
         title=r"C1 FZ",
         persistentName=r"dcm_30keV_c1_fz.npy")
     plots.append(plot09)
-
-    plot12 = xrtplot.XYCPlot(
-        beam=r"screen03beamLocal01",
-        xaxis=xrtplot.XYCAxis(
-            label=r"z",
-            bins=512,
-            ppb=1),
-        yaxis=xrtplot.XYCAxis(
-            label=r"z'",
-            unit=r"",
-            bins=512,
-            ppb=1),
-        caxis=xrtplot.XYCAxis(
-            label=r"energy",
-            unit=r"eV",
-            bins=512,
-            ppb=1),
-        aspect=r"auto",
-        title=r"C2 FZ",
-        persistentName=r"dcm_30keV_c2_fz.npy")
-    plots.append(plot12)
     return plots
 
 
@@ -403,7 +316,7 @@ def main():
     plots = define_plots()
     xrtrun.run_ray_tracing(
         plots=plots,
-        repeats=100,
+        repeats=10,
         pickleEvery=1,
         backend=r"raycing",
         beamLine=beamLine)
