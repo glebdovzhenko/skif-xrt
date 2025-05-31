@@ -94,7 +94,7 @@ def onept(bl: NSTU_SCW, plts: List):
     """
 
     bl.set_effective_filters()
-    bl.align_30_keV_2()
+    bl.align_90_keV()
     bl.SuperCWiggler.nrays = 100000
 
     for plot in plts:
@@ -172,8 +172,8 @@ def y_g_scan(bl: NSTU_SCW, plts: List):
     70 keV, r1r2 = -870, focal = 12000
     90 keV, r1r2 = -670, focal = 12300
     """
-    en = 30.0e3
-    bl.align_30_keV()
+    en = 60.0e3
+    bl.align_60_keV()
     # r1, r2 = -670, -670
     # d_en = 1.0
     # bl.align_source(en, d_en)
@@ -182,7 +182,7 @@ def y_g_scan(bl: NSTU_SCW, plts: List):
     # bl.align_mono(en, r1, -6.0 * r1, r2, -6.0 * r2, c1_en_offset=90, c2_en_offset=-90)
     geom = croc_geometry_BSU["Be"]
     result = {"focal": [], "dz": []}
-    for focal in np.linspace(11000, 13000, 15):
+    for focal in np.linspace(11000, 14000, 15):
         y_g = PrismaticLens.calc_y_g(bl.LensMaterial, focal, en, geom["y_t"], geom["L"])
         bl.align_crl(L=geom["L"], N=geom["N"], d=geom["y_t"], g_f=y_g, g_l=0.0)
         bl.align_front_end(
@@ -198,7 +198,7 @@ def y_g_scan(bl: NSTU_SCW, plts: List):
             #     plot.yaxis.limits = [-0.5, 0.5]
         yield
         result["focal"].append(focal)
-        print(f"Fdist = {focal}")
+        print(f"Fdist = {focal}, y_g = {y_g}")
         for plot in plts:
             if "FM-XZ" in plot.title:
                 print(f"Image {plot.dy}")
@@ -493,10 +493,10 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
 # ################################## RUN ######################################
 if __name__ == "__main__":
     beamline = NSTU_SCW()
-    scan = y_g_scan
-    plot_gen = y_g_scan_plots
+    scan = onept
+    plot_gen = onept_plots
     show = False
-    repeats = 5
+    repeats = 10
 
     if show:
         beamline.glow(

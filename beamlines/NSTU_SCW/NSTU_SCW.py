@@ -316,18 +316,20 @@ class NSTU_SCW(raycing.BeamLine):
         self.SuperCWiggler.eMax = 30050
         self.SuperCWiggler.eN = 101
 
+        # rs = 2060.0  # min xsize
+        rs = 2069.0  # equal xz size
         self.MonochromatorCr1.center = [0.0, 33000.0, 0.0]
         self.MonochromatorCr1.pitch = 2.252850
         self.MonochromatorCr1.alpha = np.radians(35.3)
-        self.MonochromatorCr1.Rm = 2060.0 * 6
-        self.MonochromatorCr1.Rs = -2060.0
+        self.MonochromatorCr1.Rm = rs * 6
+        self.MonochromatorCr1.Rs = -rs
 
         self.MonochromatorCr2.center = [0.0, 33189.355, 25.0]
         self.MonochromatorCr2.pitch = 2.120950
         self.MonochromatorCr2.alpha = np.radians(35.3)
         self.MonochromatorCr2.positionRoll = np.pi
-        self.MonochromatorCr2.Rm = 2060.0 * 6
-        self.MonochromatorCr2.Rs = -2060.0
+        self.MonochromatorCr2.Rm = rs * 6
+        self.MonochromatorCr2.Rs = -rs
 
         self.Cr1Monitor.center = [
             0.0,
@@ -340,7 +342,99 @@ class NSTU_SCW(raycing.BeamLine):
             L=croc_geometry_BSU["Be"]["L"],
             N=croc_geometry_BSU["Be"]["N"],
             d=croc_geometry_BSU["Be"]["y_t"],
-            g_f=1.587,
+            g_f=1.627,
+            g_l=0.0,
+        )
+
+        self.align_front_end(
+            dzprime=2.0
+            * croc_geometry_BSU["Be"]["y_t"]
+            / self.CrocLensStack[0].center[1]
+        )
+
+    def align_60_keV(self):
+        """
+        Assuming Rm / Rs = 6.
+        """
+        self.SuperCWiggler.xPrimeMax = 1.0
+        self.SuperCWiggler.zPrimeMax = 0.1
+        self.SuperCWiggler.eMin = 59800.0
+        self.SuperCWiggler.eMax = 60200.0
+        self.SuperCWiggler.eN = 101
+
+        # rs = 1024.0  # min xsize
+        rs = 1029.0  # equal xz size
+        self.MonochromatorCr1.center = [0.0, 33000.0, 0.0]
+        self.MonochromatorCr1.pitch = 2.219840
+        self.MonochromatorCr1.alpha = np.radians(35.3)
+        self.MonochromatorCr1.Rm = rs * 6
+        self.MonochromatorCr1.Rs = -rs
+
+        self.MonochromatorCr2.center = [0.0, 33378.803, 25.0]
+        self.MonochromatorCr2.pitch = 2.153939
+        self.MonochromatorCr2.alpha = np.radians(35.3)
+        self.MonochromatorCr2.positionRoll = np.pi
+        self.MonochromatorCr2.Rm = rs * 6
+        self.MonochromatorCr2.Rs = -rs
+
+        self.Cr1Monitor.center = [
+            0.0,
+            33189.402,
+            12.5,
+        ]
+
+        self.LensMaterial = mBeryllium
+        self.align_crl(
+            L=croc_geometry_BSU["Be"]["L"],
+            N=croc_geometry_BSU["Be"]["N"],
+            d=croc_geometry_BSU["Be"]["y_t"],
+            g_f=0.394,
+            g_l=0.0,
+        )
+
+        self.align_front_end(
+            dzprime=2.0
+            * croc_geometry_BSU["Be"]["y_t"]
+            / self.CrocLensStack[0].center[1]
+        )
+
+    def align_90_keV(self):
+        """
+        Assuming Rm / Rs = 6.
+        """
+        self.SuperCWiggler.xPrimeMax = 1.0
+        self.SuperCWiggler.zPrimeMax = 0.1
+        self.SuperCWiggler.eMin = 89500.0
+        self.SuperCWiggler.eMax = 90500.0
+        self.SuperCWiggler.eN = 101
+
+        rs = 682.7  # min xsize
+        # rs = 1029.0  # equal xz size
+        self.MonochromatorCr1.center = [0.0, 33000.0, 0.0]
+        self.MonochromatorCr1.pitch = 2.208832
+        self.MonochromatorCr1.alpha = np.radians(35.3)
+        self.MonochromatorCr1.Rm = rs * 6
+        self.MonochromatorCr1.Rs = -rs
+
+        self.MonochromatorCr2.center = [0.0, 33567.500, 25.0]
+        self.MonochromatorCr2.pitch = 2.164917
+        self.MonochromatorCr2.alpha = np.radians(35.3)
+        self.MonochromatorCr2.positionRoll = np.pi
+        self.MonochromatorCr2.Rm = rs * 6
+        self.MonochromatorCr2.Rs = -rs
+
+        self.Cr1Monitor.center = [
+            0.0,
+            33283.750,
+            12.5,
+        ]
+
+        self.LensMaterial = mBeryllium
+        self.align_crl(
+            L=croc_geometry_BSU["Be"]["L"],
+            N=croc_geometry_BSU["Be"]["N"],
+            d=croc_geometry_BSU["Be"]["y_t"],
+            g_f=0.394,
             g_l=0.0,
         )
 
