@@ -200,6 +200,8 @@ class NSTU_SCW(raycing.BeamLine):
     def set_filter_stacks(self):
         self.FilterEffectiveC = None
         self.FilterEffectiveSiC = None
+        del self.FilterStackC[:]
+        del self.FilterStackSiC[:]
 
         for ii in range(diamond_filter_N):
             self.FilterStackC.append(
@@ -434,51 +436,7 @@ class NSTU_SCW(raycing.BeamLine):
             L=croc_geometry_BSU["Be"]["L"],
             N=croc_geometry_BSU["Be"]["N"],
             d=croc_geometry_BSU["Be"]["y_t"],
-            g_f=0.394,
-            g_l=0.0,
-        )
-
-        self.align_front_end(
-            dzprime=2.0
-            * croc_geometry_BSU["Be"]["y_t"]
-            / self.CrocLensStack[0].center[1]
-        )
-
-    def align_30_keV_2(self):
-        """
-        Assuming Rm / Rs = 12. f croc = 8150
-        """
-        self.SuperCWiggler.xPrimeMax = 1.0
-        self.SuperCWiggler.zPrimeMax = 0.1
-        self.SuperCWiggler.eMin = 29950.0
-        self.SuperCWiggler.eMax = 30050
-        self.SuperCWiggler.eN = 101
-
-        self.MonochromatorCr1.center = [0.0, 33000.0, 0.0]
-        self.MonochromatorCr1.pitch = 2.252815
-        self.MonochromatorCr1.alpha = np.radians(35.3)
-        self.MonochromatorCr1.Rm = 2060.0 * 12
-        self.MonochromatorCr1.Rs = -2060.0
-
-        self.MonochromatorCr2.center = [0.0, 33189.355, 25.0]
-        self.MonochromatorCr2.pitch = 2.120988
-        self.MonochromatorCr2.alpha = np.radians(35.3)
-        self.MonochromatorCr2.positionRoll = np.pi
-        self.MonochromatorCr2.Rm = 2060.0 * 12
-        self.MonochromatorCr2.Rs = -2060.0
-
-        self.Cr1Monitor.center = [
-            0.0,
-            33094.678,
-            12.5,
-        ]
-
-        self.LensMaterial = mBeryllium
-        self.align_crl(
-            L=croc_geometry_BSU["Be"]["L"],
-            N=croc_geometry_BSU["Be"]["N"],
-            d=croc_geometry_BSU["Be"]["y_t"],
-            g_f=1.587,
+            g_f=0.144,
             g_l=0.0,
         )
 
@@ -554,7 +512,7 @@ def run_process(bl: NSTU_SCW):
             outDict["BeamFilterSiCLocal2a" + strl] = llocal2a
             beamIn = lglobal
 
-    # # CRL
+    # CRL
     for ilens, lens in enumerate(bl.CrocLensStack):
         lglobal, llocal1, llocal2 = lens.double_refract(beamIn, needLocal=True)
         strl = "_{0:02d}".format(ilens)
@@ -569,26 +527,26 @@ def run_process(bl: NSTU_SCW):
 
     beam_crl_exit = bl.CrlMonitor.expose(beam=beamIn)
 
-    # monochromator
-    beam_mono_c1_global, beam_mono_c1_local = bl.MonochromatorCr1.reflect(beam=beamIn)
+    # # monochromator
+    # beam_mono_c1_global, beam_mono_c1_local = bl.MonochromatorCr1.reflect(beam=beamIn)
 
-    beam_mon1 = bl.Cr1Monitor.expose(beam=beam_mono_c1_global)
+    # beam_mon1 = bl.Cr1Monitor.expose(beam=beam_mono_c1_global)
 
-    beam_mono_c2_global, beam_mono_c2_local = bl.MonochromatorCr2.reflect(
-        beam=beam_mono_c1_global
-    )
+    # beam_mono_c2_global, beam_mono_c2_local = bl.MonochromatorCr2.reflect(
+    #     beam=beam_mono_c1_global
+    # )
 
-    beam_mon2 = bl.ExitSlit.propagate(beam=beam_mono_c2_global)
+    # beam_mon2 = bl.ExitSlit.propagate(beam=beam_mono_c2_global)
 
-    outDict["BeamLensExitLocal"] = beam_crl_exit
-    outDict["BeamMonoC1Local"] = beam_mono_c1_local
-    outDict["BeamMonoC1Global"] = beam_mono_c1_global
-    outDict["BeamMonitor1Local"] = beam_mon1
-    outDict["BeamMonoC2Local"] = beam_mono_c2_local
-    outDict["BeamMonoC2Global"] = beam_mono_c2_global
-    outDict["BeamMonitor2Local"] = beam_mon2
+    # outDict["BeamLensExitLocal"] = beam_crl_exit
+    # outDict["BeamMonoC1Local"] = beam_mono_c1_local
+    # outDict["BeamMonoC1Global"] = beam_mono_c1_global
+    # outDict["BeamMonitor1Local"] = beam_mon1
+    # outDict["BeamMonoC2Local"] = beam_mono_c2_local
+    # outDict["BeamMonoC2Global"] = beam_mono_c2_global
+    # outDict["BeamMonitor2Local"] = beam_mon2
 
-    bl.prepare_flow()
+    # bl.prepare_flow()
 
     return outDict
 

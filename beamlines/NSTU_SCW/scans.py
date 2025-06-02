@@ -105,6 +105,7 @@ def onept(bl: NSTU_SCW, plts: List):
         # if "FM-XZ" in plot.title:
         #     plot.xaxis.limits = [-0.5, 0.5]
         #     plot.yaxis.limits = [-0.05 - 0.0644, 0.05 - 0.0644]
+
     yield
 
 
@@ -172,8 +173,8 @@ def y_g_scan(bl: NSTU_SCW, plts: List):
     70 keV, r1r2 = -870, focal = 12000
     90 keV, r1r2 = -670, focal = 12300
     """
-    en = 60.0e3
-    bl.align_60_keV()
+    en = 90.0e3
+    bl.align_90_keV()
     # r1, r2 = -670, -670
     # d_en = 1.0
     # bl.align_source(en, d_en)
@@ -182,7 +183,7 @@ def y_g_scan(bl: NSTU_SCW, plts: List):
     # bl.align_mono(en, r1, -6.0 * r1, r2, -6.0 * r2, c1_en_offset=90, c2_en_offset=-90)
     geom = croc_geometry_BSU["Be"]
     result = {"focal": [], "dz": []}
-    for focal in np.linspace(11000, 14000, 15):
+    for focal in np.linspace(9000, 14000, 15):
         y_g = PrismaticLens.calc_y_g(bl.LensMaterial, focal, en, geom["y_t"], geom["L"])
         bl.align_crl(L=geom["L"], N=geom["N"], d=geom["y_t"], g_f=y_g, g_l=0.0)
         bl.align_front_end(
@@ -456,47 +457,75 @@ def croc_scan(bl: NSTU_SCW, plts: List):
 #     )
 
 
+def absorbed_power_plots(*args, **kwargs):
+
+    extra_kwargs = {
+        r"fwhmFormatStr": "%.2e",
+        "bins": 256,
+        "ppb": 1,
+    }
+
+    x_kwds = {r"label": r"$x$", r"unit": r"mm", r"data": raycing.get_x, **extra_kwargs}
+    y_kwds = {r"label": r"$y$", r"unit": r"mm", r"data": raycing.get_y, **extra_kwargs}
+    z_kwds = {r"label": r"$z$", r"unit": r"mm", r"data": raycing.get_z, **extra_kwargs}
+
+    result = []
+    fmt1 = "BeamFilterCLocal2a_{0:02d}"
+    fmt2 = "BeamFilterSiCLocal2a_{0:02d}"
+    fmt3 = "BeamLensLocal2a_{0:02d}"
+    # beams = (
+    #     [fmt1.format(ii) for ii in range(5)]
+    #     + [fmt2.format(ii) for ii in range(5)]
+    #     + [fmt3.format(ii) for ii in range(5)]
+    # )
+
+    beams = [fmt3.format(ii) for ii in range(5)]
+
+    for beam in beams:
+        result.append(
+            xrtplot.XYCPlot(
+                beam=beam,
+                title=beam,
+                xaxis=xrtplot.XYCAxis(**x_kwds, limits=[-30, 30]),
+                yaxis=xrtplot.XYCAxis(**y_kwds, limits=[-1, 1]),
+                caxis=xrtplot.XYCAxis(label="Energy", limits=[100, 100000]),
+                aspect="auto",
+                fluxKind="power",
+            )
+        )
+    return result
+
+
 def absorbed_power(bl: NSTU_SCW, plts: List):
-    subdir = os.path.join(os.getenv("BASE_DIR", ""), "datasets", "nstu-scw-2")
-    scan_name = "absorbed_power"
-
-    if not os.path.exists(os.path.join(subdir, scan_name)):
-        os.mkdir(os.path.join(subdir, scan_name))
-
-    bl.align_source(50050, 999.0 / 1001.0)
-    bl.align_crl(croc_crl_L, int(croc_crl_L), croc_crl_y_t, 0.0, 0.0)
-    bl.align_mono(50e3, np.inf, np.inf, np.inf, np.inf)
-
-    for plot in plts:
-        if re.match(r"(C|SiC)[\d]+-XZ", plot.title):
-            print(plot.title)
-            plot.saveName = os.path.join(subdir, scan_name, "%s.png" % (plot.title,))
-            plot.persistentName = plot.saveName.replace(".png", ".pickle")
-
-    metadata = check_repo(bl._metadata)
-    with open(os.path.join(subdir, scan_name, "md.csv"), "w") as ff:
-        ff.write("\n".join("%s,%s" % (k, str(val)) for k, val in metadata.items()))
+    bl.set_filter_stacks()
+    bl.align_90_keV()
+    # bl.align_front_end()
+    bl.SuperCWiggler.eMin = 10.0
+    bl.SuperCWiggler.eMax = 100000.0
+    bl.SuperCWiggler.eN = 10001
+    print(bl.FilterEffectiveC, len(bl.FilterStackC))
+    print(bl.FilterEffectiveSiC, len(bl.FilterStackSiC))
     yield
 
-    for plot in plts:
-        if plot.persistentName is not None:
-            with open(plot.persistentName, "rb") as f:
-                f = pickle.load(f)
-                np.savetxt(
-                    plot.persistentName.replace(".pickle", ".txt"),
-                    pickle_to_table(f),
-                    delimiter=" ",
-                    header="""\"x (mm)\"	\"y (mm)\"	\"Filtered Power (W/mm<sup>2</sup>)\"""",
-                )
+    # for plot in plts:
+    #     if plot.persistentName is not None:
+    #         with open(plot.persistentName, "rb") as f:
+    #             f = pickle.load(f)
+    #             np.savetxt(
+    #                 plot.persistentName.replace(".pickle", ".txt"),
+    #                 pickle_to_table(f),
+    #                 delimiter=" ",
+    #                 header="""\"x (mm)\"	\"y (mm)\"	\"Filtered Power (W/mm<sup>2</sup>)\"""",
+    #             )
 
 
 # ################################## RUN ######################################
 if __name__ == "__main__":
     beamline = NSTU_SCW()
-    scan = onept
-    plot_gen = onept_plots
+    scan = absorbed_power
+    plot_gen = absorbed_power_plots
     show = False
-    repeats = 10
+    repeats = 2
 
     if show:
         beamline.glow(
