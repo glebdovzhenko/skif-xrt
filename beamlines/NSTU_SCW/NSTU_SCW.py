@@ -538,7 +538,7 @@ def run_process(bl: NSTU_SCW):
 
     # beam_mon2 = bl.ExitSlit.propagate(beam=beam_mono_c2_global)
 
-    # outDict["BeamLensExitLocal"] = beam_crl_exit
+    outDict["BeamLensExitLocal"] = beam_crl_exit
     # outDict["BeamMonoC1Local"] = beam_mono_c1_local
     # outDict["BeamMonoC1Global"] = beam_mono_c1_global
     # outDict["BeamMonitor1Local"] = beam_mon1

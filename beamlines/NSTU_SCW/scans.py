@@ -436,26 +436,6 @@ def croc_scan(bl: NSTU_SCW, plts: List):
 
 # ########################## ABSORBED POWER SCAN ##############################
 
-# for beam in [
-#     "BeamFilterCLocal2a_{0:02d}".format(ii) for ii in range(diamond_filter_N)
-# ] + ["BeamFilterSiCLocal2a_{0:02d}".format(ii) for ii in range(sic_filter_N)]:
-#     t1 = beam.replace("BeamFilter", "").replace("Local2a_", "")
-#     t2 = "XZ"
-#     plots.append(
-#         xrtplot.XYCPlot(
-#             beam=beam,
-#             title="-".join((t1, t2)),
-#             xaxis=xrtplot.XYCAxis(
-#                 limits=[-filter_size_x / 2, filter_size_x / 2], **x_kwds
-#             ),
-#             yaxis=xrtplot.XYCAxis(
-#                 limits=[-filter_size_z / 2, filter_size_z / 2], **y_kwds
-#             ),
-#             fluxKind="power",
-#             aspect="auto",
-#         )
-#     )
-
 
 def absorbed_power_plots(*args, **kwargs):
 
@@ -473,13 +453,11 @@ def absorbed_power_plots(*args, **kwargs):
     fmt1 = "BeamFilterCLocal2a_{0:02d}"
     fmt2 = "BeamFilterSiCLocal2a_{0:02d}"
     fmt3 = "BeamLensLocal2a_{0:02d}"
-    # beams = (
-    #     [fmt1.format(ii) for ii in range(5)]
-    #     + [fmt2.format(ii) for ii in range(5)]
-    #     + [fmt3.format(ii) for ii in range(5)]
-    # )
-
-    beams = [fmt3.format(ii) for ii in range(5)]
+    beams = (
+        [fmt1.format(ii) for ii in range(5)]
+        + [fmt2.format(ii) for ii in range(5)]
+        + [fmt3.format(ii) for ii in range(178)]
+    )
 
     for beam in beams:
         result.append(
@@ -488,7 +466,7 @@ def absorbed_power_plots(*args, **kwargs):
                 title=beam,
                 xaxis=xrtplot.XYCAxis(**x_kwds, limits=[-30, 30]),
                 yaxis=xrtplot.XYCAxis(**y_kwds, limits=[-1, 1]),
-                caxis=xrtplot.XYCAxis(label="Energy", limits=[100, 100000]),
+                caxis=xrtplot.XYCAxis(label="energy", unit="eV", limits=[0, 100000]),
                 aspect="auto",
                 fluxKind="power",
             )
@@ -500,23 +478,25 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
     bl.set_filter_stacks()
     bl.align_90_keV()
     # bl.align_front_end()
-    bl.SuperCWiggler.eMin = 10.0
+    bl.SuperCWiggler.eMin = 300.0
     bl.SuperCWiggler.eMax = 100000.0
     bl.SuperCWiggler.eN = 10001
-    print(bl.FilterEffectiveC, len(bl.FilterStackC))
-    print(bl.FilterEffectiveSiC, len(bl.FilterStackSiC))
     yield
 
-    # for plot in plts:
-    #     if plot.persistentName is not None:
-    #         with open(plot.persistentName, "rb") as f:
-    #             f = pickle.load(f)
-    #             np.savetxt(
-    #                 plot.persistentName.replace(".pickle", ".txt"),
-    #                 pickle_to_table(f),
-    #                 delimiter=" ",
-    #                 header="""\"x (mm)\"	\"y (mm)\"	\"Filtered Power (W/mm<sup>2</sup>)\"""",
-    #             )
+    # lens
+    for opt_el in ("BeamFilterCLocal2a", "BeamFilterSiCLocal2a", "BeamLensLocal2a"):
+        el_plots = [plot for plot in plts if opt_el in plot.title]
+        np.savetxt(
+            fname=f"{os.getenv("BASE_DIR")}/datasets/{opt_el}.txt",
+            X=np.array(
+                [
+                    [int(plot.title.replace(f"{opt_el}_", "")), plot.power]
+                    for plot in el_plots
+                ]
+            ),
+            delimiter=" ",
+            header="""\"Id\" \"Absorbed Power (W/mm<sup>2</sup>)\"""",
+        )
 
 
 # ################################## RUN ######################################
