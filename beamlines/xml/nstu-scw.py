@@ -2,7 +2,7 @@
 """
 
 __author__ = "Konstantin Klementiev", "Roman Chernikov"
-__date__ = "2025-04-19"
+__date__ = "2025-08-13"
 
 Created with xrtQook
 
@@ -13,7 +13,7 @@ Created with xrtQook
 
 import numpy as np
 import sys
-sys.path.append(r"/nix/store/zms2fc9xb0cgjnbixx3szmqnqwf480f5-python3.12-xrt-1.6.1/lib/python3.12/site-packages")
+sys.path.append(r"/nix/store/rywyrn2a3czklrlfzs1ly9f5sv7kyyjv-python3.12-xrt-1.6.1/lib/python3.12/site-packages")
 import xrt.backends.raycing.sources as rsources
 import xrt.backends.raycing.screens as rscreens
 import xrt.backends.raycing.materials as rmats
@@ -34,19 +34,10 @@ crystalSi01 = rmats.CrystalSi(
     volumetricDiffraction=True,
     useTT=True)
 
-powder01 = rmats.Powder(
-    chi=[0, 6.283185307179586],
-    hkl=[7, 7, 7],
-    a=5.256,
-    atoms=[58, 58, 58, 58, 8, 8, 8, 8, 8, 8, 8, 8],
-    atomsXYZ=[[0.0, 0.0, 0.0], [0.0, 0.5, 0.5], [0.5, 0.0, 0.5], [0.5, 0.5, 0.0], [0.25, 0.25, 0.25], [0.25, 0.75, 0.75], [0.75, 0.25, 0.75], [0.75, 0.75, 0.25], [0.75, 0.75, 0.75], [0.75, 0.25, 0.25], [0.25, 0.75, 0.25], [0.25, 0.25, 0.75]],
-    tK=297.15,
-    t=1)
-
 
 def build_beamline():
     beamLine = raycing.BeamLine(
-        alignE=60000.0)
+        alignE=90000.0)
 
     beamLine.wiggler01 = rsources.Wiggler(
         bl=beamLine,
@@ -61,8 +52,8 @@ def build_beamline():
         betaZ=2.29,
         xPrimeMax=1,
         zPrimeMax=0.1,
-        eMin=59500,
-        eMax=60500,
+        eMin=89150,
+        eMax=90850,
         eN=101,
         K=20.1685,
         period=48.0,
@@ -77,11 +68,11 @@ def build_beamline():
         bl=beamLine,
         name=None,
         center=[0, 33000, 0],
-        pitch=2.21984,
+        pitch=r"auto",
         material=crystalSi01,
         alpha=0.6161012259539983,
-        Rm=6144.0,
-        Rs=-1024,
+        Rm=100000000.0,
+        Rs=100000000.0,
         targetOpenCL=[2, 0])
 
     beamLine.screen02 = rscreens.Screen(
@@ -92,35 +83,19 @@ def build_beamline():
     beamLine.bentLaue2D02 = roes.BentLaue2D(
         bl=beamLine,
         name=None,
-        center=[0, 33378.803, 25],
-        pitch=2.153939,
+        center=[0, 33189.355, 25],
+        pitch=r"auto",
         positionRoll=3.141592653589793,
         material=crystalSi01,
         alpha=0.6161012259539983,
-        Rm=6144.0,
-        Rs=-1024,
+        Rm=100000000.0,
+        Rs=100000000.0,
         targetOpenCL=[2, 0])
-
-    beamLine.rectangularAperture01 = rapts.RectangularAperture(
-        bl=beamLine,
-        center=[0, 55990, 25],
-        opening=[-0.068, 0.068, -0.69, 0.69])
-
-    beamLine.lauePlate01 = roes.LauePlate(
-        bl=beamLine,
-        center=[0, 55000, 25],
-        pitch=1.5707963267948966,
-        material=powder01,
-        targetOpenCL=[0, 0],
-        precisionOpenCL=r"float32")
-
-    beamLine.roundBeamStop01 = rapts.RoundBeamStop(
-        bl=beamLine,
-        center=[0, 56499, 25])
 
     beamLine.screen03 = rscreens.Screen(
         bl=beamLine,
-        center=[0, 56500, 25])
+        name=None,
+        center=[0, 56000, 25])
 
     return beamLine
 
@@ -140,17 +115,8 @@ def run_process(beamLine):
     bentLaue2D02beamGlobal01, bentLaue2D02beamLocal01 = beamLine.bentLaue2D02.reflect(
         beam=bentLaue2D01beamGlobal01)
 
-    rectangularAperture01beamLocal01 = beamLine.rectangularAperture01.propagate(
-        beam=bentLaue2D02beamGlobal01)
-
-    lauePlate01beamGlobal01, lauePlate01beamLocal01 = beamLine.lauePlate01.reflect(
-        beam=bentLaue2D02beamGlobal01)
-
-    roundBeamStop01beamLocal01 = beamLine.roundBeamStop01.propagate(
-        beam=lauePlate01beamGlobal01)
-
     screen03beamLocal01 = beamLine.screen03.expose(
-        beam=lauePlate01beamGlobal01)
+        beam=bentLaue2D02beamGlobal01)
 
     outDict = {
         'wiggler01beamGlobal01': wiggler01beamGlobal01,
@@ -160,10 +126,6 @@ def run_process(beamLine):
         'screen02beamLocal01': screen02beamLocal01,
         'bentLaue2D02beamGlobal01': bentLaue2D02beamGlobal01,
         'bentLaue2D02beamLocal01': bentLaue2D02beamLocal01,
-        'rectangularAperture01beamLocal01': rectangularAperture01beamLocal01,
-        'lauePlate01beamGlobal01': lauePlate01beamGlobal01,
-        'lauePlate01beamLocal01': lauePlate01beamLocal01,
-        'roundBeamStop01beamLocal01': roundBeamStop01beamLocal01,
         'screen03beamLocal01': screen03beamLocal01}
     return outDict
 
@@ -227,7 +189,7 @@ def define_plots():
     plots.append(plot03)
 
     plot04 = xrtplot.XYCPlot(
-        beam=r"rectangularAperture01beamLocal01",
+        beam=r"screen03beamLocal01",
         xaxis=xrtplot.XYCAxis(
             label=r"x",
             bins=512,
@@ -246,27 +208,6 @@ def define_plots():
         aspect=r"auto",
         title=r"EXIT")
     plots.append(plot04)
-
-    plot05 = xrtplot.XYCPlot(
-        beam=r"screen03beamLocal01",
-        xaxis=xrtplot.XYCAxis(
-            label=r"x",
-            limits=[-100, 100],
-            bins=1000,
-            ppb=1),
-        yaxis=xrtplot.XYCAxis(
-            label=r"z",
-            limits=[-100, 100],
-            bins=1000,
-            ppb=1),
-        caxis=xrtplot.XYCAxis(
-            label=r"energy",
-            unit=r"eV",
-            bins=256,
-            ppb=1),
-        title=r"DETECTOR",
-        persistentName=r"sagittal_f_60keV_detector.npy")
-    plots.append(plot05)
     return plots
 
 
@@ -278,7 +219,7 @@ def main():
     plots = define_plots()
     xrtrun.run_ray_tracing(
         plots=plots,
-        repeats=1000,
+        repeats=10,
         backend=r"raycing",
         beamLine=beamLine)
 

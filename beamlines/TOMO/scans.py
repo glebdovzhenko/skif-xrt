@@ -58,22 +58,55 @@ def onept_plots(*args, **kwargs):
             z_kwds,
         ),
     ):
-        result.append(
-            xrtplot.XYCPlot(
-                beam=beam,
-                title=t1,
-                xaxis=xrtplot.XYCAxis(**x_kwds),
-                yaxis=xrtplot.XYCAxis(**y_k),
-                caxis=xrtplot.XYCAxis(**e_kwds),
-                aspect="auto",
+        if t1 == "Detector":
+            result.append(
+                xrtplot.XYCPlot(
+                    beam=beam,
+                    title=t1,
+                    xaxis=xrtplot.XYCAxis(
+                        **{
+                            r"label": r"$x$",
+                            r"unit": r"mm",
+                            r"data": raycing.get_x,
+                            r"fwhmFormatStr": "%.2e",
+                            "bins": 1600,
+                            "ppb": 1,
+                            "limits": [-80, 80],
+                        }
+                    ),
+                    yaxis=xrtplot.XYCAxis(
+                        **{
+                            r"label": r"$z$",
+                            r"unit": r"mm",
+                            r"data": raycing.get_z,
+                            r"fwhmFormatStr": "%.2e",
+                            "bins": 1600,
+                            "ppb": 1,
+                            "limits": [-80, 80],
+                        }
+                    ),
+                    caxis=xrtplot.XYCAxis(**e_kwds),
+                    aspect="equal",
+                )
             )
-        )
+        else:
+            result.append(
+                xrtplot.XYCPlot(
+                    beam=beam,
+                    title=t1,
+                    xaxis=xrtplot.XYCAxis(**x_kwds),
+                    yaxis=xrtplot.XYCAxis(**y_k),
+                    caxis=xrtplot.XYCAxis(**e_kwds),
+                    aspect="equal",
+                )
+            )
 
     return result
 
 
 def onept(bl: LABTOMO, plts: List):
     """"""
+    bl.set_mesh_sample()
     yield
 
 
@@ -83,7 +116,7 @@ if __name__ == "__main__":
     scan = onept
     plot_gen = onept_plots
     show = False
-    repeats = 2
+    repeats = 10
 
     if show:
         beamline.glow(

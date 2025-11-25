@@ -101,6 +101,108 @@ def onept(bl: SURFACE_VEIPS, plts: List):
     yield
 
 
+# ############################ ABSORPTION SCAN ################################
+def absorption_plots(*args, **kwargs):
+    """"""
+    result = []
+    for beam, t1, y_k in zip(
+        (
+            "BeamSourceGlobal",
+            "BeamFilter1Local2",
+            "BeamFilter2Local2",
+        ),
+        (
+            "SRC",
+            "Filter 1",
+            "Filter 2",
+        ),
+        (
+            z_kwds,
+            y_kwds,
+            y_kwds,
+        ),
+    ):
+        result.append(
+            xrtplot.XYCPlot(
+                beam=beam,
+                title=t1,
+                xaxis=xrtplot.XYCAxis(**x_kwds),
+                yaxis=xrtplot.XYCAxis(**y_k),
+                caxis=xrtplot.XYCAxis(**e_kwds),
+                aspect="auto",
+                fluxKind="power",
+            )
+        )
+
+    for ii in range(10):
+        result.append(
+            xrtplot.XYCPlot(
+                beam="BeamLensLocal2_{0:02d}".format(ii),
+                title="BeamLensLocal2_{0:02d}".format(ii),
+                xaxis=xrtplot.XYCAxis(**x_kwds),
+                yaxis=xrtplot.XYCAxis(**y_kwds),
+                caxis=xrtplot.XYCAxis(**e_kwds),
+                aspect="auto",
+                fluxKind="power",
+            )
+        )
+
+    result.append(
+        xrtplot.XYCPlot(
+            beam="BeamMonoLocal2",
+            title="BeamMonoLocal2",
+            xaxis=xrtplot.XYCAxis(**x_kwds),
+            yaxis=xrtplot.XYCAxis(**y_kwds),
+            caxis=xrtplot.XYCAxis(**e_kwds),
+            aspect="auto",
+            fluxKind="power",
+        )
+    )
+
+    return result
+
+
+def absorption(bl: SURFACE_VEIPS, plts: List):
+    """"""
+    bl.bm.eMin = 300
+    bl.bm.eMax = 60000
+    bl.bm.eN = 10001
+    bl.CrlFocusApt.opening = [-0.5, 0.5, -0.5, 0.5]
+    bl.CrlEntranceApt.opening = [-70, 70, -1.75, 1.75]
+
+    del bl.CrocLensStack[:]
+    bl.CrocLensStack = PrismaticLens.make_stack(
+        L=90 * 3,
+        N=30,  # 90 * 3,
+        d=1.2 * 3,
+        g_first=0.0,
+        g_last=0.0,
+        bl=bl,
+        center=[0.0, 21.0e3, 0],
+        material=rm.Be(kind="lens"),
+        limPhysX=[-70, 70],
+        limPhysY=[-5, 5],
+    )
+
+    for plot in plts:
+        if plot.title == "CRL Focus":
+            plot.xaxis.limits = None
+            plot.yaxis.limits = None
+            plot.caxis.limits = None
+        else:
+            plot.xaxis.limits = None
+            plot.yaxis.limits = None
+            plot.caxis.limits = None
+    yield
+
+    total_p = 0
+    for plot in plts:
+        if "BeamLensLocal2" in plot.title:
+            print(plot.power)
+            total_p += plot.power
+    print(total_p)
+
+
 # ################################## RUN ######################################
 if __name__ == "__main__":
     beamline = SURFACE_VEIPS()

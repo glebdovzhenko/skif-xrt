@@ -34,6 +34,15 @@ class LABTOMO(raycing.BeamLine):
             center=[0, -15, 0],
             energies=(57.9e3,),  # W target
             distE="lines",
+            distx="normal",
+            distz="normal",
+            dx=0.001,
+            dz=0.001,
+            distxprime="flat",
+            distzprime="flat",
+            dxprime=160 / 580,
+            dzprime=160 / 580,
+            nrays=1000000,
         )
 
         self.sample = roe.Plate(
@@ -46,6 +55,21 @@ class LABTOMO(raycing.BeamLine):
         )
 
         self.detector = rscreens.Screen(name="Detector", bl=self, center=[0, 580, 0])
+
+    def set_mesh_sample(self, mesh_d=3, mesh_t=0.1):
+        def lz1(x, y):
+            result = np.zeros_like(x)
+            result[x**2 + y**2 <= (mesh_d / 2) ** 2] = mesh_t / 2
+            return result
+
+        def lz2(x, y):
+            result = np.zeros_like(x)
+            result[x**2 + y**2 <= (mesh_d / 2) ** 2] = mesh_t / 2
+            return result
+
+        self.sample.local_z1 = lz1
+        self.sample.local_z2 = lz2
+        self.sample.t = 0.0
 
 
 # ############################# BEAM TOPOLOGY #################################

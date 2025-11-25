@@ -67,6 +67,7 @@ mGraphite = rm.Material("C", rho=2.15, kind="lens")
 mGlassyCarbon = rm.Material("C", rho=1.50, kind="lens")
 mDiamondF = rm.Material("C", rho=3.5, kind="lens")
 mSiC = rm.Material(("Si", "C"), quantities=(1, 1), rho=3.16, kind="lens")
+mSi = rm.Material("Si", rho=2.33, kind="lens")
 lens_material = mBeryllium
 
 
@@ -133,6 +134,22 @@ class NSTU_SCW(raycing.BeamLine):
             limOptY=monochromator_y_lim,
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
+        )
+
+        # has to be used INSTEAD of monochromator to calculate its absorption
+        self.MonoC1Absorber = roe.Plate(
+            name="Si Absorber plate",
+            bl=self,
+            center=[
+                0,
+                monochromator_distance,
+                0,
+            ],
+            pitch=np.pi / 2.0,
+            material=mSi,
+            t=monochromator_c1_thickness,
+            limPhysX=monochromator_x_lim,
+            limPhysY=monochromator_y_lim,
         )
 
         self.Cr1Monitor = rscreens.Screen(
@@ -333,6 +350,8 @@ class NSTU_SCW(raycing.BeamLine):
         self.MonochromatorCr2.Rm = rs * 6
         self.MonochromatorCr2.Rs = -rs
 
+        self.ExitSlit.center[2] = monochromator_z_offset + 0.2
+
         self.Cr1Monitor.center = [
             0.0,
             33094.678,
@@ -526,27 +545,37 @@ def run_process(bl: NSTU_SCW):
         beamIn = lglobal
 
     beam_crl_exit = bl.CrlMonitor.expose(beam=beamIn)
-
-    # # monochromator
-    # beam_mono_c1_global, beam_mono_c1_local = bl.MonochromatorCr1.reflect(beam=beamIn)
-
-    # beam_mon1 = bl.Cr1Monitor.expose(beam=beam_mono_c1_global)
-
-    # beam_mono_c2_global, beam_mono_c2_local = bl.MonochromatorCr2.reflect(
-    #     beam=beam_mono_c1_global
-    # )
-
-    # beam_mon2 = bl.ExitSlit.propagate(beam=beam_mono_c2_global)
-
     outDict["BeamLensExitLocal"] = beam_crl_exit
-    # outDict["BeamMonoC1Local"] = beam_mono_c1_local
-    # outDict["BeamMonoC1Global"] = beam_mono_c1_global
-    # outDict["BeamMonitor1Local"] = beam_mon1
-    # outDict["BeamMonoC2Local"] = beam_mono_c2_local
-    # outDict["BeamMonoC2Global"] = beam_mono_c2_global
-    # outDict["BeamMonitor2Local"] = beam_mon2
 
-    # bl.prepare_flow()
+    if False:
+        # absorption on C1 of monochromator
+        _, _, beam_mono_c1_local_2 = bl.MonoC1Absorber.double_refract(beam=beamIn)
+        beam_mono_c1_local_2a = raycing.sources.Beam(copyFrom=beam_mono_c1_local_2)
+        beam_mono_c1_local_2a.absorb_intensity(beamIn)
+
+        outDict["BeamMonoC1Locala"] = beam_mono_c1_local_2a
+    else:
+        # monochromator
+        beam_mono_c1_global, beam_mono_c1_local = bl.MonochromatorCr1.reflect(
+            beam=beamIn
+        )
+
+        beam_mon1 = bl.Cr1Monitor.expose(beam=beam_mono_c1_global)
+
+        beam_mono_c2_global, beam_mono_c2_local = bl.MonochromatorCr2.reflect(
+            beam=beam_mono_c1_global
+        )
+
+        beam_mon2 = bl.ExitSlit.propagate(beam=beam_mono_c2_global)
+
+        outDict["BeamMonoC1Local"] = beam_mono_c1_local
+        outDict["BeamMonoC1Global"] = beam_mono_c1_global
+        outDict["BeamMonitor1Local"] = beam_mon1
+        outDict["BeamMonoC2Local"] = beam_mono_c2_local
+        outDict["BeamMonoC2Global"] = beam_mono_c2_global
+        outDict["BeamMonitor2Local"] = beam_mon2
+
+    bl.prepare_flow()
 
     return outDict
 

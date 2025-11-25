@@ -44,8 +44,11 @@ class SURFACE_VEIPS(raycing.BeamLine):
     def __init__(self):
         raycing.BeamLine.__init__(self)
         self.name = "SURFACE VEIPS BRANCH"
-        self.alignE = 15000
+        self.alignE = 12400
 
+        r_k = ring_kwargs.copy()
+        r_k["betaX"] = 0.252
+        r_k["betaZ"] = 7.77
         self.bm = rsources.BendingMagnet(
             nrays=100000,
             name="Bending Magnet",
@@ -56,11 +59,29 @@ class SURFACE_VEIPS(raycing.BeamLine):
             xPrimeMax=2.50,
             zPrimeMax=2.0,
             B0=2.0,
-            **ring_kwargs,
+            **r_k,
         )
 
         self.SourceMonitor = rscreens.Screen(
-            bl=self, name="Source Monitor", center=[0.0, 1.0, 0.0]
+            bl=self, name="Source Monitor", center=[0.0, 20.0, 0.0]
+        )
+
+        self.Filter1 = roes.Plate(
+            bl=self,
+            name="Filter 1",
+            center=[0.0, 11000.0, 0.0],
+            pitch=np.pi / 2,
+            material=rm.Be(kind="lens"),
+            t=0.3,
+        )
+
+        self.Filter2 = roes.Plate(
+            bl=self,
+            name="Filter 2",
+            center=[0.0, 13000.0, 0.0],
+            pitch=np.pi / 2,
+            material=rm.Be(kind="lens"),
+            t=0.3,
         )
 
         self.CrlEntranceMonitor = rscreens.Screen(
@@ -108,6 +129,18 @@ class SURFACE_VEIPS(raycing.BeamLine):
             targetOpenCL=[2, 0],
         )
 
+        self.MonoAbsorber = roes.Plate(
+            name="Si Absorber Plate",
+            bl=self,
+            center=[r"auto", 24000, 0],
+            pitch=np.pi / 18,
+            roll=np.pi / 2,
+            material=rm.Si(kind="lens"),
+            t=1.0,
+            limPhysX=[-10, 10],
+            limPhysY=[-150, 150],
+        )
+
         self.CrlFocusApt = rapts.RectangularAperture(
             bl=self, name="BL Exit Aperture", center=[r"auto", 41.990e3, 0.0]
         )
@@ -122,27 +155,41 @@ def run_process(bl: SURFACE_VEIPS):
 
     beam_source = bl.sources[0].shine()
     beam_source_monitor = bl.SourceMonitor.expose(beam=beam_source)
-    beam_crl_entrance = bl.CrlEntranceMonitor.expose(beam=beam_source)
-    _ = bl.CrlEntranceApt.propagate(beam=beam_source)
+
+    beam_f1_global, beam_f1_local1, beam_f1_local2 = bl.Filter1.double_refract(
+        beam=beam_source, returnLocalAbsorbed=0
+    )
+
+    beam_f2_global, beam_f2_local1, beam_f2_local2 = bl.Filter2.double_refract(
+        beam=beam_f1_global, returnLocalAbsorbed=0
+    )
+
+    beam_crl_entrance = bl.CrlEntranceMonitor.expose(beam=beam_f2_global)
+    _ = bl.CrlEntranceApt.propagate(beam=beam_f2_global)
 
     outDict = {
         "BeamSourceGlobal": beam_source,
         "BeamSourceLocal": beam_source_monitor,
         "BeamCRLEntranceLocal": beam_crl_entrance,
+        "BeamFilter1Global": beam_f1_global,
+        "BeamFilter1Local1": beam_f1_local1,
+        "BeamFilter1Local2": beam_f1_local2,
+        "BeamFilter2Global": beam_f2_global,
+        "BeamFilter2Local1": beam_f2_local1,
+        "BeamFilter2Local2": beam_f2_local2,
     }
 
     # CRL
-    beamIn = beam_source
+    beamIn = beam_f2_global
     for ilens, lens in enumerate(bl.CrocLensStack):
-        lglobal, llocal1, llocal2 = lens.double_refract(beamIn, needLocal=True)
+        lglobal, llocal1, llocal2 = lens.double_refract(
+            beamIn, needLocal=True, returnLocalAbsorbed=0
+        )
         strl = "_{0:02d}".format(ilens)
         outDict["BeamLensGlobal" + strl] = lglobal
         outDict["BeamLensLocal1" + strl] = llocal1
         outDict["BeamLensLocal2" + strl] = llocal2
 
-        llocal2a = raycing.sources.Beam(copyFrom=llocal2)
-        llocal2a.absorb_intensity(beamIn)
-        outDict["BeamLensLocal2a" + strl] = llocal2a
         beamIn = lglobal
 
     beam_crl_exit = bl.CrlMonitor.expose(beam=beamIn)
@@ -150,15 +197,24 @@ def run_process(bl: SURFACE_VEIPS):
 
     outDict["BeamSplitterLocal"] = bl.Splitter.propagate(beam=beamIn)
 
-    beam_mono_global, beam_mono_local = bl.Mono.reflect(beam=beamIn)
-    outDict["BeamMonoGlobal"] = beam_mono_global
-    outDict["BeamMonoLocal"] = beam_mono_local
+    if False:
+        beam_mono_global, beam_mono_local, beam_mono_local2 = (
+            bl.MonoAbsorber.double_refract(beam=beamIn, returnLocalAbsorbed=0)
+        )
+        outDict["BeamMonoGlobal"] = beam_mono_global
+        outDict["BeamMonoLocal"] = beam_mono_local
+        outDict["BeamMonoLocal2"] = beam_mono_local2
 
-    beam_focus_apt = bl.CrlFocusApt.propagate(beam=beam_mono_global)
-    outDict["BeamFocusAptLocal"] = beam_focus_apt
+    else:
+        beam_mono_global, beam_mono_local = bl.Mono.reflect(beam=beamIn)
+        outDict["BeamMonoGlobal"] = beam_mono_global
+        outDict["BeamMonoLocal"] = beam_mono_local
 
-    beam_crl_focus = bl.CrlFocusMonitor.expose(beam=beam_mono_global)
-    outDict["BeamCRLFocusLocal"] = beam_crl_focus
+        beam_focus_apt = bl.CrlFocusApt.propagate(beam=beam_mono_global)
+        outDict["BeamFocusAptLocal"] = beam_focus_apt
+
+        beam_crl_focus = bl.CrlFocusMonitor.expose(beam=beam_mono_global)
+        outDict["BeamCRLFocusLocal"] = beam_crl_focus
 
     bl.prepare_flow()
     return outDict

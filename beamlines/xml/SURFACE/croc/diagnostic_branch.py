@@ -2,7 +2,7 @@
 """
 
 __author__ = "Konstantin Klementiev", "Roman Chernikov"
-__date__ = "2025-07-09"
+__date__ = "2025-08-04"
 
 Created with xrtQook
 
@@ -37,7 +37,7 @@ crystalSi01 = rmats.CrystalSi(
 
 def build_beamline():
     beamLine = raycing.BeamLine(
-        alignE=15000)
+        alignE=5000)
 
     beamLine.bendingMagnet01 = rsources.BendingMagnet(
         bl=beamLine,
@@ -53,8 +53,8 @@ def build_beamline():
         betaZ=7.77,
         xPrimeMax=2.5,
         zPrimeMax=2.0,
-        eMin=14975,
-        eMax=15025,
+        eMin=4990,
+        eMax=5010,
         B0=2)
 
     beamLine.screen01 = rscreens.Screen(
@@ -86,7 +86,7 @@ def build_beamline():
         name=None,
         center=[0, 21000, 0],
         material=be01,
-        focus=0.00867,
+        focus=0.0973,
         zmax=270,
         targetOpenCL=r"CPU",
         precisionOpenCL=r"float32")
@@ -95,25 +95,27 @@ def build_beamline():
         bl=beamLine,
         name=r"Splitter",
         center=[0, 22000, 0],
-        opening=[11, 55, -2, 2])
+        opening=[-55, -11, -2, 2])
 
-    beamLine.johannCylinder01 = roes.JohannCylinder(
+    beamLine.dcMwithSagittalFocusing01 = roes.DCMwithSagittalFocusing(
         bl=beamLine,
-        name=r"Monochromtaor",
+        name=r"Mono",
         center=[r"auto", 24000, 0],
-        pitch=r"auto",
-        roll=1.5707963267948966,
+        bragg=r"auto",
+        yaw=0.0015,
         material=crystalSi01,
-        limPhysX=[-2.0, 2.0],
-        limPhysY=[-150.0, 150.0],
-        Rm=159000,
+        material2=crystalSi01,
+        limPhysX=[-70, 70],
+        limPhysY=[-30, 30],
+        Rs=8135,
+        fixedOffset=25,
         targetOpenCL=r"CPU",
         precisionOpenCL=r"float32")
 
     beamLine.screen02 = rscreens.Screen(
         bl=beamLine,
         name=None,
-        center=[r"auto", 42000, 0])
+        center=[r"auto", 42000, 25])
 
     return beamLine
 
@@ -138,11 +140,11 @@ def run_process(beamLine):
     rectangularAperture01beamLocal01 = beamLine.rectangularAperture01.propagate(
         beam=parabolicCylinderFlatLens01beamGlobal01)
 
-    johannCylinder01beamGlobal01, johannCylinder01beamLocal01 = beamLine.johannCylinder01.reflect(
+    dcMwithSagittalFocusing01beamGlobal01, dcMwithSagittalFocusing01beamLocal101, dcMwithSagittalFocusing01beamLocal201 = beamLine.dcMwithSagittalFocusing01.double_reflect(
         beam=parabolicCylinderFlatLens01beamGlobal01)
 
     screen02beamLocal01 = beamLine.screen02.expose(
-        beam=johannCylinder01beamGlobal01)
+        beam=dcMwithSagittalFocusing01beamGlobal01)
 
     outDict = {
         'bendingMagnet01beamGlobal01': bendingMagnet01beamGlobal01,
@@ -157,8 +159,9 @@ def run_process(beamLine):
         'parabolicCylinderFlatLens01beamLocal101': parabolicCylinderFlatLens01beamLocal101,
         'parabolicCylinderFlatLens01beamLocal201': parabolicCylinderFlatLens01beamLocal201,
         'rectangularAperture01beamLocal01': rectangularAperture01beamLocal01,
-        'johannCylinder01beamGlobal01': johannCylinder01beamGlobal01,
-        'johannCylinder01beamLocal01': johannCylinder01beamLocal01,
+        'dcMwithSagittalFocusing01beamGlobal01': dcMwithSagittalFocusing01beamGlobal01,
+        'dcMwithSagittalFocusing01beamLocal101': dcMwithSagittalFocusing01beamLocal101,
+        'dcMwithSagittalFocusing01beamLocal201': dcMwithSagittalFocusing01beamLocal201,
         'screen02beamLocal01': screen02beamLocal01}
     return outDict
 
@@ -239,6 +242,50 @@ def define_plots():
     plots.append(plot03)
 
     plot04 = xrtplot.XYCPlot(
+        beam=r"dcMwithSagittalFocusing01beamLocal101",
+        xaxis=xrtplot.XYCAxis(
+            label=r"x",
+            bins=512,
+            ppb=1,
+            fwhmFormatStr=r"%.1e"),
+        yaxis=xrtplot.XYCAxis(
+            label=r"y",
+            bins=512,
+            ppb=1,
+            fwhmFormatStr=r"%.1e"),
+        caxis=xrtplot.XYCAxis(
+            label=r"energy",
+            unit=r"eV",
+            bins=512,
+            ppb=1,
+            fwhmFormatStr=r"%.1e"),
+        aspect=r"auto",
+        title=r"DCM C1")
+    plots.append(plot04)
+
+    plot05 = xrtplot.XYCPlot(
+        beam=r"dcMwithSagittalFocusing01beamLocal201",
+        xaxis=xrtplot.XYCAxis(
+            label=r"x",
+            bins=512,
+            ppb=1,
+            fwhmFormatStr=r"%.1e"),
+        yaxis=xrtplot.XYCAxis(
+            label=r"y",
+            bins=512,
+            ppb=1,
+            fwhmFormatStr=r"%.1e"),
+        caxis=xrtplot.XYCAxis(
+            label=r"energy",
+            unit=r"eV",
+            bins=512,
+            ppb=1,
+            fwhmFormatStr=r"%.1e"),
+        aspect=r"auto",
+        title=r"DCM C2")
+    plots.append(plot05)
+
+    plot06 = xrtplot.XYCPlot(
         beam=r"screen02beamLocal01",
         xaxis=xrtplot.XYCAxis(
             label=r"x",
@@ -258,29 +305,7 @@ def define_plots():
             fwhmFormatStr=r"%.1e"),
         aspect=r"auto",
         title=r"Sample")
-    plots.append(plot04)
-
-    plot05 = xrtplot.XYCPlot(
-        beam=r"johannCylinder01beamLocal01",
-        xaxis=xrtplot.XYCAxis(
-            label=r"x",
-            bins=512,
-            ppb=1,
-            fwhmFormatStr=r"%.1e"),
-        yaxis=xrtplot.XYCAxis(
-            label=r"y",
-            bins=512,
-            ppb=1,
-            fwhmFormatStr=r"%.1e"),
-        caxis=xrtplot.XYCAxis(
-            label=r"energy",
-            unit=r"eV",
-            bins=512,
-            ppb=1,
-            fwhmFormatStr=r"%.1e"),
-        aspect=r"auto",
-        title=r"Crystal Footprint")
-    plots.append(plot05)
+    plots.append(plot06)
     return plots
 
 

@@ -62,7 +62,7 @@
 	<properties type="prop">
 		<azimuth type="param">0.0</azimuth>
 		<height type="param">0.0</height>
-		<alignE type="param">15000</alignE>
+		<alignE type="param">10000</alignE>
 	</properties>
 	<_object type="object">xrt.backends.raycing.BeamLine</_object>
 	<bendingMagnet01 type="value">
@@ -85,8 +85,8 @@
 			<xPrimeMax type="param">2.50</xPrimeMax>
 			<zPrimeMax type="param">2.</zPrimeMax>
 			<distE type="param">eV</distE>
-			<eMin type="param">14975</eMin>
-			<eMax type="param">15025</eMax>
+			<eMin type="param">9990</eMin>
+			<eMax type="param">10010</eMax>
 			<B0 type="param">2</B0>
 			<rho type="param">None</rho>
 			<R0 type="param">None</R0>
@@ -246,7 +246,7 @@
 			<wedgeAngle type="param">0</wedgeAngle>
 			<alarmLevel type="param">None</alarmLevel>
 			<t type="param">0</t>
-			<focus type="param">0.00867</focus>
+			<focus type="param">0.019</focus>
 			<zmax type="param">270</zmax>
 			<nCRL type="param">1</nCRL>
 			<targetOpenCL type="param">CPU</targetOpenCL>
@@ -322,7 +322,7 @@
 			<gratingDensity type="param">None</gratingDensity>
 			<order type="param">None</order>
 			<shouldCheckCenter type="param">False</shouldCheckCenter>
-			<Rs type="param">2709</Rs>
+			<Rs type="param">4065</Rs>
 			<cryst1roll type="param">0</cryst1roll>
 			<cryst2roll type="param">0</cryst2roll>
 			<cryst2pitch type="param">0</cryst2pitch>
@@ -354,7 +354,7 @@
 	<screen02 type="value">
 		<properties type="prop">
 			<bl type="param">beamLine</bl>
-			<name type="param"></name>
+			<name type="param">None</name>
 			<center type="param">[auto, 42000, 25]</center>
 			<x type="param">auto</x>
 			<z type="param">auto</z>
@@ -805,7 +805,7 @@
 <run_ray_tracing type="prop">
 	<_object type="object">xrt.runner.run_ray_tracing</_object>
 	<plots type="param">plots</plots>
-	<repeats type="param">1</repeats>
+	<repeats type="param">5</repeats>
 	<updateEvery type="param">1</updateEvery>
 	<pickleEvery type="param">None</pickleEvery>
 	<energyRange type="param">None</energyRange>

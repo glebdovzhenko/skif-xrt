@@ -94,8 +94,10 @@ def onept(bl: NSTU_SCW, plts: List):
     """
 
     bl.set_effective_filters()
-    bl.align_90_keV()
+    bl.align_30_keV()
     bl.SuperCWiggler.nrays = 100000
+    bl.ExitSlit.opening = [-0.25, 0.25, -0.25, 0.25]
+    # bl.FilterEffectiveSiC = None
 
     for plot in plts:
         plot.xaxis.limits = None
@@ -454,9 +456,11 @@ def absorbed_power_plots(*args, **kwargs):
     fmt2 = "BeamFilterSiCLocal2a_{0:02d}"
     fmt3 = "BeamLensLocal2a_{0:02d}"
     beams = (
-        [fmt1.format(ii) for ii in range(5)]
-        + [fmt2.format(ii) for ii in range(5)]
+        []
+        # + [fmt1.format(ii) for ii in range(5)]
+        # + [fmt2.format(ii) for ii in range(5)]
         + [fmt3.format(ii) for ii in range(178)]
+        + ["BeamLensExitLocal", "BeamMonoC1Locala"]
     )
 
     for beam in beams:
@@ -465,7 +469,7 @@ def absorbed_power_plots(*args, **kwargs):
                 beam=beam,
                 title=beam,
                 xaxis=xrtplot.XYCAxis(**x_kwds, limits=[-30, 30]),
-                yaxis=xrtplot.XYCAxis(**y_kwds, limits=[-1, 1]),
+                yaxis=xrtplot.XYCAxis(**y_kwds),
                 caxis=xrtplot.XYCAxis(label="energy", unit="eV", limits=[0, 100000]),
                 aspect="auto",
                 fluxKind="power",
@@ -478,34 +482,52 @@ def absorbed_power(bl: NSTU_SCW, plts: List):
     bl.set_filter_stacks()
     bl.align_90_keV()
     # bl.align_front_end()
+    # del bl.CrocLensStack[:]
+    bl.align_crl(
+        L=croc_geometry_BSU["Be"]["L"],
+        N=croc_geometry_BSU["Be"]["N"],
+        d=croc_geometry_BSU["Be"]["y_t"],
+        g_f=0.0,
+        g_l=0.0,
+    )
+    del bl.FilterStackSiC[:]
+    # del bl.FilterStackC[:]
+
     bl.SuperCWiggler.eMin = 300.0
     bl.SuperCWiggler.eMax = 100000.0
     bl.SuperCWiggler.eN = 10001
     yield
 
     # lens
-    for opt_el in ("BeamFilterCLocal2a", "BeamFilterSiCLocal2a", "BeamLensLocal2a"):
+    bsu_tooth_surf = 73  # mm2
+    bsu_tooth_foot = 310 / 178  # mm
+    for opt_el in ("BeamLensLocal2a",):
         el_plots = [plot for plot in plts if opt_el in plot.title]
+        print("Total power", sum([plot.power for plot in el_plots]))
         np.savetxt(
-            fname=f"{os.getenv("BASE_DIR")}/datasets/{opt_el}.txt",
+            fname=f"{os.getenv("BASE_DIR")}/datasets/{opt_el}_no_SiC.txt",
             X=np.array(
                 [
-                    [int(plot.title.replace(f"{opt_el}_", "")), plot.power]
+                    [
+                        (int(plot.title.replace(f"{opt_el}_", "")) + 0.5)
+                        * bsu_tooth_foot,
+                        plot.power / bsu_tooth_surf,
+                    ]
                     for plot in el_plots
                 ]
             ),
             delimiter=" ",
-            header="""\"Id\" \"Absorbed Power (W/mm<sup>2</sup>)\"""",
+            header="""\"Distance along beam (mm)\" \"Absorbed Power (W/mm<sup>2</sup>)\"""",
         )
 
 
 # ################################## RUN ######################################
 if __name__ == "__main__":
     beamline = NSTU_SCW()
-    scan = absorbed_power
-    plot_gen = absorbed_power_plots
+    scan = onept
+    plot_gen = onept_plots
     show = False
-    repeats = 2
+    repeats = 10
 
     if show:
         beamline.glow(
